@@ -419,22 +419,208 @@
     100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
   }
 
-  /* ── SPINNING DRUM ── */
+  /* ══════════════════════════════════
+     SLOT MACHINE + DRUM PREVIEW
+  ══════════════════════════════════ */
+
+  /* preview mode selector */
+  .preview-mode-tabs {
+    display: flex; gap: 6px; margin-bottom: 14px;
+  }
+  .preview-tab {
+    flex: 1; padding: 8px 6px; border-radius: 10px; border: none;
+    font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit;
+    background: var(--bg-input); color: var(--text-secondary);
+    transition: all 0.2s;
+  }
+  .preview-tab.active {
+    background: var(--accent-purple); color: #fff;
+    box-shadow: 0 3px 12px rgba(88,86,214,0.4);
+  }
+
+  /* ── SLOT MACHINE ── */
+  .slot-machine {
+    border-radius: var(--radius-md);
+    overflow: hidden; position: relative;
+    background: linear-gradient(160deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.1);
+    margin-bottom: 14px;
+  }
+  .slot-top-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .slot-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: rgba(255,255,255,0.4);
+  }
+  .slot-lights {
+    display: flex; gap: 5px;
+  }
+  .slot-light {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #ff6b6b;
+    box-shadow: 0 0 6px #ff6b6b;
+    animation: lightBlink 1.4s ease infinite;
+  }
+  .slot-light:nth-child(2) { background: #ffd43b; box-shadow: 0 0 6px #ffd43b; animation-delay: 0.2s; }
+  .slot-light:nth-child(3) { background: #69db7c; box-shadow: 0 0 6px #69db7c; animation-delay: 0.4s; }
+  @keyframes lightBlink {
+    0%,100% { opacity: 1; } 50% { opacity: 0.2; }
+  }
+
+  /* reel window */
+  .slot-reels-wrap {
+    padding: 0 14px 14px; display: flex; gap: 8px;
+    position: relative;
+  }
+  .slot-reels-wrap::before,
+  .slot-reels-wrap::after {
+    content: ''; position: absolute; left: 14px; right: 14px; z-index: 5;
+    height: 30px; pointer-events: none;
+  }
+  .slot-reels-wrap::before {
+    top: 0;
+    background: linear-gradient(to bottom, rgba(15,52,96,0.95), transparent);
+  }
+  .slot-reels-wrap::after {
+    bottom: 14px;
+    background: linear-gradient(to top, rgba(15,52,96,0.95), transparent);
+  }
+  .slot-reel {
+    flex: 1; height: 120px; overflow: hidden;
+    border-radius: 10px; position: relative;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .slot-reel-inner {
+    display: flex; flex-direction: column; align-items: center;
+    transition: transform 0.12s linear;
+    will-change: transform;
+  }
+  .slot-reel-item {
+    height: 40px; width: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 700; color: #fff;
+    letter-spacing: -0.3px; padding: 0 4px; text-align: center;
+    flex-shrink: 0; line-height: 1.2;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .slot-reel-item.highlight {
+    color: #ffd43b;
+    text-shadow: 0 0 16px rgba(255,212,59,0.8);
+  }
+
+  /* win line overlay */
+  .slot-winline {
+    position: absolute; left: 14px; right: 14px; top: 50%; z-index: 10;
+    height: 42px; border-radius: 8px; pointer-events: none;
+    transform: translateY(-50%);
+    border: 2px solid rgba(255,212,59,0.6);
+    background: rgba(255,212,59,0.05);
+    box-shadow: 0 0 20px rgba(255,212,59,0.2), inset 0 0 20px rgba(255,212,59,0.05);
+  }
+
+  /* slot status */
+  .slot-status {
+    padding: 8px 14px 12px; text-align: center;
+  }
+  .slot-status-text {
+    font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 500;
+  }
+  .slot-status-text.spinning { color: #ffd43b; animation: statusPulse 0.6s ease infinite alternate; }
+  @keyframes statusPulse { from { opacity: 0.5; } to { opacity: 1; } }
+  .slot-status-text.won { color: #69db7c; font-size: 15px; font-weight: 700; }
+
+  /* ── DRUM MACHINE (enhanced) ── */
   .drum-container {
-    background: var(--bg-input); border-radius: var(--radius-md);
-    padding: 20px; text-align: center; margin-bottom: 14px;
-    border: 1px solid var(--border); overflow: hidden; position: relative;
-    min-height: 80px; display: flex; align-items: center; justify-content: center;
+    border-radius: var(--radius-md);
+    overflow: hidden; position: relative;
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06);
+    margin-bottom: 14px;
+  }
+  .drum-scanlines {
+    position: absolute; inset: 0; pointer-events: none; z-index: 2;
+    background: repeating-linear-gradient(
+      0deg, transparent, transparent 2px,
+      rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px
+    );
+  }
+  .drum-glow {
+    position: absolute; inset: 0; pointer-events: none; z-index: 1;
+    background: radial-gradient(ellipse at 50% 50%, rgba(88,86,214,0.15) 0%, transparent 70%);
+  }
+  .drum-inner {
+    position: relative; z-index: 3;
+    padding: 20px 16px 16px;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+  }
+  .drum-counter {
+    display: flex; gap: 8px; align-items: center;
+  }
+  .drum-digit-box {
+    width: 36px; height: 48px; border-radius: 8px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 800; color: #fff;
+    overflow: hidden; position: relative;
+  }
+  .drum-digit-box::after {
+    content: ''; position: absolute;
+    left: 0; right: 0; height: 1px; top: 50%;
+    background: rgba(255,255,255,0.15);
   }
   .drum-names {
-    font-size: 22px; font-weight: 700; color: var(--text-primary);
-    transition: all 0.1s; letter-spacing: -0.5px;
+    font-size: 28px; font-weight: 800; color: #fff;
+    letter-spacing: -0.5px; text-align: center;
+    text-shadow: 0 0 20px rgba(255,255,255,0.3);
+    min-height: 40px; display: flex; align-items: center; justify-content: center;
+    transition: all 0.06s;
   }
-  .drum-spinning { animation: drumSpin 0.08s linear infinite; }
-  @keyframes drumSpin {
-    0% { opacity: 1; transform: translateY(0); }
-    50% { opacity: 0.3; transform: translateY(-6px); }
-    100% { opacity: 1; transform: translateY(0); }
+  .drum-names.blur-spin {
+    filter: blur(3px);
+    animation: drumRoll 0.07s linear infinite;
+  }
+  @keyframes drumRoll {
+    0% { transform: translateY(-4px) scaleY(0.92); opacity: 0.7; }
+    50% { transform: translateY(4px) scaleY(1.06); opacity: 1; }
+    100% { transform: translateY(-4px) scaleY(0.92); opacity: 0.7; }
+  }
+  .drum-names.settle {
+    animation: settleIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+    filter: none;
+    color: #ffd43b;
+    text-shadow: 0 0 30px rgba(255,212,59,0.7);
+  }
+  @keyframes settleIn {
+    0% { transform: scale(1.3); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .drum-particles {
+    position: absolute; inset: 0; pointer-events: none; z-index: 4; overflow: hidden;
+  }
+  .drum-particle {
+    position: absolute; width: 4px; height: 4px; border-radius: 50%;
+    animation: particleFloat 1s ease-out both;
+  }
+  @keyframes particleFloat {
+    0% { transform: translate(0,0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+  }
+  .drum-progress {
+    width: 100%; height: 3px; border-radius: 2px;
+    background: rgba(255,255,255,0.08);
+    overflow: hidden;
+  }
+  .drum-progress-bar {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, #5856d6, #ff2d55, #ff9500);
+    border-radius: 2px;
+    transition: width 0.1s linear;
+    box-shadow: 0 0 8px rgba(255,45,85,0.5);
   }
 
   /* ── RESPONSIVE ── */
@@ -450,6 +636,36 @@
     .section { padding: 16px 0 0; }
     .draw-area { padding: 0; }
   }
+
+  /* ── NUMBER DRAW ── */
+  .num-ball {
+    width: 64px; height: 64px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 800; color: #fff;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.25);
+    animation: ballPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+    flex-shrink: 0;
+  }
+  @keyframes ballPop {
+    0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+  .num-ball.big {
+    width: 96px; height: 96px; font-size: 34px;
+  }
+  .num-history-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .num-history-row:last-child { border-bottom: none; }
+  .num-mini-ball {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+  }
+  .num-time { font-size: 11px; color: var(--text-tertiary); margin-left: auto; }
 
   .pb-safe { padding-bottom: env(safe-area-inset-bottom, 16px); }
   .spacer { height: 32px; }
@@ -469,7 +685,7 @@
 <!-- HERO -->
 <div class="hero">
   <div class="hero-label">當前抽籤工具</div>
-  <div class="hero-title" id="heroTitle">快速公平抽籤</div>
+  <div class="hero-title" id="heroTitle">抽獎幸運星</div>
   <div class="hero-sub" id="heroSub">支援多種模式・結果即時顯示</div>
   <div class="hero-stats">
     <div class="hero-stat">
@@ -485,15 +701,38 @@
       <div class="hero-stat-lbl">已抽次數</div>
     </div>
   </div>
+  <!-- 預覽模式切換 -->
+  <div style="
+    display:flex; gap:6px; margin-top:18px;
+    background:rgba(0,0,0,0.18); border-radius:14px; padding:4px;
+  ">
+    <button id="heroPtDrum" onclick="setPreviewMode('drum')" style="
+      flex:1; padding:10px 8px; border-radius:11px;
+      border:none; cursor:pointer; font-family:inherit;
+      font-size:13px; font-weight:700; letter-spacing:0.2px;
+      background:rgba(255,255,255,0.92); color:#5856d6;
+      box-shadow:0 2px 8px rgba(0,0,0,0.18);
+      transition:all 0.22s;
+    ">🥁 滾動鼓</button>
+    <button id="heroPtSlot" onclick="setPreviewMode('slot')" style="
+      flex:1; padding:10px 8px; border-radius:11px;
+      border:none; cursor:pointer; font-family:inherit;
+      font-size:13px; font-weight:600; letter-spacing:0.2px;
+      background:transparent; color:rgba(255,255,255,0.7);
+      box-shadow:none;
+      transition:all 0.22s;
+    ">🎰 老虎機</button>
+  </div>
 </div>
 
 <!-- TABS -->
 <div class="tabs-wrap">
   <div class="tabs">
-    <button class="tab-btn active" data-tab="setup">⚙️ 設定</button>
+    <button class="tab-btn active" data-tab="setup">📋 名單</button>
     <button class="tab-btn" data-tab="draw">🎯 抽籤</button>
+    <button class="tab-btn" data-tab="number">🔢 數字</button>
     <button class="tab-btn" data-tab="results">📊 結果</button>
-    <button class="tab-btn" data-tab="formula">🧮 公式</button>
+    <button class="tab-btn" data-tab="formula">⚙️ 設定</button>
   </div>
 </div>
 
@@ -513,30 +752,21 @@
         <span class="input-icon">🎪</span>
         <div class="input-field-wrap">
           <div class="input-label">活動名稱</div>
-          <input class="input-field" id="eventName" placeholder="例：年終抽獎大會" value="">
+          <input class="input-field" id="eventName" placeholder="請輸入活動名稱" value="抽獎幸運星">
         </div>
       </div>
       <div class="chips-row" id="eventChips">
-        <span class="chip" data-val="年終尾牙抽獎">年終尾牙抽獎</span>
-        <span class="chip" data-val="班級抽號碼">班級抽號碼</span>
-        <span class="chip" data-val="工作分配抽籤">工作分配抽籤</span>
-        <span class="chip" data-val="座位安排抽籤">座位安排抽籤</span>
-        <span class="chip" data-val="值日生抽籤">值日生抽籤</span>
-        <span class="chip" data-val="隊長選拔">隊長選拔</span>
+        <span class="chip" data-val="抽獎幸運星">抽獎幸運星</span>
+        <span class="chip" data-val="幸運大抽獎">幸運大抽獎</span>
+        <span class="chip" data-val="抽獎活動">抽獎活動</span>
+        <span class="chip" data-val="現場抽獎">現場抽獎</span>
       </div>
       <div class="input-row">
         <span class="input-icon">🏆</span>
         <div class="input-field-wrap">
-          <div class="input-label">獎項說明（選填）</div>
-          <input class="input-field" id="prizeName" placeholder="例：一等獎：AirPods Pro">
+          <div class="input-label">獎項說明</div>
+          <input class="input-field" id="prizeName" placeholder="請填寫獎項，例：一等獎 AirPods Pro">
         </div>
-      </div>
-      <div class="chips-row" id="prizeChips">
-        <span class="chip" data-val="一等獎：現金 $5,000">一等獎 $5,000</span>
-        <span class="chip" data-val="二等獎：禮品卡 $1,000">二等獎 $1,000</span>
-        <span class="chip" data-val="幸運獎：精美禮品">幸運獎禮品</span>
-        <span class="chip" data-val="特別獎：Apple Watch">Apple Watch</span>
-        <span class="chip" data-val="一等獎：AirPods Pro">AirPods Pro</span>
       </div>
     </div>
   </div>
@@ -601,7 +831,211 @@
 <!-- ═══════════ TAB: DRAW ═══════════ -->
 <div id="tab-draw" class="tab-content" style="display:none">
 
-  <!-- 抽出名額設定 -->
+  <!-- 抽籤預覽強化版 -->
+  <div class="section">
+    <div class="section-header"><span class="section-title">抽籤預覽</span></div>
+    <div class="card" style="padding:14px">
+
+      <!-- 模式切換 -->
+      <div class="preview-mode-tabs">
+        <button class="preview-tab active" id="ptDrum" onclick="setPreviewMode('drum')">🥁 滾動鼓</button>
+        <button class="preview-tab" id="ptSlot" onclick="setPreviewMode('slot')">🎰 老虎機</button>
+      </div>
+
+      <!-- ── 滾動鼓模式 ── -->
+      <div id="previewDrum">
+        <div class="drum-container">
+          <div class="drum-scanlines"></div>
+          <div class="drum-glow"></div>
+          <div class="drum-particles" id="drumParticles"></div>
+          <div class="drum-inner">
+            <div class="drum-names" id="drumDisplay">準備開始</div>
+            <div class="drum-progress"><div class="drum-progress-bar" id="drumProgress"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 老虎機模式 ── -->
+      <div id="previewSlot" style="display:none">
+        <div class="slot-machine">
+          <div class="slot-top-bar">
+            <div class="slot-label">Lucky Draw</div>
+            <div class="slot-lights">
+              <div class="slot-light"></div>
+              <div class="slot-light"></div>
+              <div class="slot-light"></div>
+            </div>
+          </div>
+          <div class="slot-reels-wrap">
+            <div class="slot-winline"></div>
+            <div class="slot-reel" id="reel0"><div class="slot-reel-inner" id="reelInner0"></div></div>
+            <div class="slot-reel" id="reel1"><div class="slot-reel-inner" id="reelInner1"></div></div>
+            <div class="slot-reel" id="reel2"><div class="slot-reel-inner" id="reelInner2"></div></div>
+          </div>
+          <div class="slot-status">
+            <div class="slot-status-text" id="slotStatus">拉下拉桿開始抽籤 🎰</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 抽籤按鈕 -->
+      <div class="draw-btn-wrap">
+        <div class="draw-pulse" id="drawPulse"></div>
+        <button class="btn btn-lg btn-full btn-purple" id="drawBtn" onclick="startDraw()">
+          🎯 開始抽籤
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /tab-draw -->
+
+<!-- ═══════════ TAB: NUMBER DRAW ═══════════ -->
+<div id="tab-number" class="tab-content" style="display:none">
+
+  <div class="section">
+    <div class="section-header"><span class="section-title">數字抽獎設定</span></div>
+    <div class="card">
+      <div class="config-grid">
+        <div class="config-cell">
+          <div class="config-cell-label">最小值</div>
+          <div class="config-cell-ctrl">
+            <button class="stepper-btn" onclick="stepNumRange('min',-1)">－</button>
+            <span class="stepper-val" id="numMin">1</span>
+            <button class="stepper-btn" onclick="stepNumRange('min',1)">＋</button>
+          </div>
+        </div>
+        <div class="config-cell">
+          <div class="config-cell-label">最大值</div>
+          <div class="config-cell-ctrl">
+            <button class="stepper-btn" onclick="stepNumRange('max',-1)">－</button>
+            <span class="stepper-val" id="numMax">100</span>
+            <button class="stepper-btn" onclick="stepNumRange('max',1)">＋</button>
+          </div>
+        </div>
+        <div class="config-cell">
+          <div class="config-cell-label">抽出個數</div>
+          <div class="config-cell-ctrl">
+            <button class="stepper-btn" onclick="stepNumCount(-1)">－</button>
+            <span class="stepper-val" id="numCount">1</span>
+            <button class="stepper-btn" onclick="stepNumCount(1)">＋</button>
+          </div>
+        </div>
+        <div class="config-cell">
+          <div class="config-cell-label">間隔步進</div>
+          <div class="config-cell-ctrl">
+            <button class="stepper-btn" onclick="stepNumStep(-1)">－</button>
+            <span class="stepper-val" id="numStep">1</span>
+            <button class="stepper-btn" onclick="stepNumStep(1)">＋</button>
+          </div>
+        </div>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">允許重複號碼</div>
+          <div class="toggle-sub">同一數字可重複抽出</div>
+        </div>
+        <button class="toggle" id="numRepeatToggle"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 數字顯示區 -->
+  <div class="section">
+    <div class="section-header"><span class="section-title">抽出號碼</span></div>
+    <div class="card" style="padding:16px">
+      <div id="numDisplay" style="
+        min-height:100px; display:flex; align-items:center; justify-content:center;
+        flex-wrap:wrap; gap:12px; padding:8px 0 16px;
+      ">
+        <div style="color:var(--text-tertiary); font-size:14px">按下按鈕開始數字抽獎</div>
+      </div>
+      <div class="draw-btn-wrap">
+        <button class="btn btn-lg btn-full btn-orange" id="numDrawBtn" onclick="startNumDraw()">
+          🔢 開始數字抽獎
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 快速範圍預設 -->
+  <div class="section">
+    <div class="section-header"><span class="section-title">快速範圍</span></div>
+    <div class="card">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:12px">
+        <button class="btn btn-sm btn-ghost btn-full" onclick="setNumPreset(1,10,1)">1 ~ 10</button>
+        <button class="btn btn-sm btn-ghost btn-full" onclick="setNumPreset(1,50,1)">1 ~ 50</button>
+        <button class="btn btn-sm btn-ghost btn-full" onclick="setNumPreset(1,100,1)">1 ~ 100</button>
+        <button class="btn btn-sm btn-ghost btn-full" onclick="setNumPreset(1,999,1)">1 ~ 999</button>
+        <button class="btn btn-sm btn-ghost btn-full" onclick="setNumPreset(0,9,1)">0 ~ 9 個位數</button>
+        <button class="btn btn-sm btn-ghost btn-full" onclick="setNumPreset(10,99,1)">10 ~ 99 雙位數</button>
+        <button class="btn btn-sm btn-ghost btn-full" onclick="setNumPreset(1,49,1)">1 ~ 49 樂透</button>
+        <button class="btn btn-sm btn-ghost btn-full" onclick="setNumPreset(1,360,10)">步進 10</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 數字歷史 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">抽號記錄</span>
+      <button class="section-action" onclick="clearNumHistory()">清除</button>
+    </div>
+    <div class="card" id="numHistoryList">
+      <div style="text-align:center;color:var(--text-tertiary);padding:20px;font-size:14px">尚無記錄</div>
+    </div>
+  </div>
+
+</div><!-- /tab-number -->
+
+<!-- ═══════════ TAB: RESULTS ═══════════ -->
+<div id="tab-results" class="tab-content" style="display:none">
+
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">本次結果</span>
+      <button class="section-action" onclick="clearHistory()">清除</button>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table class="draw-table">
+          <thead>
+            <tr>
+              <th>名次</th>
+              <th>姓名</th>
+              <th>獎項</th>
+              <th>時間</th>
+            </tr>
+          </thead>
+          <tbody id="resultsTable">
+            <tr><td colspan="4" style="text-align:center; color:var(--text-tertiary); padding:24px">尚無抽籤記錄</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="margin-top:16px">
+    <div class="section-header"><span class="section-title">歷史記錄</span></div>
+    <div class="card" id="historyList">
+      <div style="text-align:center; color:var(--text-tertiary); padding:24px; font-size:14px">尚無歷史記錄</div>
+    </div>
+  </div>
+
+  <div class="section" style="margin-top:16px">
+    <div style="display:flex; gap:10px; padding:4px 0">
+      <button class="btn btn-sm btn-ghost" style="flex:1" onclick="exportResults()">📤 匯出 CSV</button>
+      <button class="btn btn-sm btn-blue" style="flex:1" onclick="copyResults()">📋 複製結果</button>
+    </div>
+  </div>
+
+</div><!-- /tab-results -->
+
+<!-- ═══════════ TAB: SETTINGS ═══════════ -->
+<div id="tab-formula" class="tab-content" style="display:none">
+
+  <!-- 抽出設定 (moved here) -->
   <div class="section">
     <div class="section-header"><span class="section-title">抽出設定</span></div>
     <div class="card">
@@ -647,127 +1081,9 @@
     </div>
   </div>
 
-  <!-- 滾動鼓 -->
+  <!-- 中獎機率試算表 -->
   <div class="section">
-    <div class="section-header"><span class="section-title">抽籤預覽</span></div>
-    <div class="card" style="padding:16px">
-      <div class="drum-container">
-        <div class="drum-names" id="drumDisplay">準備好了嗎？</div>
-      </div>
-      <div class="draw-area" style="padding:0">
-        <div class="draw-btn-wrap">
-          <div class="draw-pulse" id="drawPulse"></div>
-          <button class="btn btn-lg btn-full btn-purple" id="drawBtn" onclick="startDraw()">
-            🎯 開始抽籤
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</div><!-- /tab-draw -->
-
-<!-- ═══════════ TAB: RESULTS ═══════════ -->
-<div id="tab-results" class="tab-content" style="display:none">
-
-  <div class="section">
-    <div class="section-header">
-      <span class="section-title">本次結果</span>
-      <button class="section-action" onclick="clearHistory()">清除</button>
-    </div>
-    <div class="card">
-      <div class="table-wrap">
-        <table class="draw-table">
-          <thead>
-            <tr>
-              <th>名次</th>
-              <th>姓名</th>
-              <th>獎項</th>
-              <th>時間</th>
-            </tr>
-          </thead>
-          <tbody id="resultsTable">
-            <tr><td colspan="4" style="text-align:center; color:var(--text-tertiary); padding:24px">尚無抽籤記錄</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <div class="section" style="margin-top:16px">
-    <div class="section-header"><span class="section-title">歷史記錄</span></div>
-    <div class="card" id="historyList">
-      <div style="text-align:center; color:var(--text-tertiary); padding:24px; font-size:14px">尚無歷史記錄</div>
-    </div>
-  </div>
-
-  <div class="section" style="margin-top:16px">
-    <div style="display:flex; gap:10px; padding:4px 0">
-      <button class="btn btn-sm btn-ghost" style="flex:1" onclick="exportResults()">📤 匯出 CSV</button>
-      <button class="btn btn-sm btn-blue" style="flex:1" onclick="copyResults()">📋 複製結果</button>
-    </div>
-  </div>
-
-</div><!-- /tab-results -->
-
-<!-- ═══════════ TAB: FORMULA ═══════════ -->
-<div id="tab-formula" class="tab-content" style="display:none">
-
-  <div class="section">
-    <div class="section-header"><span class="section-title">抽籤公式說明</span></div>
-    <div class="card" style="padding:16px; display:flex; flex-direction:column; gap:14px">
-
-      <div>
-        <div style="font-size:14px; font-weight:600; margin-bottom:8px; color:var(--text-primary)">① 完全隨機公式</div>
-        <div class="formula-block">
-<span class="formula-key">Math.random()</span> × N → floor<br>
-<span class="formula-comment">// N = 名單總人數</span><br>
-<span class="formula-key">index</span> = Math.floor(Math.random() × N)<br>
-<span class="formula-key">winner</span> = candidates[index]
-        </div>
-      </div>
-
-      <div>
-        <div style="font-size:14px; font-weight:600; margin-bottom:8px; color:var(--text-primary)">② Fisher-Yates 洗牌演算法</div>
-        <div class="formula-block">
-<span class="formula-comment">// 抽多人時保證不重複</span><br>
-for (i = N-1; i > 0; i--) {<br>
-  j = <span class="formula-key">floor(random × (i+1))</span><br>
-  [arr[i], arr[j]] = [arr[j], arr[i]]<br>
-}<br>
-winners = arr.slice(0, <span class="formula-key">K</span>)
-        </div>
-      </div>
-
-      <div>
-        <div style="font-size:14px; font-weight:600; margin-bottom:8px; color:var(--text-primary)">③ 加權機率公式</div>
-        <div class="formula-block">
-<span class="formula-comment">// w[i] = 個人權重</span><br>
-totalW = Σ w[i]<br>
-rand = <span class="formula-key">random × totalW</span><br>
-cumW = 0<br>
-for each candidate:<br>
-  cumW += w[i]<br>
-  if rand ≤ cumW → <span class="formula-key">selected!</span>
-        </div>
-      </div>
-
-      <div>
-        <div style="font-size:14px; font-weight:600; margin-bottom:8px; color:var(--text-primary)">④ 期望中獎率計算</div>
-        <div class="formula-block">
-P(中獎) = <span class="formula-key">K / N</span><br>
-<span class="formula-comment">// K = 抽出名額, N = 總人數</span><br><br>
-期望值 E = K × (1/N)<br>
-不中獎率 = <span class="formula-key">1 - (K/N)</span>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- 簡易計算表格 -->
-  <div class="section" style="margin-top:0">
-    <div class="section-header"><span class="section-title">中獎機率試算表</span></div>
+    <div class="section-header"><span class="section-title">中獎機率試算</span></div>
     <div class="card">
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:14px">
         <div>
@@ -785,6 +1101,36 @@ P(中獎) = <span class="formula-key">K / N</span><br>
           <div><div style="color:var(--text-secondary); font-size:11px; margin-bottom:3px">不中獎率</div><div id="resNot" style="font-size:20px; font-weight:700; color:var(--accent-pink)">90.0%</div></div>
           <div><div style="color:var(--text-secondary); font-size:11px; margin-bottom:3px">未中獎人數</div><div id="resRemain" style="font-size:18px; font-weight:600">9 人</div></div>
           <div><div style="color:var(--text-secondary); font-size:11px; margin-bottom:3px">期望組合數</div><div id="resComb" style="font-size:14px; font-weight:600; color:var(--text-secondary)">C(10,1) = 10</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 公式參考 (collapsed style) -->
+  <div class="section">
+    <div class="section-header"><span class="section-title">演算法參考</span></div>
+    <div class="card" style="padding:16px; display:flex; flex-direction:column; gap:14px">
+      <div>
+        <div style="font-size:13px; font-weight:600; margin-bottom:6px; color:var(--text-primary)">① 完全隨機</div>
+        <div class="formula-block">
+<span class="formula-key">index</span> = Math.floor(Math.random() × N)<br>
+<span class="formula-key">winner</span> = candidates[index]
+        </div>
+      </div>
+      <div>
+        <div style="font-size:13px; font-weight:600; margin-bottom:6px; color:var(--text-primary)">② Fisher-Yates 不重複洗牌</div>
+        <div class="formula-block">
+for (i = N-1; i > 0; i--) {<br>
+  j = <span class="formula-key">floor(random × (i+1))</span><br>
+  swap(arr[i], arr[j])<br>
+} → slice(0, K)
+        </div>
+      </div>
+      <div>
+        <div style="font-size:13px; font-weight:600; margin-bottom:6px; color:var(--text-primary)">③ 中獎率公式</div>
+        <div class="formula-block">
+P = <span class="formula-key">K / N</span>　<span class="formula-comment">（K=名額, N=總人數）</span><br>
+數字範圍：P = <span class="formula-key">1 / (Max−Min+1)</span>
         </div>
       </div>
     </div>
@@ -848,8 +1194,14 @@ let state = {
   history: [],
   rounds: 0,
   nameHistory: [],
-  eventName: '',
-  prizeName: ''
+  eventName: '抽獎幸運星',
+  prizeName: '',
+  numMin: 1,
+  numMax: 100,
+  numCount: 1,
+  numStep: 1,
+  numRepeat: false,
+  numHistory: []
 };
 
 const colors = ['#007aff','#5856d6','#ff2d55','#ff9500','#34c759','#5ac8fa','#af52de','#ff3b30'];
@@ -879,7 +1231,9 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.classList.add('active');
     document.getElementById('tab-' + btn.dataset.tab).style.display = 'block';
     if (btn.dataset.tab === 'results') renderResults();
-    if (btn.dataset.tab === 'formula') updateCalc();
+    if (btn.dataset.tab === 'formula') { updateCalc(); syncSettingsUI(); }
+    if (btn.dataset.tab === 'draw') { updateDrum(); if (previewMode==='slot') initSlot(); }
+    if (btn.dataset.tab === 'number') renderNumHistory();
   });
 });
 
@@ -948,7 +1302,7 @@ document.querySelectorAll('#prizeChips .chip').forEach(c => {
 });
 document.getElementById('eventName').addEventListener('input', e => { state.eventName = e.target.value; updateStats(); save(); });
 document.getElementById('prizeName').addEventListener('input', e => { state.prizeName = e.target.value; save(); });
-if (state.eventName) document.getElementById('eventName').value = state.eventName;
+document.getElementById('eventName').value = state.eventName || '抽獎幸運星';
 if (state.prizeName) document.getElementById('prizeName').value = state.prizeName;
 
 function updateNameHistory() {
@@ -1032,6 +1386,122 @@ function quickFill(type) {
   render();
 }
 
+// ── PREVIEW MODE ──
+let previewMode = 'drum'; // 'drum' | 'slot'
+function setPreviewMode(m) {
+  previewMode = m;
+  document.getElementById('previewDrum').style.display = m === 'drum' ? 'block' : 'none';
+  document.getElementById('previewSlot').style.display = m === 'slot' ? 'block' : 'none';
+  // sync tab buttons
+  const ptDrum = document.getElementById('ptDrum');
+  const ptSlot = document.getElementById('ptSlot');
+  if (ptDrum) ptDrum.classList.toggle('active', m === 'drum');
+  if (ptSlot) ptSlot.classList.toggle('active', m === 'slot');
+  // sync hero buttons
+  const hDrum = document.getElementById('heroPtDrum');
+  const hSlot = document.getElementById('heroPtSlot');
+  if (hDrum) {
+    hDrum.style.background = m === 'drum' ? 'rgba(255,255,255,0.92)' : 'transparent';
+    hDrum.style.color = m === 'drum' ? '#5856d6' : 'rgba(255,255,255,0.7)';
+    hDrum.style.fontWeight = m === 'drum' ? '700' : '600';
+    hDrum.style.boxShadow = m === 'drum' ? '0 2px 8px rgba(0,0,0,0.18)' : 'none';
+  }
+  if (hSlot) {
+    hSlot.style.background = m === 'slot' ? 'rgba(255,255,255,0.92)' : 'transparent';
+    hSlot.style.color = m === 'slot' ? '#5856d6' : 'rgba(255,255,255,0.7)';
+    hSlot.style.fontWeight = m === 'slot' ? '700' : '600';
+    hSlot.style.boxShadow = m === 'slot' ? '0 2px 8px rgba(0,0,0,0.18)' : 'none';
+  }
+  if (m === 'slot') initSlot();
+}
+
+// ── SLOT MACHINE ──
+const REEL_COUNT = 3;
+let slotRunning = false;
+
+function getReelPool() {
+  if (state.candidates.length === 0) return ['？','？','？','？','？'];
+  // pad to at least 8 items for smooth scroll
+  let pool = state.candidates.map(c => c.name);
+  while (pool.length < 8) pool = [...pool, ...pool];
+  return pool;
+}
+
+function initSlot() {
+  for (let r = 0; r < REEL_COUNT; r++) {
+    const inner = document.getElementById(`reelInner${r}`);
+    const pool = getReelPool();
+    inner.innerHTML = pool.map((n,i) => `<div class="slot-reel-item">${escHtml(n)}</div>`).join('');
+    // center on middle item
+    inner.style.transform = `translateY(-${40}px)`;
+  }
+}
+
+function spinReel(reelIdx, finalName, duration, onDone) {
+  const inner = document.getElementById(`reelInner${reelIdx}`);
+  if (!inner) return;
+  const pool = getReelPool();
+  // inject final name somewhere in the middle
+  const items = [...pool, ...pool, finalName, ...pool.slice(0,3)];
+  inner.innerHTML = items.map(n => `<div class="slot-reel-item">${escHtml(n)}</div>`).join('');
+  inner.style.transition = 'none';
+  inner.style.transform = 'translateY(0)';
+
+  const totalItems = items.length;
+  const targetIdx = items.length - 4; // finalName position
+  const targetY = -(targetIdx * 40) + 40; // center in 120px window
+
+  // fast scroll phase
+  let frame = 0;
+  const ITEM_H = 40;
+  const totalScroll = Math.abs(targetY);
+  const startTime = performance.now();
+
+  function animate(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    // ease-out curve
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const currentY = -(eased * totalScroll);
+    inner.style.transform = `translateY(${currentY}px)`;
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      inner.style.transform = `translateY(${targetY}px)`;
+      // highlight the winner
+      const winnerEls = inner.querySelectorAll('.slot-reel-item');
+      const winIdx = targetIdx;
+      winnerEls.forEach((el,i) => { if (i===winIdx) el.classList.add('highlight'); });
+      if (onDone) onDone();
+    }
+  }
+  requestAnimationFrame(animate);
+}
+
+// ── DRUM MACHINE ──
+function updateDrum() {
+  const el = document.getElementById('drumDisplay');
+  if (state.candidates.length === 0) { el.textContent = '請先新增參與者'; return; }
+  el.textContent = state.candidates[Math.floor(Math.random() * state.candidates.length)].name;
+}
+
+function spawnDrumParticles() {
+  const container = document.getElementById('drumParticles');
+  if (!container) return;
+  const cs = ['#ffd43b','#ff6b6b','#74c0fc','#69db7c','#f783ac','#a9e34b'];
+  for (let i=0; i<12; i++) {
+    const el = document.createElement('div');
+    el.className = 'drum-particle';
+    const angle = (i/12)*360;
+    const dist = 40 + Math.random()*60;
+    const dx = Math.cos(angle*Math.PI/180)*dist + 'px';
+    const dy = (-(20+Math.random()*60)) + 'px';
+    el.style.cssText = `left:50%;top:50%;background:${cs[i%cs.length]};--dx:${dx};--dy:${dy};animation-delay:${Math.random()*0.3}s;`;
+    container.appendChild(el);
+    setTimeout(()=>el.remove(), 1200);
+  }
+}
+
 // ── DRAW ──
 function startDraw() {
   if (state.candidates.length === 0) { alert('請先新增參與者！'); return; }
@@ -1039,23 +1509,63 @@ function startDraw() {
   btn.disabled = true;
   const maxWin = state.allowRepeat ? state.drawCount : Math.min(state.drawCount, state.candidates.length);
   const duration = (6 - state.spinSpeed) * 600 + 800;
-  const drum = document.getElementById('drumDisplay');
 
-  if (state.showAnim) {
-    drum.classList.add('drum-spinning');
+  if (!state.showAnim) { finishDraw(maxWin, btn); return; }
+
+  if (previewMode === 'slot') {
+    // ── SLOT ANIMATION ──
+    const statusEl = document.getElementById('slotStatus');
+    statusEl.className = 'slot-status-text spinning';
+    statusEl.textContent = '🎰 轉動中...';
+    btn.textContent = '⏳ 轉動中...';
+
+    // Pick winner first
+    let pool = [...state.candidates];
+    for (let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+    const winnerName = pool[0].name;
+
+    let done = 0;
+    for (let r = 0; r < REEL_COUNT; r++) {
+      const delay = r * 300;
+      const reelDur = duration + delay;
+      setTimeout(() => {
+        spinReel(r, winnerName, reelDur - delay, () => {
+          done++;
+          if (done === REEL_COUNT) {
+            statusEl.className = 'slot-status-text won';
+            statusEl.textContent = `🎉 ${winnerName} 中獎！`;
+            finishDraw(maxWin, btn);
+          }
+        });
+      }, delay);
+    }
+
+  } else {
+    // ── DRUM ANIMATION ──
+    const drum = document.getElementById('drumDisplay');
+    const progress = document.getElementById('drumProgress');
+    drum.classList.add('blur-spin');
+    drum.classList.remove('settle');
+    btn.textContent = '⏳ 抽籤中...';
+
     let t = 0;
     const interval = setInterval(() => {
       const rand = state.candidates[Math.floor(Math.random()*state.candidates.length)];
       drum.textContent = rand.name;
-      t += 80;
+      t += 60;
+      if (progress) progress.style.width = Math.min(t/duration*100,100)+'%';
       if (t >= duration) {
         clearInterval(interval);
-        drum.classList.remove('drum-spinning');
-        finishDraw(maxWin, btn);
+        drum.classList.remove('blur-spin');
+        setTimeout(() => {
+          drum.classList.add('settle');
+          spawnDrumParticles();
+          if (progress) progress.style.width = '100%';
+          finishDraw(maxWin, btn);
+          setTimeout(()=>{ if(progress) progress.style.width='0%'; }, 800);
+        }, 60);
       }
-    }, 80);
-  } else {
-    finishDraw(maxWin, btn);
+    }, 60);
   }
 }
 
@@ -1106,6 +1616,7 @@ function finishDraw(count, btn) {
   if (state.showConfetti) launchConfetti();
   showWinner(winners);
   btn.disabled = false;
+  btn.textContent = '🎯 開始抽籤';
 }
 
 // ── WINNER MODAL ──
@@ -1235,8 +1746,126 @@ function launchConfetti() {
   setTimeout(()=>container.innerHTML='', 5000);
 }
 
+// ── SYNC SETTINGS UI ──
+function syncSettingsUI() {
+  document.getElementById('drawCount').textContent = state.drawCount;
+  document.getElementById('spinSpeed').textContent = state.spinSpeed;
+}
+
+// ── NUMBER DRAW STATE ──
+function stepNumRange(type, d) {
+  if (type==='min') {
+    state.numMin = Math.max(0, Math.min(state.numMax - state.numStep, state.numMin + d * state.numStep));
+  } else {
+    state.numMax = Math.max(state.numMin + state.numStep, Math.min(99999, state.numMax + d * state.numStep));
+  }
+  document.getElementById('numMin').textContent = state.numMin;
+  document.getElementById('numMax').textContent = state.numMax;
+  save();
+}
+function stepNumCount(d) {
+  state.numCount = Math.max(1, Math.min(20, state.numCount + d));
+  document.getElementById('numCount').textContent = state.numCount;
+  save();
+}
+function stepNumStep(d) {
+  state.numStep = Math.max(1, Math.min(100, state.numStep + d));
+  document.getElementById('numStep').textContent = state.numStep;
+  save();
+}
+function setNumPreset(min, max, step) {
+  state.numMin = min; state.numMax = max; state.numStep = step;
+  document.getElementById('numMin').textContent = min;
+  document.getElementById('numMax').textContent = max;
+  document.getElementById('numStep').textContent = step;
+  save();
+}
+// init num UI
+document.getElementById('numMin').textContent = state.numMin;
+document.getElementById('numMax').textContent = state.numMax;
+document.getElementById('numCount').textContent = state.numCount;
+document.getElementById('numStep').textContent = state.numStep;
+setupToggle('numRepeatToggle','numRepeat');
+
+function startNumDraw() {
+  const btn = document.getElementById('numDrawBtn');
+  btn.disabled = true;
+  const display = document.getElementById('numDisplay');
+
+  // Build pool from range with step
+  let pool = [];
+  for (let v = state.numMin; v <= state.numMax; v += state.numStep) pool.push(v);
+  if (pool.length === 0) { alert('範圍無效，請重新設定！'); btn.disabled=false; return; }
+
+  const count = Math.min(state.numCount, state.numRepeat ? state.numCount : pool.length);
+  let picked = [];
+
+  if (state.numRepeat) {
+    for (let i=0; i<count; i++) picked.push(pool[Math.floor(Math.random()*pool.length)]);
+  } else {
+    for (let i=pool.length-1; i>0; i--) {
+      const j=Math.floor(Math.random()*(i+1));
+      [pool[i],pool[j]]=[pool[j],pool[i]];
+    }
+    picked = pool.slice(0, count);
+  }
+
+  // Animate display
+  const numColors = ['#007aff','#5856d6','#ff2d55','#ff9500','#34c759','#af52de','#ff6b6b','#5ac8fa'];
+  if (state.showAnim) {
+    display.innerHTML = picked.map((_,i) => `<div class="num-ball${count===1?' big':''}" style="background:${numColors[i%numColors.length]};animation-delay:${i*0.12}s">?</div>`).join('');
+    let revealed = 0;
+    const ballEls = display.querySelectorAll('.num-ball');
+    picked.forEach((num, i) => {
+      setTimeout(() => {
+        ballEls[i].textContent = num;
+        ballEls[i].style.background = numColors[i % numColors.length];
+        revealed++;
+        if (revealed === picked.length) {
+          if (state.showConfetti) launchConfetti();
+          saveNumHistory(picked);
+          btn.disabled = false;
+        }
+      }, 400 + i * 300);
+    });
+  } else {
+    display.innerHTML = picked.map((n,i) => `<div class="num-ball${count===1?' big':''}" style="background:${numColors[i%numColors.length]}">${n}</div>`).join('');
+    if (state.showConfetti) launchConfetti();
+    saveNumHistory(picked);
+    btn.disabled = false;
+  }
+}
+
+function saveNumHistory(nums) {
+  state.numHistory.unshift({
+    nums, time: new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),
+    range: `${state.numMin}～${state.numMax}`
+  });
+  if (state.numHistory.length > 30) state.numHistory.pop();
+  save();
+  renderNumHistory();
+}
+
+function renderNumHistory() {
+  const el = document.getElementById('numHistoryList');
+  if (!el) return;
+  if (state.numHistory.length === 0) {
+    el.innerHTML = '<div style="text-align:center;color:var(--text-tertiary);padding:20px;font-size:14px">尚無記錄</div>';
+    return;
+  }
+  const numColors = ['#007aff','#5856d6','#ff2d55','#ff9500','#34c759','#af52de'];
+  el.innerHTML = state.numHistory.slice(0,15).map(h => `
+    <div class="num-history-row">
+      ${h.nums.map((n,i) => `<div class="num-mini-ball" style="background:${numColors[i%numColors.length]}">${n}</div>`).join('')}
+      <span style="font-size:12px;color:var(--text-secondary)">範圍 ${h.range}</span>
+      <span class="num-time">${h.time}</span>
+    </div>
+  `).join('');
+}
+function clearNumHistory() { state.numHistory=[]; save(); renderNumHistory(); }
+
 // ── UPDATE DRUM ON TAB ──
-document.querySelector('[data-tab="draw"]').addEventListener('click', updateDrum);
+
 </script>
 </body>
 </html>
