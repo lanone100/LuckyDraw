@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="zh-TW" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>幸運抽籤</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #f2f2f7;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #e5e5ea;
+    --bg-card: #ffffff;
+    --bg-input: #f2f2f7;
+    --text-primary: #1c1c1e;
+    --text-secondary: #6e6e73;
+    --text-tertiary: #aeaeb2;
+    --accent-blue: #007aff;
+    --accent-purple: #5856d6;
+    --accent-pink: #ff2d55;
+    --accent-orange: #ff9500;
+    --accent-green: #34c759;
+    --accent-teal: #5ac8fa;
+    --border: rgba(60,60,67,0.12);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.06);
+    --shadow-lg: 0 20px 60px rgba(0,0,0,0.12), 0 8px 20px rgba(0,0,0,0.08);
+    --radius-sm: 10px;
+    --radius-md: 16px;
+    --radius-lg: 22px;
+    --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --gradient-winner: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+    --modal-bg: rgba(0,0,0,0.45);
+    --backdrop: blur(20px) saturate(180%);
+  }
+
+  [data-theme="dark"] {
+    --bg-primary: #1c1c1e;
+    --bg-secondary: #2c2c2e;
+    --bg-tertiary: #3a3a3c;
+    --bg-card: #2c2c2e;
+    --bg-input: #3a3a3c;
+    --text-primary: #f5f5f7;
+    --text-secondary: #98989d;
+    --text-tertiary: #636366;
+    --border: rgba(255,255,255,0.10);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+    --shadow-lg: 0 20px 60px rgba(0,0,0,0.5);
+    --modal-bg: rgba(0,0,0,0.65);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    transition: background 0.35s ease, color 0.35s ease;
+    overflow-x: hidden;
+  }
+
+  /* ── TOP NAV ── */
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: var(--backdrop);
+    -webkit-backdrop-filter: var(--backdrop);
+    background: rgba(var(--bg-secondary-rgb, 255,255,255), 0.82);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  [data-theme="dark"] .topbar { background: rgba(28,28,30,0.82); }
+  .topbar-title { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
+  .topbar-actions { display: flex; gap: 8px; align-items: center; }
+
+  .icon-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: none; cursor: pointer;
+    background: var(--bg-input);
+    color: var(--accent-blue);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    transition: all 0.2s;
+    box-shadow: var(--shadow-sm);
+  }
+  .icon-btn:active { transform: scale(0.92); }
+
+  /* ── HERO ── */
+  .hero {
+    margin: 20px 16px 0;
+    border-radius: var(--radius-lg);
+    background: var(--gradient-1);
+    padding: 28px 24px 24px;
+    color: #fff;
+    position: relative; overflow: hidden;
+    box-shadow: var(--shadow-lg);
+  }
+  .hero::before {
+    content: '🎯';
+    position: absolute; right: 20px; top: 16px;
+    font-size: 64px; opacity: 0.18;
+    transform: rotate(-15deg);
+  }
+  .hero-label { font-size: 12px; font-weight: 500; letter-spacing: 1.2px; text-transform: uppercase; opacity: 0.75; margin-bottom: 6px; }
+  .hero-title { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; line-height: 1.2; }
+  .hero-sub { font-size: 14px; opacity: 0.80; margin-top: 6px; font-weight: 400; }
+  .hero-stats { display: flex; gap: 20px; margin-top: 18px; }
+  .hero-stat { text-align: center; }
+  .hero-stat-num { font-size: 26px; font-weight: 700; }
+  .hero-stat-lbl { font-size: 11px; opacity: 0.72; margin-top: 1px; }
+
+  /* ── TABS ── */
+  .tabs-wrap { padding: 16px 16px 0; }
+  .tabs {
+    display: flex; gap: 4px;
+    background: var(--bg-input);
+    border-radius: 12px; padding: 4px;
+  }
+  .tab-btn {
+    flex: 1; border: none; cursor: pointer;
+    padding: 8px 4px; border-radius: 9px;
+    font-size: 13px; font-weight: 500;
+    background: transparent; color: var(--text-secondary);
+    transition: all 0.25s; font-family: inherit;
+    white-space: nowrap;
+  }
+  .tab-btn.active {
+    background: var(--bg-card); color: var(--text-primary);
+    box-shadow: var(--shadow-sm); font-weight: 600;
+  }
+
+  /* ── SECTION ── */
+  .section { padding: 16px 16px 0; }
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .section-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.3px; text-transform: uppercase; }
+  .section-action { font-size: 14px; color: var(--accent-blue); font-weight: 500; cursor: pointer; border: none; background: none; font-family: inherit; }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  /* ── INPUT ROW ── */
+  .input-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .input-row:last-child { border-bottom: none; }
+  .input-icon { font-size: 18px; flex-shrink: 0; width: 24px; text-align: center; }
+  .input-field-wrap { flex: 1; position: relative; }
+  .input-label { font-size: 11px; color: var(--text-tertiary); margin-bottom: 2px; font-weight: 500; }
+  .input-field {
+    width: 100%; border: none; background: transparent;
+    font-size: 16px; color: var(--text-primary);
+    font-family: inherit; outline: none; padding: 0;
+    line-height: 1.4;
+  }
+  .input-field::placeholder { color: var(--text-tertiary); }
+
+  /* ── SUGGESTION CHIPS ── */
+  .chips-row {
+    display: flex; gap: 7px; flex-wrap: wrap;
+    padding: 10px 14px 12px;
+    background: var(--bg-input);
+    border-bottom: 1px solid var(--border);
+  }
+  .chip {
+    padding: 5px 12px; border-radius: 20px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    font-size: 12px; font-weight: 500; color: var(--accent-blue);
+    cursor: pointer; transition: all 0.18s; white-space: nowrap;
+    box-shadow: var(--shadow-sm);
+  }
+  .chip:active { transform: scale(0.94); background: var(--accent-blue); color: #fff; }
+
+  /* ── CANDIDATES LIST ── */
+  .candidates-list { display: flex; flex-direction: column; }
+  .candidate-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .candidate-item:last-child { border-bottom: none; }
+  .candidate-num {
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0;
+  }
+  .candidate-name { flex: 1; font-size: 15px; font-weight: 500; }
+  .candidate-tag { font-size: 11px; padding: 3px 8px; border-radius: 6px; background: var(--bg-input); color: var(--text-secondary); }
+  .candidate-del {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: none; background: rgba(255,45,85,0.12);
+    color: var(--accent-pink); font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.18s;
+  }
+  .candidate-del:active { transform: scale(0.88); background: var(--accent-pink); color: #fff; }
+
+  /* ── ADD FORM ── */
+  .add-form {
+    display: flex; gap: 8px; padding: 12px 14px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-input);
+  }
+  .add-input {
+    flex: 1; background: var(--bg-card); border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 9px 12px;
+    font-size: 15px; color: var(--text-primary);
+    font-family: inherit; outline: none;
+    transition: border-color 0.2s;
+  }
+  .add-input:focus { border-color: var(--accent-blue); }
+  .add-input::placeholder { color: var(--text-tertiary); }
+
+  /* ── BUTTONS ── */
+  .btn {
+    border: none; cursor: pointer; font-family: inherit;
+    border-radius: 12px; font-weight: 600;
+    transition: all 0.2s; display: inline-flex;
+    align-items: center; justify-content: center; gap: 6px;
+    white-space: nowrap;
+  }
+  .btn-sm { padding: 9px 16px; font-size: 14px; }
+  .btn-md { padding: 12px 20px; font-size: 16px; }
+  .btn-lg { padding: 16px 24px; font-size: 17px; border-radius: 16px; }
+  .btn-full { width: 100%; }
+  .btn-blue { background: var(--accent-blue); color: #fff; box-shadow: 0 4px 14px rgba(0,122,255,0.35); }
+  .btn-blue:active { transform: scale(0.97); box-shadow: 0 2px 6px rgba(0,122,255,0.25); }
+  .btn-purple { background: var(--accent-purple); color: #fff; box-shadow: 0 4px 14px rgba(88,86,214,0.35); }
+  .btn-purple:active { transform: scale(0.97); }
+  .btn-orange { background: var(--accent-orange); color: #fff; box-shadow: 0 4px 14px rgba(255,149,0,0.35); }
+  .btn-green { background: var(--accent-green); color: #fff; box-shadow: 0 4px 14px rgba(52,199,89,0.35); }
+  .btn-ghost { background: var(--bg-input); color: var(--text-primary); }
+  .btn-ghost:active { transform: scale(0.97); }
+  .btn-danger { background: rgba(255,45,85,0.12); color: var(--accent-pink); }
+
+  /* ── DRAW CONFIG ── */
+  .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
+  .config-cell {
+    background: var(--bg-card); padding: 14px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .config-cell-label { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+  .config-cell-ctrl { display: flex; align-items: center; gap: 8px; }
+  .stepper-btn {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: none; background: var(--accent-blue);
+    color: #fff; font-size: 16px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.18s; flex-shrink: 0;
+  }
+  .stepper-btn:active { transform: scale(0.88); }
+  .stepper-val { font-size: 20px; font-weight: 700; min-width: 28px; text-align: center; }
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 14px; border-bottom: 1px solid var(--border); }
+  .toggle-row:last-child { border-bottom: none; }
+  .toggle-label { font-size: 15px; font-weight: 500; }
+  .toggle-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .toggle {
+    width: 51px; height: 31px; border-radius: 16px;
+    background: var(--bg-tertiary); border: none; cursor: pointer;
+    position: relative; transition: background 0.25s; flex-shrink: 0;
+  }
+  .toggle.on { background: var(--accent-green); }
+  .toggle::after {
+    content: ''; position: absolute;
+    width: 27px; height: 27px; border-radius: 50%;
+    background: #fff; top: 2px; left: 2px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    transition: transform 0.25s;
+  }
+  .toggle.on::after { transform: translateX(20px); }
+
+  /* ── MODE SELECTOR ── */
+  .mode-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; padding: 14px; }
+  .mode-card {
+    border-radius: 12px; padding: 12px 8px;
+    text-align: center; cursor: pointer;
+    border: 2px solid var(--border);
+    background: var(--bg-input);
+    transition: all 0.2s;
+  }
+  .mode-card.selected { border-color: var(--accent-blue); background: rgba(0,122,255,0.08); }
+  .mode-icon { font-size: 24px; margin-bottom: 5px; }
+  .mode-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+  .mode-desc { font-size: 10px; color: var(--text-secondary); margin-top: 2px; }
+
+  /* ── TABLE VIEW ── */
+  .table-wrap { overflow-x: auto; }
+  .draw-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 14px;
+  }
+  .draw-table th {
+    padding: 10px 12px; text-align: left;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+    text-transform: uppercase; color: var(--text-secondary);
+    background: var(--bg-input); border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .draw-table td {
+    padding: 12px 12px; border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .draw-table tr:last-child td { border-bottom: none; }
+  .draw-table tr:hover td { background: var(--bg-input); }
+  .rank-badge {
+    display: inline-flex; width: 24px; height: 24px; border-radius: 50%;
+    align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #fff;
+  }
+
+  /* ── FORMULA CARD ── */
+  .formula-block {
+    background: var(--bg-input); border-radius: var(--radius-sm);
+    padding: 14px; font-family: 'Courier New', monospace;
+    font-size: 13px; color: var(--text-secondary);
+    border-left: 3px solid var(--accent-blue);
+    overflow-x: auto;
+  }
+  .formula-key { color: var(--accent-blue); font-weight: 700; }
+  .formula-comment { color: var(--text-tertiary); }
+
+  /* ── DRAW BUTTON AREA ── */
+  .draw-area { padding: 16px; }
+  .draw-btn-wrap { position: relative; }
+  .draw-pulse {
+    position: absolute; inset: -6px; border-radius: 22px;
+    background: var(--gradient-1); opacity: 0; z-index: -1;
+    animation: pulse-ring 2.5s ease infinite;
+  }
+  @keyframes pulse-ring {
+    0% { transform: scale(1); opacity: 0.5; }
+    100% { transform: scale(1.12); opacity: 0; }
+  }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 500;
+    background: var(--modal-bg);
+    backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--bg-card); border-radius: var(--radius-lg);
+    width: 100%; max-width: 360px;
+    box-shadow: var(--shadow-lg);
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    overflow: hidden;
+  }
+  .modal-overlay.show .modal { transform: scale(1) translateY(0); }
+  .modal-header {
+    padding: 20px 20px 0;
+    text-align: center;
+  }
+  .modal-emoji { font-size: 56px; margin-bottom: 8px; display: block;
+    animation: bounceIn 0.6s 0.2s both; }
+  @keyframes bounceIn {
+    0% { transform: scale(0); }
+    60% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+  .modal-title { font-size: 22px; font-weight: 700; letter-spacing: -0.4px; }
+  .modal-sub { font-size: 14px; color: var(--text-secondary); margin-top: 4px; }
+  .winners-list { padding: 16px 20px; display: flex; flex-direction: column; gap: 8px; }
+  .winner-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; border-radius: 12px;
+    background: var(--gradient-winner);
+    box-shadow: 0 4px 12px rgba(253,160,133,0.3);
+    animation: slideIn 0.4s ease both;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .winner-rank { font-size: 20px; font-weight: 800; color: rgba(0,0,0,0.45); min-width: 32px; }
+  .winner-name { font-size: 18px; font-weight: 700; color: #3d1c00; flex: 1; }
+  .winner-prize { font-size: 12px; font-weight: 600; color: #8a4000; background: rgba(255,255,255,0.4); padding: 3px 8px; border-radius: 6px; }
+  .modal-actions { display: flex; gap: 10px; padding: 0 20px 20px; margin-top: 4px; }
+
+  /* ── HISTORY ── */
+  .history-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 14px; border-bottom: 1px solid var(--border);
+  }
+  .history-item:last-child { border-bottom: none; }
+  .history-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent-blue); margin-top: 5px; flex-shrink: 0; }
+  .history-info { flex: 1; }
+  .history-name { font-size: 15px; font-weight: 600; }
+  .history-meta { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .history-time { font-size: 12px; color: var(--text-tertiary); }
+
+  /* ── CONFETTI ── */
+  .confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 999; overflow: hidden; }
+  .confetti-piece {
+    position: absolute; width: 10px; height: 10px; border-radius: 2px;
+    animation: confettiFall 3s ease-in both;
+  }
+  @keyframes confettiFall {
+    0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* ── SPINNING DRUM ── */
+  .drum-container {
+    background: var(--bg-input); border-radius: var(--radius-md);
+    padding: 20px; text-align: center; margin-bottom: 14px;
+    border: 1px solid var(--border); overflow: hidden; position: relative;
+    min-height: 80px; display: flex; align-items: center; justify-content: center;
+  }
+  .drum-names {
+    font-size: 22px; font-weight: 700; color: var(--text-primary);
+    transition: all 0.1s; letter-spacing: -0.5px;
+  }
+  .drum-spinning { animation: drumSpin 0.08s linear infinite; }
+  @keyframes drumSpin {
+    0% { opacity: 1; transform: translateY(0); }
+    50% { opacity: 0.3; transform: translateY(-6px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 430px) {
+    .hero-title { font-size: 24px; }
+    .hero-stat-num { font-size: 22px; }
+    .modal { max-width: 100%; }
+  }
+  @media (min-width: 768px) {
+    .main-grid { display: grid; grid-template-columns: 380px 1fr; gap: 20px; align-items: start; max-width: 860px; margin: 0 auto; padding: 0 20px; }
+    .hero { margin: 20px 20px 0; }
+    .tabs-wrap { padding: 16px 20px 0; }
+    .section { padding: 16px 0 0; }
+    .draw-area { padding: 0; }
+  }
+
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom, 16px); }
+  .spacer { height: 32px; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="topbar-title">🎲 幸運抽籤</div>
+  <div class="topbar-actions">
+    <button class="icon-btn" id="themeToggle" title="切換主題">☀️</button>
+    <button class="icon-btn" id="resetAll" title="重置全部">🗑</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-label">當前抽籤工具</div>
+  <div class="hero-title" id="heroTitle">快速公平抽籤</div>
+  <div class="hero-sub" id="heroSub">支援多種模式・結果即時顯示</div>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-num" id="statTotal">0</div>
+      <div class="hero-stat-lbl">參與人數</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num" id="statWin">1</div>
+      <div class="hero-stat-lbl">抽出名額</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num" id="statRounds">0</div>
+      <div class="hero-stat-lbl">已抽次數</div>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="setup">⚙️ 設定</button>
+    <button class="tab-btn" data-tab="draw">🎯 抽籤</button>
+    <button class="tab-btn" data-tab="results">📊 結果</button>
+    <button class="tab-btn" data-tab="formula">🧮 公式</button>
+  </div>
+</div>
+
+<div class="main-grid-wrapper">
+<div class="main-grid" id="mainGrid">
+
+<!-- ═══════════ TAB: SETUP ═══════════ -->
+<div id="tab-setup" class="tab-content">
+
+  <!-- 活動名稱 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">活動資訊</span>
+    </div>
+    <div class="card">
+      <div class="input-row">
+        <span class="input-icon">🎪</span>
+        <div class="input-field-wrap">
+          <div class="input-label">活動名稱</div>
+          <input class="input-field" id="eventName" placeholder="例：年終抽獎大會" value="">
+        </div>
+      </div>
+      <div class="chips-row" id="eventChips">
+        <span class="chip" data-val="年終尾牙抽獎">年終尾牙抽獎</span>
+        <span class="chip" data-val="班級抽號碼">班級抽號碼</span>
+        <span class="chip" data-val="工作分配抽籤">工作分配抽籤</span>
+        <span class="chip" data-val="座位安排抽籤">座位安排抽籤</span>
+        <span class="chip" data-val="值日生抽籤">值日生抽籤</span>
+        <span class="chip" data-val="隊長選拔">隊長選拔</span>
+      </div>
+      <div class="input-row">
+        <span class="input-icon">🏆</span>
+        <div class="input-field-wrap">
+          <div class="input-label">獎項說明（選填）</div>
+          <input class="input-field" id="prizeName" placeholder="例：一等獎：AirPods Pro">
+        </div>
+      </div>
+      <div class="chips-row" id="prizeChips">
+        <span class="chip" data-val="一等獎：現金 $5,000">一等獎 $5,000</span>
+        <span class="chip" data-val="二等獎：禮品卡 $1,000">二等獎 $1,000</span>
+        <span class="chip" data-val="幸運獎：精美禮品">幸運獎禮品</span>
+        <span class="chip" data-val="特別獎：Apple Watch">Apple Watch</span>
+        <span class="chip" data-val="一等獎：AirPods Pro">AirPods Pro</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 抽籤模式 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">抽籤模式</span>
+    </div>
+    <div class="card">
+      <div class="mode-grid">
+        <div class="mode-card selected" data-mode="random">
+          <div class="mode-icon">🎲</div>
+          <div class="mode-name">完全隨機</div>
+          <div class="mode-desc">公平抽取</div>
+        </div>
+        <div class="mode-card" data-mode="weighted">
+          <div class="mode-icon">⚖️</div>
+          <div class="mode-name">加權機率</div>
+          <div class="mode-desc">依比重抽取</div>
+        </div>
+        <div class="mode-card" data-mode="sequential">
+          <div class="mode-icon">📋</div>
+          <div class="mode-name">順序排列</div>
+          <div class="mode-desc">依序分配</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 參與名單 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">參與名單</span>
+      <button class="section-action" id="importBtn">批次匯入</button>
+    </div>
+    <div class="card">
+      <div id="candidatesList" class="candidates-list"></div>
+      <div class="add-form">
+        <input class="add-input" id="addName" placeholder="輸入姓名或號碼" maxlength="30">
+        <button class="btn btn-sm btn-blue" id="addBtn">➕ 新增</button>
+      </div>
+      <div class="chips-row" id="nameHistory" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- 快速填入預設名單 -->
+  <div class="section">
+    <div class="section-header"><span class="section-title">預設範例名單</span></div>
+    <div class="card">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:12px;">
+        <button class="btn btn-sm btn-ghost btn-full" onclick="quickFill('class')">🎓 班級 (1-40號)</button>
+        <button class="btn btn-sm btn-ghost btn-full" onclick="quickFill('team')">👥 小組 (A-F組)</button>
+        <button class="btn btn-sm btn-ghost btn-full" onclick="quickFill('dept')">🏢 部門人員</button>
+        <button class="btn btn-sm btn-ghost btn-full" onclick="quickFill('lucky')">🍀 幸運數字</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /tab-setup -->
+
+<!-- ═══════════ TAB: DRAW ═══════════ -->
+<div id="tab-draw" class="tab-content" style="display:none">
+
+  <!-- 抽出名額設定 -->
+  <div class="section">
+    <div class="section-header"><span class="section-title">抽出設定</span></div>
+    <div class="card">
+      <div class="config-grid">
+        <div class="config-cell">
+          <div class="config-cell-label">抽出名額</div>
+          <div class="config-cell-ctrl">
+            <button class="stepper-btn" onclick="stepCount(-1)">－</button>
+            <span class="stepper-val" id="drawCount">1</span>
+            <button class="stepper-btn" onclick="stepCount(1)">＋</button>
+          </div>
+        </div>
+        <div class="config-cell">
+          <div class="config-cell-label">動畫速度</div>
+          <div class="config-cell-ctrl">
+            <button class="stepper-btn" onclick="stepSpeed(-1)">－</button>
+            <span class="stepper-val" id="spinSpeed">2</span>
+            <button class="stepper-btn" onclick="stepSpeed(1)">＋</button>
+          </div>
+        </div>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">允許重複中獎</div>
+          <div class="toggle-sub">同一人可多次被抽中</div>
+        </div>
+        <button class="toggle" id="repeatToggle"></button>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">顯示動畫效果</div>
+          <div class="toggle-sub">抽籤時顯示滾動效果</div>
+        </div>
+        <button class="toggle on" id="animToggle"></button>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">開啟彩帶慶祝</div>
+          <div class="toggle-sub">結果出爐時撒彩帶</div>
+        </div>
+        <button class="toggle on" id="confettiToggle"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 滾動鼓 -->
+  <div class="section">
+    <div class="section-header"><span class="section-title">抽籤預覽</span></div>
+    <div class="card" style="padding:16px">
+      <div class="drum-container">
+        <div class="drum-names" id="drumDisplay">準備好了嗎？</div>
+      </div>
+      <div class="draw-area" style="padding:0">
+        <div class="draw-btn-wrap">
+          <div class="draw-pulse" id="drawPulse"></div>
+          <button class="btn btn-lg btn-full btn-purple" id="drawBtn" onclick="startDraw()">
+            🎯 開始抽籤
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /tab-draw -->
+
+<!-- ═══════════ TAB: RESULTS ═══════════ -->
+<div id="tab-results" class="tab-content" style="display:none">
+
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">本次結果</span>
+      <button class="section-action" onclick="clearHistory()">清除</button>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table class="draw-table">
+          <thead>
+            <tr>
+              <th>名次</th>
+              <th>姓名</th>
+              <th>獎項</th>
+              <th>時間</th>
+            </tr>
+          </thead>
+          <tbody id="resultsTable">
+            <tr><td colspan="4" style="text-align:center; color:var(--text-tertiary); padding:24px">尚無抽籤記錄</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="margin-top:16px">
+    <div class="section-header"><span class="section-title">歷史記錄</span></div>
+    <div class="card" id="historyList">
+      <div style="text-align:center; color:var(--text-tertiary); padding:24px; font-size:14px">尚無歷史記錄</div>
+    </div>
+  </div>
+
+  <div class="section" style="margin-top:16px">
+    <div style="display:flex; gap:10px; padding:4px 0">
+      <button class="btn btn-sm btn-ghost" style="flex:1" onclick="exportResults()">📤 匯出 CSV</button>
+      <button class="btn btn-sm btn-blue" style="flex:1" onclick="copyResults()">📋 複製結果</button>
+    </div>
+  </div>
+
+</div><!-- /tab-results -->
+
+<!-- ═══════════ TAB: FORMULA ═══════════ -->
+<div id="tab-formula" class="tab-content" style="display:none">
+
+  <div class="section">
+    <div class="section-header"><span class="section-title">抽籤公式說明</span></div>
+    <div class="card" style="padding:16px; display:flex; flex-direction:column; gap:14px">
+
+      <div>
+        <div style="font-size:14px; font-weight:600; margin-bottom:8px; color:var(--text-primary)">① 完全隨機公式</div>
+        <div class="formula-block">
+<span class="formula-key">Math.random()</span> × N → floor<br>
+<span class="formula-comment">// N = 名單總人數</span><br>
+<span class="formula-key">index</span> = Math.floor(Math.random() × N)<br>
+<span class="formula-key">winner</span> = candidates[index]
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:14px; font-weight:600; margin-bottom:8px; color:var(--text-primary)">② Fisher-Yates 洗牌演算法</div>
+        <div class="formula-block">
+<span class="formula-comment">// 抽多人時保證不重複</span><br>
+for (i = N-1; i > 0; i--) {<br>
+  j = <span class="formula-key">floor(random × (i+1))</span><br>
+  [arr[i], arr[j]] = [arr[j], arr[i]]<br>
+}<br>
+winners = arr.slice(0, <span class="formula-key">K</span>)
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:14px; font-weight:600; margin-bottom:8px; color:var(--text-primary)">③ 加權機率公式</div>
+        <div class="formula-block">
+<span class="formula-comment">// w[i] = 個人權重</span><br>
+totalW = Σ w[i]<br>
+rand = <span class="formula-key">random × totalW</span><br>
+cumW = 0<br>
+for each candidate:<br>
+  cumW += w[i]<br>
+  if rand ≤ cumW → <span class="formula-key">selected!</span>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:14px; font-weight:600; margin-bottom:8px; color:var(--text-primary)">④ 期望中獎率計算</div>
+        <div class="formula-block">
+P(中獎) = <span class="formula-key">K / N</span><br>
+<span class="formula-comment">// K = 抽出名額, N = 總人數</span><br><br>
+期望值 E = K × (1/N)<br>
+不中獎率 = <span class="formula-key">1 - (K/N)</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 簡易計算表格 -->
+  <div class="section" style="margin-top:0">
+    <div class="section-header"><span class="section-title">中獎機率試算表</span></div>
+    <div class="card">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:14px">
+        <div>
+          <div class="input-label" style="margin-bottom:4px">總人數 N</div>
+          <input class="add-input" id="calcN" type="number" min="1" value="10" style="width:100%">
+        </div>
+        <div>
+          <div class="input-label" style="margin-bottom:4px">抽出名額 K</div>
+          <input class="add-input" id="calcK" type="number" min="1" value="1" style="width:100%">
+        </div>
+      </div>
+      <div id="calcResult" style="padding:0 14px 14px">
+        <div style="background:var(--bg-input); border-radius:10px; padding:12px; display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:14px">
+          <div><div style="color:var(--text-secondary); font-size:11px; margin-bottom:3px">個人中獎率</div><div id="resProb" style="font-size:20px; font-weight:700; color:var(--accent-blue)">10.0%</div></div>
+          <div><div style="color:var(--text-secondary); font-size:11px; margin-bottom:3px">不中獎率</div><div id="resNot" style="font-size:20px; font-weight:700; color:var(--accent-pink)">90.0%</div></div>
+          <div><div style="color:var(--text-secondary); font-size:11px; margin-bottom:3px">未中獎人數</div><div id="resRemain" style="font-size:18px; font-weight:600">9 人</div></div>
+          <div><div style="color:var(--text-secondary); font-size:11px; margin-bottom:3px">期望組合數</div><div id="resComb" style="font-size:14px; font-weight:600; color:var(--text-secondary)">C(10,1) = 10</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /tab-formula -->
+
+</div><!-- /main-grid -->
+</div><!-- /wrapper -->
+
+<!-- IMPORT MODAL -->
+<div class="modal-overlay" id="importModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-emoji">📥</span>
+      <div class="modal-title">批次匯入名單</div>
+      <div class="modal-sub">每行一個名稱，自動解析</div>
+    </div>
+    <div style="padding:16px 20px">
+      <textarea id="importText" style="width:100%; height:140px; background:var(--bg-input); border:1.5px solid var(--border); border-radius:10px; padding:10px 12px; font-size:14px; color:var(--text-primary); font-family:inherit; resize:none; outline:none;" placeholder="張小明&#10;李美麗&#10;王大同&#10;陳志偉&#10;..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-sm btn-ghost btn-full" onclick="closeImport()">取消</button>
+      <button class="btn btn-sm btn-blue btn-full" onclick="doImport()">匯入</button>
+    </div>
+  </div>
+</div>
+
+<!-- WINNER MODAL -->
+<div class="modal-overlay" id="winnerModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-emoji">🏆</span>
+      <div class="modal-title">恭喜得獎者！</div>
+      <div class="modal-sub" id="winnerSub">系統公正隨機抽取</div>
+    </div>
+    <div class="winners-list" id="winnersList"></div>
+    <div class="modal-actions">
+      <button class="btn btn-sm btn-ghost btn-full" onclick="closeWinner()">關閉</button>
+      <button class="btn btn-sm btn-blue btn-full" onclick="drawAgain()">再抽一次</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFETTI -->
+<div class="confetti-container" id="confettiContainer"></div>
+
+<div class="spacer pb-safe"></div>
+
+<script>
+// ── STATE ──
+let state = {
+  candidates: [],
+  drawCount: 1,
+  spinSpeed: 2,
+  allowRepeat: false,
+  showAnim: true,
+  showConfetti: true,
+  mode: 'random',
+  results: [],
+  history: [],
+  rounds: 0,
+  nameHistory: [],
+  eventName: '',
+  prizeName: ''
+};
+
+const colors = ['#007aff','#5856d6','#ff2d55','#ff9500','#34c759','#5ac8fa','#af52de','#ff3b30'];
+
+// ── LOAD / SAVE ──
+function load() {
+  try {
+    const s = localStorage.getItem('luckyDraw');
+    if (s) Object.assign(state, JSON.parse(s));
+  } catch(e) {}
+}
+function save() {
+  try { localStorage.setItem('luckyDraw', JSON.stringify(state)); } catch(e) {}
+}
+
+// ── INIT ──
+load();
+render();
+updateStats();
+updateCalc();
+
+// ── TABS ──
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).style.display = 'block';
+    if (btn.dataset.tab === 'results') renderResults();
+    if (btn.dataset.tab === 'formula') updateCalc();
+  });
+});
+
+// ── THEME ──
+const themeBtn = document.getElementById('themeToggle');
+const html = document.documentElement;
+if (localStorage.getItem('theme') === 'dark') {
+  html.setAttribute('data-theme','dark');
+  themeBtn.textContent = '🌙';
+}
+themeBtn.addEventListener('click', () => {
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  themeBtn.textContent = isDark ? '☀️' : '🌙';
+  localStorage.setItem('theme', isDark ? 'light' : 'dark');
+});
+
+// ── RENDER CANDIDATES ──
+function render() {
+  const list = document.getElementById('candidatesList');
+  if (state.candidates.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-tertiary);font-size:14px">尚無參與者，請新增名單</div>';
+  } else {
+    list.innerHTML = state.candidates.map((c, i) => `
+      <div class="candidate-item">
+        <div class="candidate-num" style="background:${colors[i % colors.length]}">${i+1}</div>
+        <div class="candidate-name">${escHtml(c.name)}</div>
+        ${c.tag ? `<div class="candidate-tag">${escHtml(c.tag)}</div>` : ''}
+        <button class="candidate-del" onclick="removeCand(${i})">✕</button>
+      </div>
+    `).join('');
+  }
+  updateStats();
+  updateNameHistory();
+  updateDrum();
+  save();
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── ADD ──
+document.getElementById('addBtn').addEventListener('click', addName);
+document.getElementById('addName').addEventListener('keydown', e => { if (e.key === 'Enter') addName(); });
+function addName() {
+  const inp = document.getElementById('addName');
+  const val = inp.value.trim();
+  if (!val) return;
+  state.candidates.push({ name: val, tag: '' });
+  if (!state.nameHistory.includes(val)) {
+    state.nameHistory.unshift(val);
+    if (state.nameHistory.length > 12) state.nameHistory.pop();
+  }
+  inp.value = '';
+  render();
+}
+function removeCand(i) { state.candidates.splice(i,1); render(); }
+
+// ── CHIPS ──
+document.querySelectorAll('#eventChips .chip').forEach(c => {
+  c.addEventListener('click', () => { document.getElementById('eventName').value = c.dataset.val; state.eventName = c.dataset.val; updateStats(); save(); });
+});
+document.querySelectorAll('#prizeChips .chip').forEach(c => {
+  c.addEventListener('click', () => { document.getElementById('prizeName').value = c.dataset.val; state.prizeName = c.dataset.val; save(); });
+});
+document.getElementById('eventName').addEventListener('input', e => { state.eventName = e.target.value; updateStats(); save(); });
+document.getElementById('prizeName').addEventListener('input', e => { state.prizeName = e.target.value; save(); });
+if (state.eventName) document.getElementById('eventName').value = state.eventName;
+if (state.prizeName) document.getElementById('prizeName').value = state.prizeName;
+
+function updateNameHistory() {
+  const wrap = document.getElementById('nameHistory');
+  if (state.nameHistory.length === 0) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'flex';
+  wrap.innerHTML = '<span style="font-size:11px;color:var(--text-tertiary);align-self:center;white-space:nowrap">最近:</span>' +
+    state.nameHistory.slice(0,8).map(n => `<span class="chip" onclick="quickAdd('${escHtml(n)}')">${escHtml(n)}</span>`).join('');
+}
+function quickAdd(name) {
+  document.getElementById('addName').value = name;
+  addName();
+}
+
+// ── MODE ──
+document.querySelectorAll('.mode-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    state.mode = card.dataset.mode;
+    save();
+  });
+});
+document.querySelectorAll('.mode-card').forEach(c => {
+  if (c.dataset.mode === state.mode) c.classList.add('selected');
+  else c.classList.remove('selected');
+});
+
+// ── STATS ──
+function updateStats() {
+  document.getElementById('statTotal').textContent = state.candidates.length;
+  document.getElementById('statWin').textContent = state.drawCount;
+  document.getElementById('statRounds').textContent = state.rounds;
+  const title = state.eventName || '快速公平抽籤';
+  document.getElementById('heroTitle').textContent = title;
+}
+
+// ── STEPPERS ──
+function stepCount(d) {
+  state.drawCount = Math.max(1, Math.min(state.candidates.length || 1, state.drawCount + d));
+  document.getElementById('drawCount').textContent = state.drawCount;
+  updateStats(); save();
+}
+function stepSpeed(d) {
+  state.spinSpeed = Math.max(1, Math.min(5, state.spinSpeed + d));
+  document.getElementById('spinSpeed').textContent = state.spinSpeed;
+  save();
+}
+document.getElementById('drawCount').textContent = state.drawCount;
+document.getElementById('spinSpeed').textContent = state.spinSpeed;
+
+// ── TOGGLES ──
+function setupToggle(id, key) {
+  const el = document.getElementById(id);
+  if (state[key]) el.classList.add('on'); else el.classList.remove('on');
+  el.addEventListener('click', () => {
+    state[key] = !state[key];
+    state[key] ? el.classList.add('on') : el.classList.remove('on');
+    save();
+  });
+}
+setupToggle('repeatToggle','allowRepeat');
+setupToggle('animToggle','showAnim');
+setupToggle('confettiToggle','showConfetti');
+
+// ── DRUM ──
+function updateDrum() {
+  const el = document.getElementById('drumDisplay');
+  if (state.candidates.length === 0) { el.textContent = '請先新增參與者'; return; }
+  el.textContent = state.candidates[Math.floor(Math.random() * state.candidates.length)].name;
+}
+
+// ── QUICK FILL ──
+function quickFill(type) {
+  let names = [];
+  if (type === 'class') names = Array.from({length:40},(_,i)=>`第${i+1}號`);
+  else if (type === 'team') names = ['A組','B組','C組','D組','E組','F組'];
+  else if (type === 'dept') names = ['行銷部-王明','業務部-李芳','研發部-陳強','人資部-林美','財務部-黃志','客服部-吳欣','企劃部-鄭偉'];
+  else if (type === 'lucky') names = Array.from({length:10},(_,i)=>`幸運號碼 ${(i+1)*7}`);
+  names.forEach(n => state.candidates.push({ name: n, tag: '' }));
+  render();
+}
+
+// ── DRAW ──
+function startDraw() {
+  if (state.candidates.length === 0) { alert('請先新增參與者！'); return; }
+  const btn = document.getElementById('drawBtn');
+  btn.disabled = true;
+  const maxWin = state.allowRepeat ? state.drawCount : Math.min(state.drawCount, state.candidates.length);
+  const duration = (6 - state.spinSpeed) * 600 + 800;
+  const drum = document.getElementById('drumDisplay');
+
+  if (state.showAnim) {
+    drum.classList.add('drum-spinning');
+    let t = 0;
+    const interval = setInterval(() => {
+      const rand = state.candidates[Math.floor(Math.random()*state.candidates.length)];
+      drum.textContent = rand.name;
+      t += 80;
+      if (t >= duration) {
+        clearInterval(interval);
+        drum.classList.remove('drum-spinning');
+        finishDraw(maxWin, btn);
+      }
+    }, 80);
+  } else {
+    finishDraw(maxWin, btn);
+  }
+}
+
+function finishDraw(count, btn) {
+  let pool = [...state.candidates];
+  let winners = [];
+  if (state.mode === 'random') {
+    if (state.allowRepeat) {
+      for (let i=0; i<count; i++) winners.push(pool[Math.floor(Math.random()*pool.length)]);
+    } else {
+      for (let i = pool.length-1; i>0; i--) {
+        const j = Math.floor(Math.random()*(i+1));
+        [pool[i],pool[j]] = [pool[j],pool[i]];
+      }
+      winners = pool.slice(0,count);
+    }
+  } else if (state.mode === 'sequential') {
+    winners = pool.slice(0, count);
+  } else {
+    // weighted (random with equal weight for demo)
+    for (let i=pool.length-1; i>0; i--) {
+      const j = Math.floor(Math.random()*(i+1));
+      [pool[i],pool[j]] = [pool[j],pool[i]];
+    }
+    winners = pool.slice(0,count);
+  }
+
+  const drum = document.getElementById('drumDisplay');
+  drum.textContent = winners[0].name;
+
+  state.rounds++;
+  state.results = winners.map((w,i) => ({
+    rank: i+1, name: w.name,
+    prize: state.prizeName || '得獎者',
+    time: new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})
+  }));
+  state.history.unshift({
+    event: state.eventName || '抽籤活動',
+    winners: winners.map(w=>w.name).join('、'),
+    count: winners.length,
+    time: new Date().toLocaleString('zh-TW')
+  });
+  if (state.history.length > 20) state.history.pop();
+
+  updateStats();
+  save();
+
+  if (state.showConfetti) launchConfetti();
+  showWinner(winners);
+  btn.disabled = false;
+}
+
+// ── WINNER MODAL ──
+function showWinner(winners) {
+  const list = document.getElementById('winnersList');
+  list.innerHTML = winners.map((w,i) => `
+    <div class="winner-item" style="animation-delay:${i*0.1}s">
+      <div class="winner-rank">${i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`}</div>
+      <div class="winner-name">${escHtml(w.name)}</div>
+      <div class="winner-prize">${escHtml(state.prizeName || '得獎')}</div>
+    </div>
+  `).join('');
+  document.getElementById('winnerSub').textContent = `從 ${state.candidates.length} 人中公正抽取`;
+  document.getElementById('winnerModal').classList.add('show');
+}
+function closeWinner() { document.getElementById('winnerModal').classList.remove('show'); }
+function drawAgain() { closeWinner(); setTimeout(startDraw,300); }
+
+// ── RESULTS TABLE ──
+function renderResults() {
+  const tbody = document.getElementById('resultsTable');
+  if (state.results.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-tertiary);padding:24px">尚無抽籤記錄</td></tr>';
+    return;
+  }
+  tbody.innerHTML = state.results.map(r => `
+    <tr>
+      <td><span class="rank-badge" style="background:${colors[(r.rank-1)%colors.length]}">${r.rank}</span></td>
+      <td style="font-weight:600">${escHtml(r.name)}</td>
+      <td style="color:var(--text-secondary);font-size:13px">${escHtml(r.prize)}</td>
+      <td style="color:var(--text-tertiary);font-size:12px">${r.time}</td>
+    </tr>
+  `).join('');
+
+  const hList = document.getElementById('historyList');
+  if (state.history.length === 0) {
+    hList.innerHTML = '<div style="text-align:center;color:var(--text-tertiary);padding:24px;font-size:14px">尚無歷史記錄</div>';
+    return;
+  }
+  hList.innerHTML = state.history.slice(0,10).map((h,i) => `
+    <div class="history-item">
+      <div class="history-dot" style="background:${colors[i%colors.length]}"></div>
+      <div class="history-info">
+        <div class="history-name">${escHtml(h.winners)}</div>
+        <div class="history-meta">${escHtml(h.event)} · 抽出 ${h.count} 人</div>
+      </div>
+      <div class="history-time">${h.time}</div>
+    </div>
+  `).join('');
+}
+
+// ── EXPORT ──
+function exportResults() {
+  if (state.results.length===0) { alert('尚無結果可匯出'); return; }
+  const rows = [['名次','姓名','獎項','時間'],
+    ...state.results.map(r=>[r.rank,r.name,r.prize,r.time])];
+  const csv = '\uFEFF' + rows.map(r=>r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = '抽籤結果.csv'; a.click();
+}
+function copyResults() {
+  if (state.results.length===0) { alert('尚無結果'); return; }
+  const text = state.results.map(r=>`第${r.rank}名：${r.name}`).join('\n');
+  navigator.clipboard.writeText(text).then(()=>alert('已複製到剪貼簿！'));
+}
+function clearHistory() { state.results=[]; state.history=[]; save(); renderResults(); }
+
+// ── IMPORT ──
+document.getElementById('importBtn').addEventListener('click', ()=>{
+  document.getElementById('importModal').classList.add('show');
+});
+function closeImport() { document.getElementById('importModal').classList.remove('show'); }
+function doImport() {
+  const lines = document.getElementById('importText').value.split('\n').map(l=>l.trim()).filter(Boolean);
+  lines.forEach(n => { if (n) state.candidates.push({ name: n, tag: '' }); });
+  render(); closeImport();
+}
+
+// ── RESET ──
+document.getElementById('resetAll').addEventListener('click', ()=>{
+  if (!confirm('確定要清除所有資料？')) return;
+  state.candidates = []; state.results = []; state.history = [];
+  state.rounds = 0; state.eventName = ''; state.prizeName = '';
+  document.getElementById('eventName').value = '';
+  document.getElementById('prizeName').value = '';
+  render(); updateStats();
+});
+
+// ── FORMULA CALC ──
+['calcN','calcK'].forEach(id => document.getElementById(id).addEventListener('input', updateCalc));
+function updateCalc() {
+  const N = parseInt(document.getElementById('calcN').value)||1;
+  const K = Math.min(parseInt(document.getElementById('calcK').value)||1, N);
+  const prob = (K/N*100).toFixed(1);
+  const notProb = ((1-K/N)*100).toFixed(1);
+  document.getElementById('resProb').textContent = prob + '%';
+  document.getElementById('resNot').textContent = notProb + '%';
+  document.getElementById('resRemain').textContent = (N-K) + ' 人';
+  document.getElementById('resComb').textContent = `C(${N},${K}) = ${comb(N,K)}`;
+}
+function comb(n,k) {
+  if (k>n) return 0; if (k===0||k===n) return 1;
+  let r=1; for(let i=0;i<Math.min(k,n-k);i++) { r=r*(n-i)/(i+1); } return Math.round(r);
+}
+
+// ── CONFETTI ──
+function launchConfetti() {
+  const container = document.getElementById('confettiContainer');
+  container.innerHTML = '';
+  const cs = ['#ff6b6b','#ffd43b','#69db7c','#74c0fc','#f783ac','#a9e34b','#ff922b','#cc5de8'];
+  for (let i=0; i<60; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.cssText = `
+      left:${Math.random()*100}%;
+      top:-20px;
+      background:${cs[Math.floor(Math.random()*cs.length)]};
+      width:${6+Math.random()*10}px;
+      height:${6+Math.random()*10}px;
+      border-radius:${Math.random()>0.5?'50%':'2px'};
+      animation-delay:${Math.random()*1.5}s;
+      animation-duration:${2+Math.random()*2}s;
+    `;
+    container.appendChild(el);
+  }
+  setTimeout(()=>container.innerHTML='', 5000);
+}
+
+// ── UPDATE DRUM ON TAB ──
+document.querySelector('[data-tab="draw"]').addEventListener('click', updateDrum);
+</script>
+</body>
+</html>
