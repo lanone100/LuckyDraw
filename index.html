@@ -679,6 +679,16 @@ body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;back
 
   <div class="card">
     <div class="card-hd">
+      <div class="card-title"><div class="c-ico" style="background:rgba(255,55,95,.15)">📜</div>抽籤紀錄</div>
+      <button class="btn-sm" style="flex:none;padding:5px 11px;" onclick="wClearHistory()">清除</button>
+    </div>
+    <div class="hist-list" id="wHistList">
+      <div class="hist-empty">尚無紀錄，開始旋轉後顯示於此</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd">
       <div class="card-title"><div class="c-ico" style="background:rgba(255,159,10,.15)">✏️</div>編輯選項<span class="badge" id="wBadge">0</span></div>
       <button class="bic" onclick="openImport('w')" style="background:rgba(0,113,227,.1);color:var(--accent);border-radius:9px;width:29px;height:29px;">📋</button>
     </div>
@@ -714,16 +724,6 @@ body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;back
   <div class="card">
     <div class="card-hd"><div class="card-title"><div class="c-ico" style="background:rgba(52,210,75,.15)">🎰</div>中獎機率</div></div>
     <div style="overflow-x:auto"><table class="ptbl"><thead><tr><th>選項</th><th>權重</th><th style="min-width:60px">分布</th><th>機率</th></tr></thead><tbody id="wPBody"></tbody></table></div>
-  </div>
-
-  <div class="card">
-    <div class="card-hd">
-      <div class="card-title"><div class="c-ico" style="background:rgba(255,55,95,.15)">📜</div>抽籤紀錄</div>
-      <button class="btn-sm" style="flex:none;padding:5px 11px;" onclick="wClearHistory()">清除</button>
-    </div>
-    <div class="hist-list" id="wHistList">
-      <div class="hist-empty">尚無紀錄，開始旋轉後顯示於此</div>
-    </div>
   </div>
 </div>
 
@@ -778,6 +778,16 @@ body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;back
 
   <div class="card">
     <div class="card-hd">
+      <div class="card-title"><div class="c-ico" style="background:rgba(255,55,95,.15)">📜</div>抽籤紀錄</div>
+      <button class="btn-sm" style="flex:none;padding:5px 11px;" onclick="sClearHistory()">清除</button>
+    </div>
+    <div class="hist-list" id="sHistList">
+      <div class="hist-empty">尚無紀錄，開始拉霸後顯示於此</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd">
       <div class="card-title"><div class="c-ico" style="background:rgba(255,69,58,.15)">🎲</div>拉霸選項<span class="badge" id="sBadge">0</span></div>
       <button class="bic" onclick="openImport('s')" style="background:rgba(0,113,227,.1);color:var(--accent);border-radius:9px;width:29px;height:29px;">📋</button>
     </div>
@@ -797,16 +807,6 @@ body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;back
       <button class="btn-sm" onclick="openImport('s')">📥 批次</button>
       <button class="btn-sm" onclick="sShuffle()">🔀 排序</button>
       <button class="btn-sm danger" onclick="sClear()">🗑 清空</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-hd">
-      <div class="card-title"><div class="c-ico" style="background:rgba(255,55,95,.15)">📜</div>抽籤紀錄</div>
-      <button class="btn-sm" style="flex:none;padding:5px 11px;" onclick="sClearHistory()">清除</button>
-    </div>
-    <div class="hist-list" id="sHistList">
-      <div class="hist-empty">尚無紀錄，開始拉霸後顯示於此</div>
     </div>
   </div>
 </div>
