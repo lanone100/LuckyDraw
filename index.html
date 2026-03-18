@@ -41,24 +41,21 @@ body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;back
 .nav-title{font-family:'Outfit',sans-serif;font-size:19px;font-weight:900;letter-spacing:-.5px;background:linear-gradient(135deg,var(--text) 40%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 
 /* ── THEME TOGGLE ── */
-.tgl{position:relative;width:62px;height:32px;cursor:pointer;flex-shrink:0;}
-.tgl input{opacity:0;width:0;height:0;position:absolute;}
-.tgl-trk{position:absolute;inset:0;border-radius:16px;background:linear-gradient(135deg,#87CEEB,#FDB813);transition:background .5s;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.15),inset 0 1px 3px rgba(0,0,0,.1);}
-[data-theme="dark"] .tgl-trk{background:linear-gradient(135deg,#1a1a2e,#16213e);}
-.tgl-trk::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,#fff 1px,transparent 1px),radial-gradient(circle,#fff 1px,transparent 1px),radial-gradient(circle,#fff .8px,transparent .8px),radial-gradient(circle,#fff .8px,transparent .8px);background-size:8px 8px,12px 12px,10px 10px,7px 7px;background-position:8px 6px,22px 10px,44px 5px,54px 15px;opacity:0;transition:opacity .4s;}
-[data-theme="dark"] .tgl-trk::before{opacity:1;}
-.tgl-trk::after{content:'';position:absolute;bottom:4px;left:4px;width:20px;height:9px;background:rgba(255,255,255,.7);border-radius:9px;box-shadow:14px -3px 0 rgba(255,255,255,.5),28px 2px 0 rgba(255,255,255,.4);opacity:1;transition:opacity .4s;}
-[data-theme="dark"] .tgl-trk::after{opacity:0;}
-.tgl-th{position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;transition:transform .45s cubic-bezier(.34,1.56,.64,1);z-index:2;display:flex;align-items:center;justify-content:center;}
-[data-theme="dark"] .tgl-th{transform:translateX(30px);}
-.tgl-sun{width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFF176,#FDB813);box-shadow:0 2px 8px rgba(253,184,19,.6);position:relative;transition:opacity .3s,transform .3s;}
-.tgl-sun::before{content:'';position:absolute;inset:-4px;border-radius:50%;background:conic-gradient(rgba(253,184,19,.6) 0deg 18deg,transparent 18deg 45deg,rgba(253,184,19,.6) 45deg 63deg,transparent 63deg 90deg,rgba(253,184,19,.6) 90deg 108deg,transparent 108deg 135deg,rgba(253,184,19,.6) 135deg 153deg,transparent 153deg 180deg,rgba(253,184,19,.6) 180deg 198deg,transparent 198deg 225deg,rgba(253,184,19,.6) 225deg 243deg,transparent 243deg 270deg,rgba(253,184,19,.6) 270deg 288deg,transparent 288deg 315deg,rgba(253,184,19,.6) 315deg 333deg,transparent 333deg 360deg);animation:sunspin 8s linear infinite;}
-@keyframes sunspin{to{transform:rotate(360deg);}}
-[data-theme="dark"] .tgl-sun{opacity:0;transform:scale(.5);}
-[data-theme="dark"] .tgl-sun::before{animation-play-state:paused;}
-.tgl-moon{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 60% 35%,#E8F4FD,#C8E6F5);opacity:0;transition:opacity .3s;overflow:hidden;}
-.tgl-moon::before{content:'';position:absolute;top:2px;right:2px;width:14px;height:14px;border-radius:50%;background:#16213e;box-shadow:-2px 4px 0 #16213e;}
-[data-theme="dark"] .tgl-moon{opacity:1;}
+.tgl-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface);
+  box-shadow: var(--sh-sm), 0 0 0 1px var(--border);
+  cursor: pointer;
+  font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .2s;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.tgl-btn:hover { transform: scale(1.15); box-shadow: var(--sh-md), 0 0 0 1px var(--border); }
+.tgl-btn:active { transform: scale(.9); }
 
 /* ── TAB BAR ── */
 .tab-bar{width:100%;max-width:560px;padding:10px 14px 0;position:sticky;top:60px;z-index:80;background:var(--bg);transition:background .4s;}
@@ -599,14 +596,7 @@ body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;back
     <div class="nav-icon">🎯</div>
     <span class="nav-title">Lucky Pro</span>
   </div>
-  <label class="tgl" title="切換主題">
-    <input type="checkbox" id="themeChk" onchange="toggleTheme(this)">
-    <div class="tgl-trk"></div>
-    <div class="tgl-th">
-      <div class="tgl-sun"></div>
-      <div class="tgl-moon"></div>
-    </div>
-  </label>
+  <button class="tgl-btn" id="tglBtn" onclick="toggleTheme()" title="切換主題">☀️</button>
 </nav>
 
 <!-- TAB BAR -->
@@ -1060,8 +1050,10 @@ let slotBusy = false;
 let importTgt = 'w';
 
 /* ═══ THEME ═══ */
-function toggleTheme(cb) {
-  document.documentElement.setAttribute('data-theme', cb.checked ? 'dark' : 'light');
+function toggleTheme() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('tglBtn').textContent = isDark ? '☀️' : '🌙';
   drawWheel();
 }
 
