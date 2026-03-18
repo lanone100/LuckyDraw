@@ -2,280 +2,290 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>隨機轉盤隨機抽獎</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>極簡轉盤 Pro - Apple Style</title>
     <style>
         :root {
-            --primary-color: #4a90e2;
-            --bg-color: #f5f7fa;
+            --bg: #F2F2F7;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --text: #000000;
+            --accent: #007AFF;
+            --secondary: #8E8E93;
+            --glass: blur(20px);
         }
+
+        [data-theme="dark"] {
+            --bg: #000000;
+            --card-bg: rgba(28, 28, 30, 0.8);
+            --text: #FFFFFF;
+            --accent: #0A84FF;
+            --secondary: #98989D;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
-            font-family: "Microsoft JhengHei", sans-serif;
-            background-color: var(--bg-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
             margin: 0;
-        }
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
-            justify-content: center;
-            max-width: 1000px;
-            width: 100%;
-        }
-        /* 轉盤區域 */
-        .wheel-section {
-            position: relative;
-            flex: 1;
-            min-width: 350px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            transition: background 0.3s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
         }
-        #canvas-container {
+
+        /* Header & Toggle */
+        .nav {
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 500px;
+        }
+
+        .theme-btn {
+            background: var(--card-bg);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: var(--text);
+            backdrop-filter: var(--glass);
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* 轉盤主體 */
+        .wheel-container {
             position: relative;
-            margin-top: 20px;
+            margin: 20px 0;
+            width: 320px;
+            height: 320px;
         }
-        #wheel-canvas {
+
+        #wheel {
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
-            box-shadow: 0 0 15px rgba(0,0,0,0.2);
-            transition: transform 5s cubic-bezier(0.1, 0, 0.1, 1);
+            transition: transform 5s cubic-bezier(0.15, 0, 0.15, 1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
-        /* 指針 */
+
         .pointer {
             position: absolute;
             top: -10px;
             left: 50%;
             transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 30px solid #ff4757;
             z-index: 10;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
         }
-        /* 控制面板 */
-        .input-section {
-            flex: 1;
-            min-width: 300px;
-            background: white;
+
+        /* 控制卡片 */
+        .card {
+            width: 90%;
+            max-width: 500px;
+            background: var(--card-bg);
+            backdrop-filter: var(--glass);
+            border-radius: 20px;
             padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
         }
+
         textarea {
             width: 100%;
-            height: 200px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            resize: vertical;
-            box-sizing: border-box;
-            font-size: 16px;
-        }
-        .btn-group {
-            margin-top: 15px;
-            display: flex;
-            gap: 10px;
-        }
-        button {
-            flex: 1;
-            padding: 12px;
+            height: 120px;
+            background: rgba(120, 120, 128, 0.12);
             border: none;
-            border-radius: 8px;
-            cursor: pointer;
+            border-radius: 12px;
+            padding: 12px;
+            color: var(--text);
             font-size: 16px;
-            font-weight: bold;
-            transition: 0.3s;
+            margin: 15px 0;
+            outline: none;
         }
-        .btn-spin { background-color: #2ecc71; color: white; }
-        .btn-spin:disabled { background-color: #bdc3c7; }
-        .btn-reset { background-color: #3498db; color: white; }
-        
+
+        .btn-main {
+            width: 100%;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 14px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .btn-main:active { transform: scale(0.98); opacity: 0.9; }
+
+        /* 表格與公式 */
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 13px;
+        }
+        .info-table th { color: var(--secondary); text-align: left; padding: 8px; border-bottom: 1px solid var(--secondary); }
+        .info-table td { padding: 8px; border-bottom: 1px solid rgba(120, 120, 128, 0.1); }
+
+        .formula {
+            background: rgba(120, 120, 128, 0.08);
+            padding: 10px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
         /* 結果彈窗 */
-        #result-modal {
-            display: none;
+        #modal {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
+            top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8);
+            background: var(--card-bg);
+            backdrop-filter: var(--glass);
             padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
-            z-index: 100;
+            border-radius: 25px;
             text-align: center;
-        }
-        #overlay {
             display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 90;
+            z-index: 100;
+            width: 280px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
     </style>
 </head>
 <body>
 
-    <h1>🎡 隨機大轉盤</h1>
+    <div class="nav">
+        <h2 style="margin:0; font-weight:700;">Lucky Wheel</h2>
+        <button class="theme-btn" onclick="toggleTheme()">切換外觀</button>
+    </div>
 
-    <div class="container">
-        <div class="wheel-section">
-            <div id="canvas-container">
-                <div class="pointer"></div>
-                <canvas id="wheel-canvas" width="400" height="400"></canvas>
-            </div>
-            <div class="btn-group" style="width: 100%; margin-top: 20px;">
-                <button class="btn-spin" id="spin-btn">開始旋轉！</button>
-            </div>
-        </div>
+    <div class="wheel-container">
+        <svg class="pointer" width="30" height="40" viewBox="0 0 30 40">
+            <path d="M15 40 L30 0 L0 0 Z" fill="#FF3B30"/>
+        </svg>
+        <canvas id="wheel" width="640" height="640"></canvas>
+    </div>
 
-        <div class="input-section">
-            <h3>設定選項 (一行一個)</h3>
-            <textarea id="items-input">選項 A
-選項 B
-選項 C
-選項 D
-選項 E
-選項 F</textarea>
-            <p><small>* 提示：重複輸入相同項目可增加其權重。</small></p>
-            <div class="btn-group">
-                <button class="btn-reset" id="update-btn">更新轉盤</button>
-            </div>
+    <div class="card">
+        <button class="btn-main" id="spinTrigger">SPIN</button>
+        <textarea id="listInput" placeholder="輸入選項，每行一個...">咖啡
+綠茶
+珍奶
+可樂
+果汁</textarea>
+        
+        <h4 style="margin: 10px 0 5px 0;">機率計算方案</h4>
+        <table class="info-table" id="probTable">
+            <thead>
+                <tr><th>選項</th><th>權重</th><th>機率 (%)</th></tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <div class="formula">
+            $P(x) = \frac{count(x)}{\sum count(i)} \times 100\%$
         </div>
     </div>
 
-    <div id="overlay"></div>
-    <div id="result-modal">
-        <h2 style="margin-top:0">恭喜中獎！</h2>
-        <h1 id="winner-text" style="color: #e67e22;"></h1>
-        <div class="btn-group">
-            <button onclick="closeModal()">繼續</button>
-            <button onclick="removeWinner()" style="background:#e74c3c; color:white;">刪除此項並繼續</button>
-        </div>
+    <div id="modal">
+        <p style="color: var(--secondary); margin-bottom: 5px;">結果是</p>
+        <h1 id="resultName" style="margin: 0 0 20px 0; font-size: 32px;"></h1>
+        <button class="btn-main" onclick="closeModal()">確認</button>
     </div>
 
     <script>
-        const canvas = document.getElementById('wheel-canvas');
+        const canvas = document.getElementById('wheel');
         const ctx = canvas.getContext('2d');
-        const itemsInput = document.getElementById('items-input');
-        const spinBtn = document.getElementById('spin-btn');
-        const updateBtn = document.getElementById('update-btn');
-        const winnerText = document.getElementById('winner-text');
-        const modal = document.getElementById('result-modal');
-        const overlay = document.getElementById('overlay');
-
+        const input = document.getElementById('listInput');
+        const tableBody = document.querySelector('#probTable tbody');
         let items = [];
-        let currentRotation = 0;
-        let isSpinning = false;
-        let lastWinnerIndex = -1;
+        let angle = 0;
 
-        const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#8bc34a', '#f44336'];
+        const colors = ['#FF3B30', '#FF9500', '#FFCC00', '#34C759', '#007AFF', '#5856D6', '#AF52DE', '#FF2D55'];
 
-        function drawWheel() {
-            const lines = itemsInput.value.split('\n').filter(line => line.trim() !== "");
-            items = lines;
+        function init() {
+            items = input.value.split('\n').filter(t => t.trim() !== "");
+            draw();
+            updateTable();
+        }
+
+        function draw() {
+            const n = items.length;
+            const arc = (Math.PI * 2) / n;
+            ctx.clearRect(0, 0, 640, 640);
             
-            const numSegments = items.length;
-            const anglePerSegment = (Math.PI * 2) / numSegments;
-            
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            if (numSegments === 0) return;
-
-            items.forEach((item, i) => {
-                const angle = i * anglePerSegment;
-                
-                // 畫扇形
-                ctx.beginPath();
+            items.forEach((text, i) => {
+                const curAngle = i * arc;
                 ctx.fillStyle = colors[i % colors.length];
-                ctx.moveTo(200, 200);
-                ctx.arc(200, 200, 200, angle, angle + anglePerSegment);
-                ctx.lineTo(200, 200);
+                ctx.beginPath();
+                ctx.moveTo(320, 320);
+                ctx.arc(320, 320, 310, curAngle, curAngle + arc);
                 ctx.fill();
-                ctx.stroke();
 
-                // 畫文字
                 ctx.save();
-                ctx.translate(200, 200);
-                ctx.rotate(angle + anglePerSegment / 2);
+                ctx.translate(320, 320);
+                ctx.rotate(curAngle + arc / 2);
                 ctx.textAlign = "right";
                 ctx.fillStyle = "#fff";
-                ctx.font = "bold 18px sans-serif";
-                ctx.shadowColor = "rgba(0,0,0,0.5)";
-                ctx.shadowBlur = 4;
-                ctx.fillText(item, 180, 10);
+                ctx.font = "bold 24px -apple-system";
+                ctx.fillText(text.substring(0, 10), 280, 10);
                 ctx.restore();
             });
         }
 
-        function spin() {
-            if (isSpinning || items.length === 0) return;
-
-            isSpinning = true;
-            spinBtn.disabled = true;
-
-            // 隨機旋轉圈數 (5-10圈) + 隨機角度
-            const extraDegree = Math.floor(Math.random() * 360);
-            const totalRotation = currentRotation + (360 * 8) + extraDegree;
-            
-            canvas.style.transform = `rotate(${totalRotation}deg)`;
-            currentRotation = totalRotation;
-
-            // 計算結果 (由於轉盤旋轉是順時針，指針在正上方，計算邏輯需扣掉旋轉位移)
-            setTimeout(() => {
-                isSpinning = false;
-                spinBtn.disabled = false;
-                
-                // 計算指向哪個索引
-                const actualDegree = (360 - (totalRotation % 360)) % 360;
-                // 轉盤繪製起點是 3 點鐘方向，指針在 12 點鐘，所以要偏轉 90 度補償
-                const correctedDegree = (actualDegree + 270) % 360;
-                const index = Math.floor((correctedDegree / 360) * items.length);
-                
-                lastWinnerIndex = index;
-                showWinner(items[index]);
-            }, 5000); // 對應 CSS 的 5s
+        function updateTable() {
+            const counts = {};
+            items.forEach(x => counts[x] = (counts[x] || 0) + 1);
+            tableBody.innerHTML = Object.entries(counts).map(([name, count]) => `
+                <tr>
+                    <td>${name}</td>
+                    <td>${count}</td>
+                    <td>${((count/items.length)*100).toFixed(1)}%</td>
+                </tr>
+            `).join('');
         }
 
-        function showWinner(name) {
-            winnerText.innerText = name;
-            modal.style.display = 'block';
-            overlay.style.display = 'block';
+        function spin() {
+            if(items.length < 2) return;
+            const randomDeg = Math.floor(Math.random() * 360) + 3600; 
+            angle += randomDeg;
+            canvas.style.transform = `rotate(${angle}deg)`;
+
+            setTimeout(() => {
+                const actualDeg = (360 - (angle % 360)) % 360;
+                const corrected = (actualDeg + 270) % 360; // 補償 pointer 位置
+                const idx = Math.floor((corrected / 360) * items.length);
+                showResult(items[idx]);
+            }, 5000);
+        }
+
+        function showResult(name) {
+            document.getElementById('resultName').innerText = name;
+            const m = document.getElementById('modal');
+            m.style.display = 'block';
+            setTimeout(() => m.style.transform = 'translate(-50%, -50%) scale(1)', 10);
         }
 
         function closeModal() {
-            modal.style.display = 'none';
-            overlay.style.display = 'none';
+            document.getElementById('modal').style.display = 'none';
         }
 
-        function removeWinner() {
-            if (lastWinnerIndex > -1) {
-                const lines = itemsInput.value.split('\n').filter(line => line.trim() !== "");
-                lines.splice(lastWinnerIndex, 1);
-                itemsInput.value = lines.join('\n');
-                drawWheel();
-                closeModal();
-            }
+        function toggleTheme() {
+            const body = document.body;
+            const current = body.getAttribute('data-theme');
+            body.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
         }
 
-        updateBtn.addEventListener('click', () => {
-            currentRotation = 0;
-            canvas.style.transition = 'none';
-            canvas.style.transform = `rotate(0deg)`;
-            setTimeout(() => {
-                canvas.style.transition = 'transform 5s cubic-bezier(0.1, 0, 0.1, 1)';
-                drawWheel();
-            }, 50);
-        });
-
-        spinBtn.addEventListener('click', spin);
-
-        // 初始化繪製
-        drawWheel();
+        input.addEventListener('input', init);
+        document.getElementById('spinTrigger').addEventListener('click', spin);
+        
+        init();
     </script>
 </body>
 </html>
