@@ -3,899 +3,449 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Lucky Wheel Pro</title>
+<title>Lucky Pro — 幸運遊戲</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <style>
+/* ═══ TOKENS ═══ */
 :root {
-  --bg: #F5F5F7;
-  --surface: #FFFFFF;
-  --surface2: rgba(255,255,255,0.7);
-  --border: rgba(0,0,0,0.08);
-  --text: #1D1D1F;
-  --text2: #6E6E73;
-  --text3: #AEAEB2;
-  --accent: #0071E3;
-  --accent2: #34AADC;
-  --green: #32D74B;
-  --red: #FF453A;
-  --orange: #FF9F0A;
-  --purple: #BF5AF2;
-  --pink: #FF375F;
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
-  --shadow-md: 0 8px 24px rgba(0,0,0,0.10);
-  --shadow-lg: 0 20px 60px rgba(0,0,0,0.14);
-  --radius-sm: 12px;
-  --radius-md: 20px;
-  --radius-lg: 28px;
-  --glass: blur(24px) saturate(200%);
-  --safe-b: env(safe-area-inset-bottom, 0px);
+  --bg:#F5F5F7;--surface:#FFFFFF;--border:rgba(0,0,0,0.08);
+  --text:#1D1D1F;--text2:#6E6E73;--text3:#AEAEB2;
+  --accent:#0071E3;--green:#32D74B;--red:#FF453A;
+  --orange:#FF9F0A;--purple:#BF5AF2;--pink:#FF375F;
+  --sh-sm:0 2px 8px rgba(0,0,0,0.06);--sh-md:0 8px 24px rgba(0,0,0,0.10);--sh-lg:0 20px 60px rgba(0,0,0,0.14);
+  --r-sm:12px;--r-md:20px;--r-lg:28px;
+  --glass:blur(24px) saturate(200%);--safe-b:env(safe-area-inset-bottom,0px);
 }
 [data-theme="dark"] {
-  --bg: #000000;
-  --surface: #1C1C1E;
-  --surface2: rgba(44,44,46,0.85);
-  --border: rgba(255,255,255,0.10);
-  --text: #F5F5F7;
-  --text2: #AEAEB2;
-  --text3: #636366;
-  --accent: #0A84FF;
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
-  --shadow-md: 0 8px 24px rgba(0,0,0,0.4);
-  --shadow-lg: 0 20px 60px rgba(0,0,0,0.6);
+  --bg:#000;--surface:#1C1C1E;--border:rgba(255,255,255,0.10);
+  --text:#F5F5F7;--text2:#AEAEB2;--text3:#636366;--accent:#0A84FF;
+  --sh-sm:0 2px 8px rgba(0,0,0,0.3);--sh-md:0 8px 24px rgba(0,0,0,0.4);--sh-lg:0 20px 60px rgba(0,0,0,0.6);
 }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;display:flex;flex-direction:column;align-items:center;transition:background .4s,color .3s;overflow-x:hidden;}
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-html { scroll-behavior: smooth; }
-
-body {
-  font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: background 0.4s, color 0.3s;
-  overflow-x: hidden;
-}
-
-/* ── BG DECORATION ── */
-.bg-orb {
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.25;
-  pointer-events: none;
-  z-index: 0;
-  transition: opacity 0.5s;
-}
-.bg-orb-1 { width: 400px; height: 400px; background: radial-gradient(circle, #0071E3, #BF5AF2); top: -120px; right: -100px; }
-.bg-orb-2 { width: 300px; height: 300px; background: radial-gradient(circle, #FF9F0A, #FF375F); bottom: 100px; left: -80px; }
-[data-theme="dark"] .bg-orb { opacity: 0.18; }
+/* ── BG ORBS ── */
+.orb{position:fixed;border-radius:50%;filter:blur(80px);opacity:.22;pointer-events:none;z-index:0;transition:opacity .5s;}
+.orb1{width:420px;height:420px;background:radial-gradient(circle,#0071E3,#BF5AF2);top:-130px;right:-110px;}
+.orb2{width:320px;height:320px;background:radial-gradient(circle,#FF9F0A,#FF375F);bottom:80px;left:-90px;}
+[data-theme="dark"] .orb{opacity:.15;}
 
 /* ── NAV ── */
-.nav {
-  width: 100%;
-  max-width: 540px;
-  padding: 16px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 80;
-  background: rgba(245,245,247,0.82);
-  backdrop-filter: var(--glass);
-  -webkit-backdrop-filter: var(--glass);
-  border-bottom: 1px solid var(--border);
-}
-[data-theme="dark"] .nav { background: rgba(0,0,0,0.82); }
+.nav{width:100%;max-width:560px;padding:13px 17px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:90;background:rgba(245,245,247,.85);backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);border-bottom:1px solid var(--border);}
+[data-theme="dark"] .nav{background:rgba(0,0,0,.85);}
+.nav-logo{display:flex;align-items:center;gap:9px;}
+.nav-icon{width:33px;height:33px;background:linear-gradient(135deg,#FF9F0A,#FF375F);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 4px 12px rgba(255,100,0,.35);}
+.nav-title{font-family:'Outfit',sans-serif;font-size:19px;font-weight:900;letter-spacing:-.5px;background:linear-gradient(135deg,var(--text) 40%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 
-.nav-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.nav-icon {
-  width: 36px; height: 36px;
-  background: linear-gradient(135deg, #FF9F0A, #FF375F);
-  border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px;
-  box-shadow: 0 4px 12px rgba(255,100,0,0.35);
-}
-.nav-title {
-  font-family: 'Outfit', sans-serif;
-  font-size: 20px;
-  font-weight: 900;
-  letter-spacing: -0.5px;
-  background: linear-gradient(135deg, var(--text) 40%, var(--accent));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+/* ── THEME TOGGLE ── */
+.tgl{position:relative;width:62px;height:32px;cursor:pointer;flex-shrink:0;}
+.tgl input{opacity:0;width:0;height:0;position:absolute;}
+.tgl-trk{position:absolute;inset:0;border-radius:16px;background:linear-gradient(135deg,#87CEEB,#FDB813);transition:background .5s;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.15),inset 0 1px 3px rgba(0,0,0,.1);}
+[data-theme="dark"] .tgl-trk{background:linear-gradient(135deg,#1a1a2e,#16213e);}
+.tgl-trk::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,#fff 1px,transparent 1px),radial-gradient(circle,#fff 1px,transparent 1px),radial-gradient(circle,#fff .8px,transparent .8px),radial-gradient(circle,#fff .8px,transparent .8px);background-size:8px 8px,12px 12px,10px 10px,7px 7px;background-position:8px 6px,22px 10px,44px 5px,54px 15px;opacity:0;transition:opacity .4s;}
+[data-theme="dark"] .tgl-trk::before{opacity:1;}
+.tgl-trk::after{content:'';position:absolute;bottom:4px;left:4px;width:20px;height:9px;background:rgba(255,255,255,.7);border-radius:9px;box-shadow:14px -3px 0 rgba(255,255,255,.5),28px 2px 0 rgba(255,255,255,.4);opacity:1;transition:opacity .4s;}
+[data-theme="dark"] .tgl-trk::after{opacity:0;}
+.tgl-th{position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;transition:transform .45s cubic-bezier(.34,1.56,.64,1);z-index:2;display:flex;align-items:center;justify-content:center;}
+[data-theme="dark"] .tgl-th{transform:translateX(30px);}
+.tgl-sun{width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFF176,#FDB813);box-shadow:0 2px 8px rgba(253,184,19,.6);position:relative;transition:opacity .3s,transform .3s;}
+.tgl-sun::before{content:'';position:absolute;inset:-4px;border-radius:50%;background:conic-gradient(rgba(253,184,19,.6) 0deg 18deg,transparent 18deg 45deg,rgba(253,184,19,.6) 45deg 63deg,transparent 63deg 90deg,rgba(253,184,19,.6) 90deg 108deg,transparent 108deg 135deg,rgba(253,184,19,.6) 135deg 153deg,transparent 153deg 180deg,rgba(253,184,19,.6) 180deg 198deg,transparent 198deg 225deg,rgba(253,184,19,.6) 225deg 243deg,transparent 243deg 270deg,rgba(253,184,19,.6) 270deg 288deg,transparent 288deg 315deg,rgba(253,184,19,.6) 315deg 333deg,transparent 333deg 360deg);animation:sunspin 8s linear infinite;}
+@keyframes sunspin{to{transform:rotate(360deg);}}
+[data-theme="dark"] .tgl-sun{opacity:0;transform:scale(.5);}
+[data-theme="dark"] .tgl-sun::before{animation-play-state:paused;}
+.tgl-moon{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 60% 35%,#E8F4FD,#C8E6F5);opacity:0;transition:opacity .3s;overflow:hidden;}
+.tgl-moon::before{content:'';position:absolute;top:2px;right:2px;width:14px;height:14px;border-radius:50%;background:#16213e;box-shadow:-2px 4px 0 #16213e;}
+[data-theme="dark"] .tgl-moon{opacity:1;}
 
-/* ── THEME TOGGLE SWITCH ── */
-.theme-toggle {
-  position: relative;
-  width: 64px;
-  height: 34px;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-.theme-toggle input {
-  opacity: 0;
-  width: 0; height: 0;
-  position: absolute;
-}
-.toggle-track {
-  position: absolute;
-  inset: 0;
-  border-radius: 17px;
-  background: linear-gradient(135deg, #87CEEB, #FDB813);
-  transition: background 0.5s ease;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15), inset 0 1px 3px rgba(0,0,0,0.1);
-}
-[data-theme="dark"] .toggle-track {
-  background: linear-gradient(135deg, #1a1a2e, #16213e);
-}
-/* Stars in dark mode */
-.toggle-track::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    radial-gradient(circle, #fff 1px, transparent 1px),
-    radial-gradient(circle, #fff 1px, transparent 1px),
-    radial-gradient(circle, #fff 1px, transparent 1px),
-    radial-gradient(circle, #fff 0.8px, transparent 0.8px),
-    radial-gradient(circle, #fff 0.8px, transparent 0.8px);
-  background-size: 8px 8px, 12px 12px, 6px 6px, 10px 10px, 7px 7px;
-  background-position: 8px 6px, 20px 10px, 36px 4px, 48px 8px, 56px 16px;
-  opacity: 0;
-  transition: opacity 0.4s;
-}
-[data-theme="dark"] .toggle-track::before { opacity: 1; }
-/* Clouds in light mode */
-.toggle-track::after {
-  content: '';
-  position: absolute;
-  bottom: 4px; left: 4px;
-  width: 22px; height: 10px;
-  background: rgba(255,255,255,0.7);
-  border-radius: 10px;
-  box-shadow: 16px -4px 0 rgba(255,255,255,0.5), 30px 2px 0 rgba(255,255,255,0.4);
-  opacity: 1;
-  transition: opacity 0.4s;
-}
-[data-theme="dark"] .toggle-track::after { opacity: 0; }
+/* ── TAB BAR ── */
+.tab-bar{width:100%;max-width:560px;padding:10px 14px 0;position:sticky;top:60px;z-index:80;background:var(--bg);transition:background .4s;}
+.tab-inner{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:17px;padding:4px;gap:3px;box-shadow:var(--sh-sm);}
+.tab-btn{flex:1;background:none;border:none;padding:9px 4px;border-radius:12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:all .25s;color:var(--text2);}
+.tab-ico{font-size:19px;line-height:1;transition:transform .3s cubic-bezier(.34,1.56,.64,1);}
+.tab-lbl{font-size:10px;font-weight:700;letter-spacing:.2px;white-space:nowrap;}
+.tab-btn.active{background:var(--accent);color:#fff;box-shadow:0 4px 14px rgba(0,113,227,.35);}
+.tab-btn.active .tab-ico{transform:scale(1.18);}
+.tab-btn:not(.active):hover{background:rgba(0,113,227,.08);color:var(--accent);}
 
-.toggle-thumb {
-  position: absolute;
-  top: 3px; left: 3px;
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
-  z-index: 2;
-  display: flex; align-items: center; justify-content: center;
-}
-[data-theme="dark"] .toggle-thumb {
-  transform: translateX(30px);
-}
-/* Sun icon */
-.thumb-sun {
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #FFF176, #FDB813);
-  box-shadow: 0 2px 8px rgba(253,184,19,0.6), 0 0 0 2px rgba(255,255,255,0.3);
-  position: relative;
-  transition: opacity 0.3s, transform 0.3s;
-}
-/* Sun rays */
-.thumb-sun::before {
-  content: '';
-  position: absolute;
-  inset: -4px;
-  border-radius: 50%;
-  background: conic-gradient(
-    rgba(253,184,19,0.6) 0deg 20deg, transparent 20deg 45deg,
-    rgba(253,184,19,0.6) 45deg 65deg, transparent 65deg 90deg,
-    rgba(253,184,19,0.6) 90deg 110deg, transparent 110deg 135deg,
-    rgba(253,184,19,0.6) 135deg 155deg, transparent 155deg 180deg,
-    rgba(253,184,19,0.6) 180deg 200deg, transparent 200deg 225deg,
-    rgba(253,184,19,0.6) 225deg 245deg, transparent 245deg 270deg,
-    rgba(253,184,19,0.6) 270deg 290deg, transparent 290deg 315deg,
-    rgba(253,184,19,0.6) 315deg 335deg, transparent 335deg 360deg
-  );
-  animation: sun-spin 8s linear infinite;
-}
-[data-theme="dark"] .thumb-sun::before { animation-play-state: paused; }
-@keyframes sun-spin { to { transform: rotate(360deg); } }
+/* ── PAGES ── */
+.page{display:none;width:100%;max-width:560px;padding:13px 13px calc(22px + var(--safe-b));flex-direction:column;gap:13px;position:relative;z-index:1;}
+.page.active{display:flex;}
 
-/* Moon icon */
-.thumb-moon {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: radial-gradient(circle at 60% 35%, #E8F4FD, #C8E6F5);
-  box-shadow: 0 2px 10px rgba(100,180,255,0.5), 0 0 0 2px rgba(255,255,255,0.15);
-  opacity: 0;
-  transition: opacity 0.3s;
-  overflow: hidden;
-}
-.thumb-moon::before {
-  content: '';
-  position: absolute;
-  top: 2px; right: 2px;
-  width: 16px; height: 16px;
-  border-radius: 50%;
-  background: #16213e;
-  box-shadow: -2px 4px 0 #16213e;
-}
-/* Craters */
-.thumb-moon::after {
-  content: '';
-  position: absolute;
-  width: 4px; height: 4px;
-  border-radius: 50%;
-  background: rgba(150,200,240,0.5);
-  top: 10px; left: 6px;
-  box-shadow: 6px 4px 0 2px rgba(150,200,240,0.3);
-}
-[data-theme="dark"] .thumb-sun { opacity: 0; transform: scale(0.5); }
-[data-theme="dark"] .thumb-moon { opacity: 1; }
+/* ── CARD ── */
+.card{background:var(--surface);border-radius:var(--r-lg);padding:17px;box-shadow:var(--sh-sm);border:1px solid var(--border);}
+.card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.card-title{font-size:15px;font-weight:700;display:flex;align-items:center;gap:7px;}
+.c-ico{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;}
+.badge{background:var(--accent);color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:20px;}
 
-.theme-toggle:active .toggle-thumb { transform: scaleX(1.15); }
-[data-theme="dark"] .theme-toggle:active .toggle-thumb { transform: translateX(30px) scaleX(1.15); }
+/* ── SHARED ITEMS UI ── */
+.qrow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px;}
+.qchip{background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .2s;white-space:nowrap;}
+.qchip:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
+.add-row{display:flex;gap:7px;margin-bottom:9px;}
+.add-inp{flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:9px 12px;color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color .2s;}
+.add-inp:focus{border-color:var(--accent);}
+.add-inp::placeholder{color:var(--text3);}
+.btn-add{background:var(--green);color:#fff;border:none;border-radius:var(--r-sm);padding:9px 14px;font-size:18px;cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(50,215,75,.3);font-weight:700;}
+.btn-add:active{transform:scale(.93);}
+.ilist{display:flex;flex-direction:column;gap:5px;max-height:220px;overflow-y:auto;padding-right:2px;}
+.ilist::-webkit-scrollbar{width:4px;}
+.ilist::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.irow{display:flex;align-items:center;gap:7px;background:var(--bg);border-radius:var(--r-sm);padding:8px 10px;border:1px solid transparent;transition:all .2s;animation:itin .3s cubic-bezier(.34,1.56,.64,1);}
+@keyframes itin{from{opacity:0;transform:translateY(-8px) scale(.95)}to{opacity:1;transform:none}}
+.irow:hover{border-color:var(--border);}
+.idot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.iname{flex:1;font-size:13px;font-weight:500;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.iname-edit{flex:1;background:var(--surface);border:1.5px solid var(--accent);border-radius:7px;padding:3px 7px;font-size:13px;font-family:inherit;color:var(--text);outline:none;}
+.iacts{display:flex;gap:3px;flex-shrink:0;}
+.bic{background:none;border:none;width:26px;height:26px;border-radius:7px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;color:var(--text2);transition:all .15s;}
+.bic:hover{background:var(--border);}
+.bic.del:hover{background:rgba(255,69,58,.12);color:var(--red);}
+.bic.edt:hover{background:rgba(0,113,227,.12);color:var(--accent);}
+.empty-hint{text-align:center;padding:18px;color:var(--text3);font-size:13px;}
+.act-row{display:flex;gap:6px;margin-top:9px;}
+.btn-sm{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 5px;font-size:11px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:4px;}
+.btn-sm:hover{background:var(--surface);border-color:var(--accent);color:var(--accent);}
+.btn-sm.danger:hover{border-color:var(--red);color:var(--red);}
+.btn-sm:active{transform:scale(.96);}
 
-/* ── MAIN LAYOUT ── */
-.main {
-  width: 100%;
-  max-width: 540px;
-  padding: 16px 16px calc(20px + var(--safe-b));
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  position: relative;
-  z-index: 1;
-}
+/* ── PROBABILITY ── */
+.ptbl{width:100%;border-collapse:collapse;font-size:13px;}
+.ptbl th{color:var(--text3);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;padding:0 7px 8px;text-align:left;border-bottom:1px solid var(--border);}
+.ptbl td{padding:7px;border-bottom:1px solid rgba(0,0,0,.04);vertical-align:middle;}
+[data-theme="dark"] .ptbl td{border-bottom-color:rgba(255,255,255,.04);}
+.ptbl tr:last-child td{border-bottom:none;}
+.pbar-w{height:5px;background:var(--bg);border-radius:3px;overflow:hidden;min-width:50px;}
+.pbar-f{height:100%;border-radius:3px;transition:width .5s cubic-bezier(.34,1.56,.64,1);}
+.ppct{font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;text-align:right;}
 
-/* ── WHEEL CARD ── */
-.wheel-card {
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  padding: 24px;
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-}
+/* ── FORMULA ── */
+.fcard{background:linear-gradient(135deg,rgba(0,113,227,.07),rgba(191,90,242,.07));border:1px solid rgba(0,113,227,.13);}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.fc{background:var(--surface);border-radius:var(--r-sm);padding:11px;text-align:center;border:1px solid var(--border);}
+.fl{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;}
+.fv{font-family:'Outfit',sans-serif;font-size:21px;font-weight:900;letter-spacing:-1px;}
 
-.wheel-wrapper {
-  position: relative;
-  width: min(75vw, 320px);
-  height: min(75vw, 320px);
-}
-.wheel-ring {
-  position: absolute;
-  inset: -6px;
-  border-radius: 50%;
-  background: conic-gradient(from 0deg, #FF453A, #FF9F0A, #FFD60A, #32D74B, #34AADC, #0071E3, #BF5AF2, #FF375F, #FF453A);
-  padding: 4px;
-  animation: ring-spin 8s linear infinite;
-}
-@keyframes ring-spin { to { transform: rotate(360deg); } }
-.wheel-ring-inner {
-  width: 100%; height: 100%;
-  border-radius: 50%;
-  background: var(--bg);
-}
-.wheel-shadow {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  box-shadow: var(--shadow-lg);
-  pointer-events: none;
-  z-index: 2;
-}
-#wheelCanvas {
-  position: relative;
-  z-index: 3;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  display: block;
-  transition: transform 5s cubic-bezier(0.08, 0, 0.05, 1);
-}
-.pointer-wrap {
-  position: absolute;
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));
-}
-.center-btn {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%);
-  z-index: 10;
-  width: 56px;
-  height: 56px;
-  background: var(--surface);
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.center-btn:active { transform: translate(-50%,-50%) scale(0.9); }
-.center-btn svg { transition: transform 0.3s; }
-.center-btn:hover svg { transform: rotate(180deg); }
+/* ════ PAGE 1 – WHEEL ════ */
+.wheel-card{background:var(--surface);border-radius:var(--r-lg);padding:20px;box-shadow:var(--sh-md);border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;gap:16px;}
+.wheel-wrap{position:relative;width:min(72vw,300px);height:min(72vw,300px);}
+.w-ring{position:absolute;inset:-5px;border-radius:50%;background:conic-gradient(from 0deg,#FF453A,#FF9F0A,#FFD60A,#32D74B,#34AADC,#0071E3,#BF5AF2,#FF375F,#FF453A);padding:4px;animation:rspin 8s linear infinite;}
+@keyframes rspin{to{transform:rotate(360deg);}}
+.w-ring-inner{width:100%;height:100%;border-radius:50%;background:var(--bg);}
+.w-shadow{position:absolute;inset:0;border-radius:50%;box-shadow:var(--sh-lg);pointer-events:none;z-index:2;}
+#wCanvas{position:relative;z-index:3;width:100%;height:100%;border-radius:50%;display:block;transition:transform 5s cubic-bezier(.08,0,.05,1);}
+.w-ptr{position:absolute;top:-17px;left:50%;transform:translateX(-50%);z-index:10;filter:drop-shadow(0 4px 8px rgba(0,0,0,.25));}
+.w-ctr{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;width:48px;height:48px;background:var(--surface);border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.18);transition:transform .2s;}
+.w-ctr:active{transform:translate(-50%,-50%) scale(.9);}
+.spin-row{width:100%;display:flex;gap:9px;}
+.btn-spin{flex:1;background:linear-gradient(135deg,#0071E3,#34AADC);color:#fff;border:none;padding:14px;border-radius:var(--r-md);font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;letter-spacing:.4px;cursor:pointer;transition:all .3s cubic-bezier(.175,.885,.32,1.2);box-shadow:0 8px 20px rgba(0,113,227,.35);overflow:hidden;position:relative;}
+.btn-spin::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);transition:left .5s;}
+.btn-spin:not(:disabled):hover::before{left:100%;}
+.btn-spin:not(:disabled):active{transform:scale(.96);}
+.btn-spin:disabled{background:var(--text3);box-shadow:none;cursor:not-allowed;}
+.btn-lucky{background:linear-gradient(135deg,#FF9F0A,#FF453A);color:#fff;border:none;padding:14px 16px;border-radius:var(--r-md);font-size:18px;cursor:pointer;transition:all .2s;box-shadow:0 8px 20px rgba(255,100,0,.3);}
+.btn-lucky:active{transform:scale(.93);}
 
-/* ── SPIN BUTTON ── */
-.spin-row { width: 100%; display: flex; gap: 10px; }
-.btn-spin {
-  flex: 1;
-  background: linear-gradient(135deg, #0071E3, #34AADC);
-  color: white;
-  border: none;
-  padding: 16px 20px;
-  border-radius: var(--radius-md);
-  font-family: 'Outfit', sans-serif;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.2);
-  box-shadow: 0 8px 20px rgba(0,113,227,0.35);
-  position: relative;
-  overflow: hidden;
-}
-.btn-spin::before {
-  content: '';
-  position: absolute;
-  top: 0; left: -100%;
-  width: 100%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  transition: left 0.5s;
-}
-.btn-spin:not(:disabled):hover::before { left: 100%; }
-.btn-spin:not(:disabled):active { transform: scale(0.96); box-shadow: 0 4px 10px rgba(0,113,227,0.2); }
-.btn-spin:disabled { background: var(--text3); box-shadow: none; cursor: not-allowed; }
+/* ════ PAGE 2 – SLOT ════ */
+.slot-machine{background:var(--surface);border-radius:var(--r-lg);border:1px solid var(--border);box-shadow:var(--sh-md);overflow:hidden;}
+.slot-top{background:linear-gradient(135deg,#0d0d1a,#1a0a2e,#0d0d1a);padding:16px 16px 12px;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.slot-header{display:flex;align-items:center;gap:8px;}
+.slot-neon{font-family:'Outfit',sans-serif;font-size:20px;font-weight:900;color:#FFD60A;text-shadow:0 0 10px #FFD60A,0 0 22px #FF9F0A,0 0 40px rgba(255,159,0,.3);letter-spacing:3px;}
+.slot-lights{display:flex;gap:5px;}
+.slot-light{width:9px;height:9px;border-radius:50%;animation:blink 1.2s ease-in-out infinite;}
+.slot-light:nth-child(1){background:#FF453A;box-shadow:0 0 6px #FF453A;animation-delay:0s;}
+.slot-light:nth-child(2){background:#FFD60A;box-shadow:0 0 6px #FFD60A;animation-delay:.2s;}
+.slot-light:nth-child(3){background:#32D74B;box-shadow:0 0 6px #32D74B;animation-delay:.4s;}
+.slot-light:nth-child(4){background:#34AADC;box-shadow:0 0 6px #34AADC;animation-delay:.6s;}
+.slot-light:nth-child(5){background:#BF5AF2;box-shadow:0 0 6px #BF5AF2;animation-delay:.8s;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
+.reels-wrap{display:flex;align-items:center;gap:4px;background:#050510;border-radius:12px;padding:8px;border:2px solid rgba(255,213,0,.12);}
+.reel-outer{width:84px;height:104px;border-radius:9px;overflow:hidden;position:relative;background:#030308;border:1.5px solid rgba(255,213,0,.18);box-shadow:inset 0 0 20px rgba(0,0,0,.9);}
+.reel-outer::before,.reel-outer::after{content:'';position:absolute;left:0;right:0;height:26px;z-index:10;pointer-events:none;}
+.reel-outer::before{top:0;background:linear-gradient(to bottom,#030308 30%,transparent);}
+.reel-outer::after{bottom:0;background:linear-gradient(to top,#030308 30%,transparent);}
+.win-line{position:absolute;top:50%;left:6px;right:6px;height:2px;background:linear-gradient(90deg,transparent,rgba(255,213,0,.4),transparent);transform:translateY(-50%);z-index:5;pointer-events:none;}
+.reel-track{display:flex;flex-direction:column;will-change:transform;}
+.reel-item{width:84px;height:104px;display:flex;align-items:center;justify-content:center;font-size:40px;user-select:none;flex-shrink:0;}
+.reel-sep{width:4px;height:104px;background:linear-gradient(to bottom,rgba(255,213,0,.02),rgba(255,213,0,.1),rgba(255,213,0,.02));border-radius:2px;flex-shrink:0;}
+.slot-body{padding:14px 16px 18px;}
+.btn-pull{width:100%;background:linear-gradient(135deg,#FF453A,#FF9F0A);color:#fff;border:none;padding:15px;border-radius:var(--r-md);font-family:'Outfit',sans-serif;font-size:17px;font-weight:800;letter-spacing:.5px;cursor:pointer;transition:all .3s;box-shadow:0 8px 22px rgba(255,69,58,.4);margin-bottom:12px;position:relative;overflow:hidden;}
+.btn-pull::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);transition:left .5s;}
+.btn-pull:not(:disabled):hover::before{left:100%;}
+.btn-pull:not(:disabled):active{transform:scale(.97);}
+.btn-pull:disabled{background:var(--text3);box-shadow:none;cursor:not-allowed;}
+.slot-res{min-height:36px;background:var(--bg);border-radius:var(--r-sm);padding:7px 13px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);}
+.slot-res-txt{font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;color:var(--text2);}
+.slot-res-txt.win{color:var(--green);animation:pwn .5s ease;}
+@keyframes pwn{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
 
-.btn-lucky {
-  background: linear-gradient(135deg, #FF9F0A, #FF453A);
-  color: white;
-  border: none;
-  padding: 16px 18px;
-  border-radius: var(--radius-md);
-  font-size: 20px;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 8px 20px rgba(255,100,0,0.3);
+/* ════ PAGE 3 – CARD DRAW ════ */
+.draw-card{background:var(--surface);border-radius:var(--r-lg);border:1px solid var(--border);box-shadow:var(--sh-md);padding:18px;}
+.draw-stage{display:flex;flex-direction:column;align-items:center;gap:14px;}
+.draw-ttl{font-family:'Outfit',sans-serif;font-size:17px;font-weight:800;color:var(--text);letter-spacing:-.3px;}
+.cards-fan{position:relative;height:175px;width:100%;display:flex;align-items:flex-end;justify-content:center;}
+.fan-card{position:absolute;bottom:0;width:84px;height:124px;border-radius:11px;cursor:pointer;transition:transform .35s cubic-bezier(.34,1.56,.64,1),box-shadow .3s;will-change:transform;transform-origin:bottom center;backface-visibility:hidden;}
+.fan-card.facedown{background:linear-gradient(135deg,#1a237e,#283593);border:2px solid rgba(255,255,255,.12);}
+.fan-card.facedown .fcard-inner{width:100%;height:100%;border-radius:9px;background:repeating-linear-gradient(45deg,rgba(255,255,255,.025) 0,rgba(255,255,255,.025) 3px,transparent 3px,transparent 10px),repeating-linear-gradient(-45deg,rgba(255,255,255,.025) 0,rgba(255,255,255,.025) 3px,transparent 3px,transparent 10px);}
+.fan-card.revealed{border:2px solid;}
+.fan-card:hover:not(.flipping){transform:var(--fan-base-transform,none) translateY(-14px) scale(1.05)!important;}
+.fan-card.flipping{animation:cflip .6s ease forwards;}
+@keyframes cflip{
+  0%{transform:rotateY(0) scale(1) translateY(0);}
+  45%{transform:rotateY(90deg) scale(1.1) translateY(-18px);}
+  55%{transform:rotateY(90deg) scale(1.1) translateY(-18px);}
+  100%{transform:rotateY(0) scale(1) translateY(0);}
 }
-.btn-lucky:active { transform: scale(0.93); }
+.fcard-content{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:8px;}
+.fcard-emoji{font-size:26px;line-height:1;}
+.fcard-text{font-size:11px;font-weight:700;text-align:center;word-break:break-word;line-height:1.2;}
+.draw-ctrls{width:100%;display:flex;gap:9px;}
+.btn-draw{flex:1;background:linear-gradient(135deg,#BF5AF2,#FF375F);color:#fff;border:none;padding:14px;border-radius:var(--r-md);font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all .3s;box-shadow:0 8px 20px rgba(191,90,242,.35);}
+.btn-draw:not(:disabled):active{transform:scale(.96);}
+.btn-draw:disabled{background:var(--text3);box-shadow:none;cursor:not-allowed;}
+.btn-reset{background:var(--bg);border:1px solid var(--border);border-radius:var(--r-md);padding:14px 16px;font-size:18px;cursor:pointer;transition:all .2s;}
+.btn-reset:active{transform:scale(.93);}
+.draw-status{width:100%;text-align:center;padding:7px 12px;background:var(--bg);border-radius:var(--r-sm);font-size:12px;color:var(--text2);font-weight:500;border:1px solid var(--border);}
+.draw-hist{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;min-height:34px;}
+.hist-chip{background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 11px;font-size:12px;font-weight:600;animation:itin .3s ease;}
 
-/* ── ITEMS CARD ── */
-.card {
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  padding: 20px;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border);
-}
-
-.card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-}
-.card-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.card-title-icon {
-  width: 28px; height: 28px;
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px;
-}
-
-.badge-count {
-  background: var(--accent);
-  color: white;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 20px;
-}
-
-/* ── QUICK INPUT ── */
-.quick-row {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-}
-.quick-chip {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 6px 14px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text2);
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-.quick-chip:hover { background: var(--accent); color: white; border-color: var(--accent); }
-.quick-chip:active { transform: scale(0.94); }
-
-/* ── ADD INPUT ── */
-.add-row {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-.add-input {
-  flex: 1;
-  background: var(--bg);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 11px 14px;
-  color: var(--text);
-  font-size: 15px;
-  font-family: inherit;
-  outline: none;
-  transition: border-color 0.2s;
-}
-.add-input:focus { border-color: var(--accent); background: var(--surface); }
-.add-input::placeholder { color: var(--text3); }
-.btn-add {
-  background: var(--green);
-  color: white;
-  border: none;
-  border-radius: var(--radius-sm);
-  padding: 11px 16px;
-  font-size: 20px;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 4px 12px rgba(50,215,75,0.3);
-  font-weight: 700;
-}
-.btn-add:active { transform: scale(0.93); }
-
-/* ── ITEMS LIST ── */
-.items-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  max-height: 260px;
-  overflow-y: auto;
-  padding-right: 2px;
-}
-.items-list::-webkit-scrollbar { width: 4px; }
-.items-list::-webkit-scrollbar-track { background: transparent; }
-.items-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-.item-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--bg);
-  border-radius: var(--radius-sm);
-  padding: 10px 12px;
-  border: 1px solid transparent;
-  transition: all 0.2s;
-  animation: item-in 0.3s cubic-bezier(0.34,1.56,0.64,1);
-}
-@keyframes item-in { from { opacity: 0; transform: translateY(-8px) scale(0.95); } to { opacity: 1; transform: none; } }
-.item-row:hover { border-color: var(--border); }
-
-.item-dot {
-  width: 12px; height: 12px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.item-name {
-  flex: 1;
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--text);
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.item-name-edit {
-  flex: 1;
-  background: var(--surface);
-  border: 1.5px solid var(--accent);
-  border-radius: 8px;
-  padding: 4px 8px;
-  font-size: 15px;
-  font-family: inherit;
-  color: var(--text);
-  outline: none;
-}
-.item-actions { display: flex; gap: 4px; flex-shrink: 0; }
-.btn-icon {
-  background: none;
-  border: none;
-  width: 30px; height: 30px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  display: flex; align-items: center; justify-content: center;
-  color: var(--text2);
-  transition: all 0.15s;
-}
-.btn-icon:hover { background: var(--border); }
-.btn-icon.del:hover { background: rgba(255,69,58,0.12); color: var(--red); }
-.btn-icon.edit:hover { background: rgba(0,113,227,0.12); color: var(--accent); }
-
-.empty-hint {
-  text-align: center;
-  padding: 24px;
-  color: var(--text3);
-  font-size: 14px;
-}
-
-/* ── IMPORT / CLEAR ROW ── */
-.action-row {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-}
-.btn-sm {
-  flex: 1;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 10px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text2);
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-.btn-sm:hover { background: var(--surface); border-color: var(--accent); color: var(--accent); }
-.btn-sm.danger:hover { border-color: var(--red); color: var(--red); }
-.btn-sm:active { transform: scale(0.96); }
-
-/* ── PROBABILITY CARD ── */
-.prob-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-}
-.prob-table th {
-  color: var(--text3);
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 0 10px 10px;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
-}
-.prob-table th:last-child { text-align: right; }
-.prob-table td {
-  padding: 10px;
-  border-bottom: 1px solid rgba(0,0,0,0.04);
-  vertical-align: middle;
-}
-[data-theme="dark"] .prob-table td { border-bottom-color: rgba(255,255,255,0.05); }
-.prob-table tr:last-child td { border-bottom: none; }
-.prob-bar-cell { width: 40%; }
-.prob-bar-wrap { height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; }
-.prob-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s cubic-bezier(0.34,1.56,0.64,1); }
-.prob-pct { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 15px; color: var(--text); text-align: right; }
-
-/* ── MODAL ── */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.45);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  z-index: 200;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s;
-}
-.overlay.show { opacity: 1; pointer-events: all; }
-.modal {
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  padding: 36px 28px 28px;
-  width: min(88vw, 340px);
-  text-align: center;
-  box-shadow: var(--shadow-lg);
-  border: 1px solid var(--border);
-  transform: scale(0.75) translateY(40px);
-  transition: transform 0.45s cubic-bezier(0.34,1.56,0.64,1);
-}
-.overlay.show .modal { transform: scale(1) translateY(0); }
-
-.modal-emoji { font-size: 56px; margin-bottom: 8px; display: block; animation: bounce 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards; }
-@keyframes bounce { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-.modal-sub { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--green); margin-bottom: 8px; }
-.modal-name {
-  font-family: 'Outfit', sans-serif;
-  font-size: 40px;
-  font-weight: 900;
-  color: var(--text);
-  letter-spacing: -1.5px;
-  word-break: break-word;
-  margin-bottom: 28px;
-  line-height: 1.1;
-}
-.btn-close-modal {
-  width: 100%;
-  background: var(--text);
-  color: var(--bg);
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 16px;
-  font-size: 17px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-  letter-spacing: -0.3px;
-}
-.btn-close-modal:active { transform: scale(0.97); opacity: 0.85; }
-
-/* ── FORMULA CARD ── */
-.formula-card {
-  background: linear-gradient(135deg, rgba(0,113,227,0.08), rgba(191,90,242,0.08));
-  border: 1px solid rgba(0,113,227,0.15);
-}
-.formula-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-.formula-cell {
-  background: var(--surface);
-  border-radius: var(--radius-sm);
-  padding: 14px;
-  text-align: center;
-  border: 1px solid var(--border);
-}
-.formula-label { font-size: 11px; color: var(--text3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-.formula-value { font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 900; color: var(--text); letter-spacing: -1px; }
-.formula-value.accent { color: var(--accent); }
-.formula-value.green { color: var(--green); }
-.formula-value.orange { color: var(--orange); }
-.formula-value.purple { color: var(--purple); }
-
-/* ── TEXTAREA IMPORT ── */
-.import-modal { display: none; }
-.import-modal.show { display: flex; }
+/* ── MODALS ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;}
+.overlay.show{opacity:1;pointer-events:all;}
+.modal{background:var(--surface);border-radius:var(--r-lg);padding:30px 24px 24px;width:min(86vw,320px);text-align:center;box-shadow:var(--sh-lg);border:1px solid var(--border);transform:scale(.75) translateY(40px);transition:transform .45s cubic-bezier(.34,1.56,.64,1);}
+.overlay.show .modal{transform:scale(1) translateY(0);}
+.m-emoji{font-size:52px;display:block;margin-bottom:5px;animation:mbounce .6s cubic-bezier(.34,1.56,.64,1) forwards;}
+@keyframes mbounce{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
+.m-sub{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);margin-bottom:5px;}
+.m-name{font-family:'Outfit',sans-serif;font-size:36px;font-weight:900;color:var(--text);letter-spacing:-1.5px;word-break:break-word;margin-bottom:22px;line-height:1.1;}
+.btn-close-m{width:100%;background:var(--text);color:var(--bg);border:none;border-radius:var(--r-md);padding:14px;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn-close-m:active{transform:scale(.97);opacity:.85;}
 
 /* ── TOAST ── */
-.toast {
-  position: fixed;
-  bottom: calc(20px + var(--safe-b));
-  left: 50%;
-  transform: translateX(-50%) translateY(80px);
-  background: var(--text);
-  color: var(--bg);
-  padding: 12px 20px;
-  border-radius: 30px;
-  font-size: 14px;
-  font-weight: 600;
-  z-index: 300;
-  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
-  white-space: nowrap;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
-}
-.toast.show { transform: translateX(-50%) translateY(0); }
+.toast{position:fixed;bottom:calc(16px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(80px);background:var(--text);color:var(--bg);padding:9px 17px;border-radius:30px;font-size:12px;font-weight:600;z-index:300;transition:transform .4s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.25);}
+.toast.show{transform:translateX(-50%) translateY(0);}
 
-/* ── SPINNING ANIMATION ── */
-.spinning .wheel-ring { animation: ring-spin 0.5s linear infinite; }
-
-/* ── RESPONSIVE DESKTOP ── */
-@media (min-width: 600px) {
-  .main { padding: 20px 20px 40px; }
-  .wheel-wrapper { width: 300px; height: 300px; }
-  .btn-spin { font-size: 20px; }
-}
-
-/* ── SCROLLBAR ── */
-html { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+@media(min-width:580px){.wheel-wrap{width:300px;height:300px;}.reel-outer{width:96px;}.reel-item{width:96px;font-size:44px;}}
 </style>
 </head>
 <body>
 
-<div class="bg-orb bg-orb-1"></div>
-<div class="bg-orb bg-orb-2"></div>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
 
 <!-- NAV -->
 <nav class="nav">
   <div class="nav-logo">
     <div class="nav-icon">🎯</div>
-    <span class="nav-title">Lucky Wheel</span>
+    <span class="nav-title">Lucky Pro</span>
   </div>
-  <label class="theme-toggle" title="切換深色／淺色模式" aria-label="切換主題">
-    <input type="checkbox" id="themeCheckbox" onchange="toggleTheme(this)">
-    <div class="toggle-track"></div>
-    <div class="toggle-thumb">
-      <div class="thumb-sun"></div>
-      <div class="thumb-moon"></div>
+  <label class="tgl" title="切換主題">
+    <input type="checkbox" id="themeChk" onchange="toggleTheme(this)">
+    <div class="tgl-trk"></div>
+    <div class="tgl-th">
+      <div class="tgl-sun"></div>
+      <div class="tgl-moon"></div>
     </div>
   </label>
 </nav>
 
-<!-- MAIN -->
-<main class="main">
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <div class="tab-inner">
+    <button class="tab-btn active" onclick="switchTab('wheel',this)">
+      <span class="tab-ico">🎡</span><span class="tab-lbl">大轉盤</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('slot',this)">
+      <span class="tab-ico">🎰</span><span class="tab-lbl">拉霸機</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('draw',this)">
+      <span class="tab-ico">🃏</span><span class="tab-lbl">翻牌抽籤</span>
+    </button>
+  </div>
+</div>
 
-  <!-- WHEEL CARD -->
-  <div class="wheel-card" id="wheelCard">
-    <div class="wheel-wrapper" id="wheelWrapper">
-      <div class="wheel-ring"><div class="wheel-ring-inner"></div></div>
-      <div class="wheel-shadow"></div>
-      <canvas id="wheelCanvas" width="640" height="640"></canvas>
-      <!-- Pointer -->
-      <div class="pointer-wrap">
-        <svg width="36" height="46" viewBox="0 0 36 46" fill="none">
-          <path d="M18 46 L36 10 A6 6 0 0 0 30 0 L6 0 A6 6 0 0 0 0 10 Z" fill="#FF3B30"/>
-          <circle cx="18" cy="6" r="4" fill="rgba(255,255,255,0.5)"/>
-        </svg>
-      </div>
-      <!-- Center button -->
-      <button class="center-btn" onclick="spin()" title="SPIN">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+<!-- ═══ PAGE 1 – WHEEL ═══ -->
+<div class="page active" id="page-wheel">
+  <div class="wheel-card">
+    <div class="wheel-wrap">
+      <div class="w-ring"><div class="w-ring-inner"></div></div>
+      <div class="w-shadow"></div>
+      <canvas id="wCanvas" width="640" height="640"></canvas>
+      <svg class="w-ptr" width="32" height="42" viewBox="0 0 32 42" fill="none">
+        <path d="M16 42 L32 8 A5 5 0 0 0 27 0 L5 0 A5 5 0 0 0 0 8 Z" fill="#FF3B30"/>
+        <circle cx="16" cy="6" r="3" fill="rgba(255,255,255,.5)"/>
+      </svg>
+      <button class="w-ctr" onclick="wheelSpin()" title="SPIN">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
           <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round"/>
         </svg>
       </button>
     </div>
-
-    <!-- SPIN ROW -->
     <div class="spin-row">
-      <button class="btn-spin" id="spinBtn" onclick="spin()">✦ SPIN</button>
-      <button class="btn-lucky" title="隨機填入範例" onclick="loadSample()">🎲</button>
+      <button class="btn-spin" id="spinBtn" onclick="wheelSpin()">✦ SPIN</button>
+      <button class="btn-lucky" onclick="loadWheelSample()">🎲</button>
     </div>
   </div>
 
-  <!-- ITEMS CARD -->
   <div class="card">
-    <div class="card-header">
-      <div class="card-title">
-        <div class="card-title-icon" style="background:rgba(255,159,10,0.15);">✏️</div>
-        編輯選項
-        <span class="badge-count" id="countBadge">0</span>
-      </div>
-      <button class="btn-icon" onclick="openImport()" title="批次貼上" style="background:rgba(0,113,227,0.1);color:var(--accent);border-radius:10px;width:32px;height:32px;">📋</button>
+    <div class="card-hd">
+      <div class="card-title"><div class="c-ico" style="background:rgba(255,159,10,.15)">✏️</div>編輯選項<span class="badge" id="wBadge">0</span></div>
+      <button class="bic" onclick="openImport('w')" style="background:rgba(0,113,227,.1);color:var(--accent);border-radius:9px;width:29px;height:29px;">📋</button>
     </div>
-
-    <!-- Quick chips -->
-    <div class="quick-row" id="quickChips">
-      <span class="quick-chip" onclick="quickAdd('王小明')">+ 王小明</span>
-      <span class="quick-chip" onclick="quickAdd('李大同')">+ 李大同</span>
-      <span class="quick-chip" onclick="quickAdd('張美麗')">+ 張美麗</span>
-      <span class="quick-chip" onclick="quickAdd('陳嘉玲')">+ 陳嘉玲</span>
-      <span class="quick-chip" onclick="quickAdd('多喝水')">+ 多喝水</span>
+    <div class="qrow">
+      <span class="qchip" onclick="wQuick('王小明')">+ 王小明</span>
+      <span class="qchip" onclick="wQuick('李大同')">+ 李大同</span>
+      <span class="qchip" onclick="wQuick('張美麗')">+ 張美麗</span>
+      <span class="qchip" onclick="wQuick('陳嘉玲')">+ 陳嘉玲</span>
+      <span class="qchip" onclick="wQuick('多喝水')">+ 多喝水</span>
     </div>
-
-    <!-- Add row -->
     <div class="add-row">
-      <input class="add-input" id="addInput" type="text" placeholder="輸入新選項並按 Enter…" maxlength="20"
-        onkeydown="if(event.key==='Enter')addItem()">
-      <button class="btn-add" onclick="addItem()">+</button>
+      <input class="add-inp" id="wInp" type="text" placeholder="輸入選項，按 Enter 新增…" maxlength="20" onkeydown="if(event.key==='Enter')wAdd()">
+      <button class="btn-add" onclick="wAdd()">+</button>
     </div>
-
-    <!-- List -->
-    <div class="items-list" id="itemsList"></div>
-
-    <!-- Action row -->
-    <div class="action-row">
-      <button class="btn-sm" onclick="openImport()">📥 批次貼上</button>
-      <button class="btn-sm" onclick="shuffleItems()">🔀 隨機排序</button>
-      <button class="btn-sm danger" onclick="clearAll()">🗑 清空</button>
+    <div class="ilist" id="wList"></div>
+    <div class="act-row">
+      <button class="btn-sm" onclick="openImport('w')">📥 批次</button>
+      <button class="btn-sm" onclick="wShuffle()">🔀 排序</button>
+      <button class="btn-sm danger" onclick="wClear()">🗑 清空</button>
     </div>
   </div>
 
-  <!-- FORMULA CARD -->
-  <div class="card formula-card">
-    <div class="card-header">
-      <div class="card-title">
-        <div class="card-title-icon" style="background:rgba(191,90,242,0.15);">📊</div>
-        統計公式
-      </div>
-    </div>
-    <div class="formula-grid">
-      <div class="formula-cell">
-        <div class="formula-label">總選項數</div>
-        <div class="formula-value accent" id="fTotal">0</div>
-      </div>
-      <div class="formula-cell">
-        <div class="formula-label">唯一項目</div>
-        <div class="formula-value purple" id="fUnique">0</div>
-      </div>
-      <div class="formula-cell">
-        <div class="formula-label">最高機率</div>
-        <div class="formula-value orange" id="fMax">—</div>
-      </div>
-      <div class="formula-cell">
-        <div class="formula-label">平均機率</div>
-        <div class="formula-value green" id="fAvg">—</div>
-      </div>
+  <div class="card fcard">
+    <div class="card-hd"><div class="card-title"><div class="c-ico" style="background:rgba(191,90,242,.15)">📊</div>統計公式</div></div>
+    <div class="fg">
+      <div class="fc"><div class="fl">總選項數</div><div class="fv" id="wFT" style="color:var(--accent)">0</div></div>
+      <div class="fc"><div class="fl">唯一項目</div><div class="fv" id="wFU" style="color:var(--purple)">0</div></div>
+      <div class="fc"><div class="fl">最高機率</div><div class="fv" id="wFM" style="color:var(--orange)">—</div></div>
+      <div class="fc"><div class="fl">平均機率</div><div class="fv" id="wFA" style="color:var(--green)">—</div></div>
     </div>
   </div>
 
-  <!-- PROBABILITY CARD -->
-  <div class="card" id="probCard">
-    <div class="card-header">
-      <div class="card-title">
-        <div class="card-title-icon" style="background:rgba(52,210,75,0.15);">🎰</div>
-        中獎機率
+  <div class="card">
+    <div class="card-hd"><div class="card-title"><div class="c-ico" style="background:rgba(52,210,75,.15)">🎰</div>中獎機率</div></div>
+    <div style="overflow-x:auto"><table class="ptbl"><thead><tr><th>選項</th><th>權重</th><th style="min-width:60px">分布</th><th>機率</th></tr></thead><tbody id="wPBody"></tbody></table></div>
+  </div>
+</div>
+
+<!-- ═══ PAGE 2 – SLOT ═══ -->
+<div class="page" id="page-slot">
+  <div class="slot-machine">
+    <div class="slot-top">
+      <div class="slot-header">
+        <div class="slot-lights"><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div></div>
+        <span class="slot-neon">★ SLOT ★</span>
+        <div class="slot-lights"><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div></div>
+      </div>
+      <div class="reels-wrap" id="reelsWrap">
+        <div class="reel-outer"><div class="win-line"></div><div class="reel-track" id="rt0"></div></div>
+        <div class="reel-sep"></div>
+        <div class="reel-outer"><div class="win-line"></div><div class="reel-track" id="rt1"></div></div>
+        <div class="reel-sep"></div>
+        <div class="reel-outer"><div class="win-line"></div><div class="reel-track" id="rt2"></div></div>
       </div>
     </div>
-    <div style="overflow-x:auto;">
-      <table class="prob-table">
-        <thead>
-          <tr>
-            <th>選項</th>
-            <th>權重</th>
-            <th class="prob-bar-cell">分布</th>
-            <th>機率</th>
-          </tr>
-        </thead>
-        <tbody id="probBody"></tbody>
-      </table>
+    <div class="slot-body">
+      <button class="btn-pull" id="pullBtn" onclick="slotPull()">🎰 PULL</button>
+      <div class="slot-res"><span class="slot-res-txt" id="slotTxt">準備好了，快拉吧！</span></div>
     </div>
   </div>
 
-</main>
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-title"><div class="c-ico" style="background:rgba(255,69,58,.15)">🎲</div>拉霸選項<span class="badge" id="sBadge">0</span></div>
+      <button class="bic" onclick="openImport('s')" style="background:rgba(0,113,227,.1);color:var(--accent);border-radius:9px;width:29px;height:29px;">📋</button>
+    </div>
+    <div class="qrow">
+      <span class="qchip" onclick="sQuick('🍒')">+ 🍒</span>
+      <span class="qchip" onclick="sQuick('🍋')">+ 🍋</span>
+      <span class="qchip" onclick="sQuick('7️⃣')">+ 7️⃣</span>
+      <span class="qchip" onclick="sQuick('💎')">+ 💎</span>
+      <span class="qchip" onclick="sQuick('⭐')">+ ⭐</span>
+    </div>
+    <div class="add-row">
+      <input class="add-inp" id="sInp" type="text" placeholder="輸入符號或文字…" maxlength="8" onkeydown="if(event.key==='Enter')sAdd()">
+      <button class="btn-add" onclick="sAdd()">+</button>
+    </div>
+    <div class="ilist" id="sList"></div>
+    <div class="act-row">
+      <button class="btn-sm" onclick="openImport('s')">📥 批次</button>
+      <button class="btn-sm" onclick="sShuffle()">🔀 排序</button>
+      <button class="btn-sm danger" onclick="sClear()">🗑 清空</button>
+    </div>
+  </div>
+</div>
 
-<!-- IMPORT MODAL -->
-<div class="overlay" id="importOverlay">
-  <div class="modal">
-    <span style="font-size:32px;display:block;margin-bottom:8px;">📋</span>
-    <div class="modal-sub">批次貼上</div>
-    <div style="font-size:14px;color:var(--text2);margin-bottom:12px;text-align:left;">從 Excel / Google 試算表複製整欄，或每行一個選項貼上：</div>
-    <textarea id="importTextarea" style="width:100%;height:140px;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px;color:var(--text);font-size:15px;font-family:inherit;resize:none;outline:none;transition:border-color 0.2s;" placeholder="王小明&#10;李大同&#10;張美麗&#10;..."></textarea>
-    <div style="display:flex;gap:10px;margin-top:14px;">
-      <button onclick="closeImport()" style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:14px;font-size:15px;font-weight:600;color:var(--text2);cursor:pointer;">取消</button>
-      <button onclick="confirmImport()" style="flex:2;background:var(--accent);color:white;border:none;border-radius:14px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 6px 16px rgba(0,113,227,0.3);">匯入</button>
+<!-- ═══ PAGE 3 – CARD DRAW ═══ -->
+<div class="page" id="page-draw">
+  <div class="draw-card">
+    <div class="draw-stage">
+      <div class="draw-ttl">翻牌抽籤 🃏</div>
+      <div class="cards-fan" id="cardsFan"></div>
+      <div class="draw-ctrls">
+        <button class="btn-draw" id="drawBtn" onclick="drawCard()">✦ 翻牌抽籤</button>
+        <button class="btn-reset" onclick="resetDraw()" title="重置">🔄</button>
+      </div>
+      <div class="draw-status" id="drawStatus">尚未抽籤，點擊按鈕開始</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-title"><div class="c-ico" style="background:rgba(255,55,95,.15)">📜</div>抽籤紀錄</div>
+      <button class="btn-sm" style="flex:none;padding:5px 11px;" onclick="clearHistUI()">清除</button>
+    </div>
+    <div class="draw-hist" id="drawHist"><span style="color:var(--text3);font-size:12px;padding:8px">尚無紀錄</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-title"><div class="c-ico" style="background:rgba(191,90,242,.15)">🎴</div>籤筒內容<span class="badge" id="dBadge">0</span></div>
+      <button class="bic" onclick="openImport('d')" style="background:rgba(0,113,227,.1);color:var(--accent);border-radius:9px;width:29px;height:29px;">📋</button>
+    </div>
+    <div class="qrow">
+      <span class="qchip" onclick="dQuick('上上籤')">+ 上上籤</span>
+      <span class="qchip" onclick="dQuick('大吉')">+ 大吉</span>
+      <span class="qchip" onclick="dQuick('中籤')">+ 中籤</span>
+      <span class="qchip" onclick="dQuick('小吉')">+ 小吉</span>
+      <span class="qchip" onclick="dQuick('下下籤')">+ 下下籤</span>
+    </div>
+    <div class="add-row">
+      <input class="add-inp" id="dInp" type="text" placeholder="輸入籤名或選項…" maxlength="16" onkeydown="if(event.key==='Enter')dAdd()">
+      <button class="btn-add" onclick="dAdd()">+</button>
+    </div>
+    <div class="ilist" id="dList"></div>
+    <div class="act-row">
+      <button class="btn-sm" onclick="openImport('d')">📥 批次</button>
+      <button class="btn-sm" onclick="dShuffle()">🔀 排序</button>
+      <button class="btn-sm danger" onclick="dClear()">🗑 清空</button>
     </div>
   </div>
 </div>
 
 <!-- RESULT MODAL -->
-<div class="overlay" id="resultOverlay">
+<div class="overlay" id="resultOvl">
   <div class="modal">
-    <span class="modal-emoji">🎉</span>
-    <div class="modal-sub">恭喜得獎！</div>
-    <div class="modal-name" id="resultName">—</div>
-    <button class="btn-close-modal" onclick="closeResult()">✓ 確認</button>
+    <span class="m-emoji" id="mEmoji">🎉</span>
+    <div class="m-sub" id="mSub">恭喜！</div>
+    <div class="m-name" id="mName">—</div>
+    <button class="btn-close-m" onclick="closeResult()">✓ 確認</button>
+  </div>
+</div>
+
+<!-- IMPORT MODAL -->
+<div class="overlay" id="importOvl">
+  <div class="modal">
+    <span style="font-size:28px;display:block;margin-bottom:5px">📋</span>
+    <div class="m-sub">批次貼上</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:9px;text-align:left">每行一個，支援從 Excel / Google 試算表整欄貼上：</div>
+    <textarea id="importTA" style="width:100%;height:110px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:9px;color:var(--text);font-size:13px;font-family:inherit;resize:none;outline:none;" placeholder="選項 A&#10;選項 B&#10;選項 C…"></textarea>
+    <div style="display:flex;gap:9px;margin-top:11px">
+      <button onclick="closeImport()" style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:13px;padding:12px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer">取消</button>
+      <button onclick="confirmImport()" style="flex:2;background:var(--accent);color:#fff;border:none;border-radius:13px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 6px 16px rgba(0,113,227,.3)">匯入</button>
+    </div>
   </div>
 </div>
 
@@ -903,327 +453,295 @@ html { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
 <div class="toast" id="toast"></div>
 
 <script>
-// ─── DATA ───────────────────────────────────────────────────────
-const COLORS = [
-  '#FF453A','#FF9F0A','#FFD60A','#32D74B',
-  '#34AADC','#0071E3','#BF5AF2','#FF375F',
-  '#5E5CE6','#64D2FF','#FF6961','#77DD77'
-];
+/* ═══ CONSTANTS ═══ */
+const C = ['#FF453A','#FF9F0A','#FFD60A','#32D74B','#34AADC','#0071E3','#BF5AF2','#FF375F','#5E5CE6','#64D2FF','#FF6961','#30D158'];
+const CEMOJI = ['🌟','🌈','🎯','💫','⚡','🔥','🌙','🍀','🎪','🌺','🦋','🎭','🌊','🍭','🎵','🏆'];
 
-let items = ['王小明','李大同','張美麗','陳嘉玲','多喝水','咖啡'];
-let currentAngle = 0;
-let isSpinning = false;
+/* ═══ STATE ═══ */
+let wItems = ['王小明','李大同','張美麗','陳嘉玲','多喝水','咖啡'];
+let sItems = ['🍒','🍋','🍊','7️⃣','💎','⭐','🎰','🃏'];
+let dItems = ['上上籤','大吉','中籤','小吉','平籤','下下籤','大凶','求財大吉'];
+let cardPool = [], drawn = [], isFlipping = false;
+let wAngle = 0, wSpin = false;
+let slotBusy = false;
+let importTgt = 'w';
 
-const canvas = document.getElementById('wheelCanvas');
-const ctx = canvas.getContext('2d');
-
-// ─── THEME ──────────────────────────────────────────────────────
+/* ═══ THEME ═══ */
 function toggleTheme(cb) {
-  const t = cb.checked ? 'dark' : 'light';
-  document.documentElement.setAttribute('data-theme', t);
+  document.documentElement.setAttribute('data-theme', cb.checked ? 'dark' : 'light');
   drawWheel();
 }
 
-// ─── WHEEL DRAW ─────────────────────────────────────────────────
-function drawWheel() {
-  const n = items.length;
-  ctx.clearRect(0, 0, 640, 640);
-  if (n === 0) {
-    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--border');
-    ctx.beginPath(); ctx.arc(320,320,310,0,Math.PI*2); ctx.fill();
-    return;
-  }
-
-  const arc = (Math.PI * 2) / n;
-  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-
-  for (let i = 0; i < n; i++) {
-    const start = i * arc;
-    const end = start + arc;
-    ctx.beginPath();
-    ctx.moveTo(320, 320);
-    ctx.arc(320, 320, 310, start, end);
-    ctx.closePath();
-    ctx.fillStyle = COLORS[i % COLORS.length];
-    ctx.fill();
-
-    // Subtle separator
-    ctx.strokeStyle = isDark ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.6)';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    // Text
-    ctx.save();
-    ctx.translate(320, 320);
-    ctx.rotate(start + arc / 2);
-    ctx.textAlign = 'right';
-    ctx.fillStyle = 'rgba(255,255,255,0.95)';
-    
-    const fontSize = n > 10 ? 22 : 28;
-    ctx.font = `700 ${fontSize}px Outfit, Noto Sans TC, sans-serif`;
-    ctx.shadowColor = 'rgba(0,0,0,0.3)';
-    ctx.shadowBlur = 4;
-
-    let text = items[i];
-    if (text.length > 10) text = text.slice(0, 9) + '…';
-    ctx.fillText(text, 295, 10);
-    ctx.restore();
-  }
-
-  // Center circle
-  const grad = ctx.createRadialGradient(320,320,0, 320,320,52);
-  grad.addColorStop(0, isDark ? '#2C2C2E' : '#FFFFFF');
-  grad.addColorStop(1, isDark ? '#1C1C1E' : '#F5F5F7');
-  ctx.beginPath(); ctx.arc(320, 320, 52, 0, Math.PI*2);
-  ctx.fillStyle = grad; ctx.fill();
-  ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)';
-  ctx.lineWidth = 3; ctx.stroke();
+/* ═══ TABS ═══ */
+function switchTab(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'wheel') drawWheel();
+  if (id === 'slot')  { renderSList(); buildReels(); }
+  if (id === 'draw')  { renderDList(); buildCards(); }
 }
 
-// ─── SPIN ───────────────────────────────────────────────────────
-function spin() {
-  if (isSpinning || items.length < 2) {
-    if (items.length < 2) toast('請至少輸入 2 個選項 😅');
-    return;
-  }
-  isSpinning = true;
-  document.getElementById('spinBtn').disabled = true;
-  document.getElementById('spinBtn').textContent = '旋轉中…';
-  document.getElementById('wheelCard').classList.add('spinning');
+/* ═══ UTILS ═══ */
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+let _tt;
+function toast(m) { const e=document.getElementById('toast'); e.textContent=m; e.classList.add('show'); clearTimeout(_tt); _tt=setTimeout(()=>e.classList.remove('show'),2200); }
+function shuffle(a) { for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} }
+function randInt(n) { return Math.floor(Math.random()*n); }
 
-  const spins = 6 + Math.random() * 5;
-  const extra = Math.random() * 360;
-  currentAngle += spins * 360 + extra;
-
-  canvas.style.transition = 'transform 5s cubic-bezier(0.08, 0, 0.05, 1)';
-  canvas.style.transform = `rotate(${currentAngle}deg)`;
-
-  setTimeout(() => {
-    isSpinning = false;
-    document.getElementById('spinBtn').disabled = false;
-    document.getElementById('spinBtn').innerHTML = '✦ SPIN';
-    document.getElementById('wheelCard').classList.remove('spinning');
-
-    // Calc winner: pointer at top = 270°
-    const norm = ((360 - (currentAngle % 360)) % 360);
-    const corrected = (norm + 270) % 360;
-    const idx = Math.floor((corrected / 360) * items.length) % items.length;
-    showResult(items[idx]);
-  }, 5000);
+function fireConfetti() {
+  const end = Date.now()+2000;
+  (function f(){ confetti({particleCount:3,angle:60,spread:55,origin:{x:0,y:.7},colors:C}); confetti({particleCount:3,angle:120,spread:55,origin:{x:1,y:.7},colors:C}); if(Date.now()<end)requestAnimationFrame(f); })();
+  setTimeout(()=>confetti({particleCount:120,spread:70,origin:{y:.55},colors:C,disableForReducedMotion:true}),250);
 }
-
-// ─── RESULT ─────────────────────────────────────────────────────
-function showResult(name) {
-  document.getElementById('resultName').textContent = name;
-  document.getElementById('resultOverlay').classList.add('show');
-
-  const emojis = ['🎉','🏆','⭐','🎊','🥳','🎯','💫','✨'];
-  document.querySelector('.modal-emoji').textContent = emojis[Math.floor(Math.random()*emojis.length)];
-
-  // Confetti
-  const end = Date.now() + 2200;
-  const colors = COLORS;
-  (function frame() {
-    confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0, y: 0.7 }, colors });
-    confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1, y: 0.7 }, colors });
-    if (Date.now() < end) requestAnimationFrame(frame);
-  })();
-  setTimeout(() => confetti({ particleCount: 120, spread: 70, origin: { y: 0.55 }, colors, disableForReducedMotion: true }), 300);
+function showResult(emoji, sub, name) {
+  document.getElementById('mEmoji').textContent = emoji;
+  document.getElementById('mSub').textContent = sub;
+  document.getElementById('mName').textContent = name;
+  document.getElementById('resultOvl').classList.add('show');
+  fireConfetti();
 }
+function closeResult() { document.getElementById('resultOvl').classList.remove('show'); }
 
-function closeResult() {
-  document.getElementById('resultOverlay').classList.remove('show');
-  canvas.style.transition = 'none';
-  setTimeout(() => canvas.style.transition = 'transform 5s cubic-bezier(0.08, 0, 0.05, 1)', 50);
-}
-
-// ─── ITEMS ──────────────────────────────────────────────────────
-function render() {
-  const list = document.getElementById('itemsList');
-  const badge = document.getElementById('countBadge');
-  badge.textContent = items.length;
-
-  if (items.length === 0) {
-    list.innerHTML = '<div class="empty-hint">還沒有選項，<br>點擊快速標籤或輸入新增 ✏️</div>';
-  } else {
-    list.innerHTML = items.map((item, i) => `
-      <div class="item-row" id="row-${i}">
-        <div class="item-dot" style="background:${COLORS[i % COLORS.length]}"></div>
-        <span class="item-name" id="name-${i}">${escHtml(item)}</span>
-        <div class="item-actions">
-          <button class="btn-icon edit" onclick="editItem(${i})" title="編輯">✏️</button>
-          <button class="btn-icon del" onclick="removeItem(${i})" title="刪除">✕</button>
-        </div>
-      </div>
-    `).join('');
-  }
-
-  updateProb();
-  updateFormula();
-  drawWheel();
-
-  const spinBtn = document.getElementById('spinBtn');
-  spinBtn.disabled = items.length < 2;
-}
-
-function escHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function addItem() {
-  const input = document.getElementById('addInput');
-  const val = input.value.trim();
-  if (!val) return;
-  items.push(val);
-  input.value = '';
-  render();
-  toast(`已新增「${val}」✅`);
-  // Scroll list to bottom
-  const list = document.getElementById('itemsList');
-  setTimeout(() => list.scrollTop = list.scrollHeight, 50);
-}
-
-function quickAdd(name) {
-  items.push(name);
-  render();
-  toast(`已新增「${name}」✅`);
-}
-
-function removeItem(i) {
-  const name = items[i];
-  const row = document.getElementById(`row-${i}`);
-  if (row) { row.style.opacity = '0'; row.style.transform = 'translateX(20px)'; }
-  setTimeout(() => { items.splice(i, 1); render(); }, 200);
-  toast(`已刪除「${name}」🗑`);
-}
-
-function editItem(i) {
-  const row = document.getElementById(`row-${i}`);
-  const nameEl = document.getElementById(`name-${i}`);
-  const current = items[i];
-
-  nameEl.outerHTML = `<input class="item-name-edit" id="edit-${i}" value="${escHtml(current)}" maxlength="20"
-    onblur="saveEdit(${i})" onkeydown="if(event.key==='Enter')saveEdit(${i});if(event.key==='Escape')render();">`;
-  
-  setTimeout(() => {
-    const el = document.getElementById(`edit-${i}`);
-    if (el) { el.focus(); el.select(); }
-  }, 10);
-}
-
-function saveEdit(i) {
-  const el = document.getElementById(`edit-${i}`);
-  if (!el) return;
-  const val = el.value.trim();
-  if (val) { items[i] = val; toast(`已更新 ✅`); }
-  render();
-}
-
-function shuffleItems() {
-  for (let i = items.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [items[i], items[j]] = [items[j], items[i]];
-  }
-  render();
-  toast('已隨機排序 🔀');
-}
-
-function clearAll() {
-  if (items.length === 0) return;
-  if (!confirm('確定要清空所有選項嗎？')) return;
-  items = [];
-  render();
-  toast('已清空所有選項 🗑');
-}
-
-function loadSample() {
-  items = ['王小明','李大同','張美麗','陳嘉玲','林志偉','黃雅婷','劉明輝','謝靜茹'];
-  render();
-  toast('已載入範例資料 🎲');
-}
-
-// ─── IMPORT ─────────────────────────────────────────────────────
-function openImport() {
-  document.getElementById('importOverlay').classList.add('show');
-  document.getElementById('importTextarea').value = '';
-  setTimeout(() => document.getElementById('importTextarea').focus(), 200);
-}
-function closeImport() {
-  document.getElementById('importOverlay').classList.remove('show');
-}
+/* ═══ IMPORT ═══ */
+function openImport(t) { importTgt=t; document.getElementById('importTA').value=''; document.getElementById('importOvl').classList.add('show'); setTimeout(()=>document.getElementById('importTA').focus(),200); }
+function closeImport() { document.getElementById('importOvl').classList.remove('show'); }
 function confirmImport() {
-  const raw = document.getElementById('importTextarea').value;
-  const newItems = raw.split(/[\n\r\t]/).map(s => s.trim()).filter(s => s !== '');
-  if (newItems.length === 0) { toast('沒有偵測到有效資料 ⚠️'); return; }
-  items = [...items, ...newItems];
-  render();
-  closeImport();
-  toast(`已匯入 ${newItems.length} 個選項 ✅`);
+  const arr = document.getElementById('importTA').value.split(/[\n\r\t]/).map(s=>s.trim()).filter(s=>s);
+  if (!arr.length) { toast('沒有偵測到有效資料 ⚠️'); return; }
+  if (importTgt==='w') { wItems=[...wItems,...arr]; renderWList(); }
+  if (importTgt==='s') { sItems=[...sItems,...arr]; renderSList(); buildReels(); }
+  if (importTgt==='d') { dItems=[...dItems,...arr]; renderDList(); buildCards(); }
+  closeImport(); toast(`已匯入 ${arr.length} 個選項 ✅`);
 }
 
-// ─── PROBABILITY TABLE ──────────────────────────────────────────
-function updateProb() {
-  const body = document.getElementById('probBody');
-  if (items.length === 0) {
-    body.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text3);padding:20px;">尚無資料</td></tr>';
-    return;
-  }
-  const counts = {};
-  items.forEach(x => counts[x] = (counts[x] || 0) + 1);
-  const total = items.length;
-  const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]);
-  const maxCount = sorted[0][1];
+/* ═══════════════════════════
+   WHEEL
+═══════════════════════════ */
+const wCvs = document.getElementById('wCanvas');
+const wCtx = wCvs.getContext('2d');
 
-  body.innerHTML = sorted.map(([name, count], i) => {
-    const pct = (count / total * 100).toFixed(1);
-    const barW = (count / maxCount * 100).toFixed(0);
-    return `
-      <tr>
-        <td style="font-weight:600;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(name)}</td>
-        <td style="color:var(--accent);font-family:'Outfit',sans-serif;font-weight:700;">${count}</td>
-        <td class="prob-bar-cell">
-          <div class="prob-bar-wrap">
-            <div class="prob-bar-fill" style="width:${barW}%;background:${COLORS[i % COLORS.length]};"></div>
-          </div>
-        </td>
-        <td class="prob-pct">${pct}%</td>
-      </tr>`;
+function drawWheel() {
+  const n = wItems.length;
+  wCtx.clearRect(0,0,640,640);
+  if (!n) { wCtx.fillStyle='rgba(128,128,128,.15)'; wCtx.beginPath(); wCtx.arc(320,320,310,0,Math.PI*2); wCtx.fill(); return; }
+  const arc = Math.PI*2/n, dark = document.documentElement.getAttribute('data-theme')==='dark';
+  for (let i=0;i<n;i++) {
+    const s=i*arc;
+    wCtx.beginPath(); wCtx.moveTo(320,320); wCtx.arc(320,320,310,s,s+arc); wCtx.closePath();
+    wCtx.fillStyle=C[i%C.length]; wCtx.fill();
+    wCtx.strokeStyle=dark?'rgba(0,0,0,.3)':'rgba(255,255,255,.55)'; wCtx.lineWidth=2; wCtx.stroke();
+    wCtx.save(); wCtx.translate(320,320); wCtx.rotate(s+arc/2);
+    wCtx.textAlign='right'; wCtx.fillStyle='rgba(255,255,255,.95)';
+    const fs=n>10?19:25; wCtx.font=`700 ${fs}px Outfit,'Noto Sans TC',sans-serif`;
+    wCtx.shadowColor='rgba(0,0,0,.3)'; wCtx.shadowBlur=4;
+    let t=wItems[i]; if(t.length>9)t=t.slice(0,8)+'…';
+    wCtx.fillText(t,285,9); wCtx.restore();
+  }
+  const g=wCtx.createRadialGradient(320,320,0,320,320,50);
+  g.addColorStop(0,dark?'#2C2C2E':'#FFFFFF'); g.addColorStop(1,dark?'#1C1C1E':'#F5F5F7');
+  wCtx.beginPath(); wCtx.arc(320,320,50,0,Math.PI*2); wCtx.fillStyle=g; wCtx.fill();
+  wCtx.strokeStyle=dark?'rgba(255,255,255,.1)':'rgba(0,0,0,.08)'; wCtx.lineWidth=3; wCtx.stroke();
+}
+
+function wheelSpin() {
+  if (wSpin||wItems.length<2) { if(wItems.length<2)toast('請至少輸入 2 個選項 😅'); return; }
+  wSpin=true;
+  const btn=document.getElementById('spinBtn'); btn.disabled=true; btn.textContent='旋轉中…';
+  wAngle += (6+Math.random()*5)*360 + Math.random()*360;
+  wCvs.style.transition='transform 5s cubic-bezier(.08,0,.05,1)';
+  wCvs.style.transform=`rotate(${wAngle}deg)`;
+  setTimeout(()=>{
+    wSpin=false; btn.disabled=false; btn.innerHTML='✦ SPIN';
+    const idx = Math.floor(((360-(wAngle%360))%360+270)%360/360*wItems.length)%wItems.length;
+    showResult(CEMOJI[randInt(CEMOJI.length)],'恭喜得獎！',wItems[idx]);
+  },5000);
+}
+
+function renderWList() {
+  const n=wItems.length;
+  document.getElementById('wBadge').textContent=n;
+  document.getElementById('wList').innerHTML=n?wItems.map((x,i)=>iRow(x,i,'w')).join(''):'<div class="empty-hint">尚無選項 ✏️</div>';
+  // formula
+  document.getElementById('wFT').textContent=n;
+  const u=new Set(wItems).size; document.getElementById('wFU').textContent=u;
+  if(!n){document.getElementById('wFM').textContent='—';document.getElementById('wFA').textContent='—';}
+  else{const cnt={}; wItems.forEach(x=>cnt[x]=(cnt[x]||0)+1); const mx=Math.max(...Object.values(cnt)); document.getElementById('wFM').textContent=(mx/n*100).toFixed(1)+'%'; document.getElementById('wFA').textContent=(100/u).toFixed(1)+'%';}
+  // prob table
+  const pb=document.getElementById('wPBody');
+  if(!n){pb.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--text3);padding:14px">尚無資料</td></tr>';} 
+  else{const cnt={}; wItems.forEach(x=>cnt[x]=(cnt[x]||0)+1); const s=Object.entries(cnt).sort((a,b)=>b[1]-a[1]); const mx=s[0][1]; pb.innerHTML=s.map(([nm,c],i)=>`<tr><td style="font-weight:600;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(nm)}</td><td style="color:var(--accent);font-family:'Outfit',sans-serif;font-weight:700">${c}</td><td><div class="pbar-w"><div class="pbar-f" style="width:${(c/mx*100).toFixed(0)}%;background:${C[i%C.length]}"></div></div></td><td class="ppct">${(c/n*100).toFixed(1)}%</td></tr>`).join('');}
+  document.getElementById('spinBtn').disabled=n<2;
+  drawWheel();
+}
+function iRow(item,i,p){ return `<div class="irow" id="${p}r${i}"><div class="idot" style="background:${C[i%C.length]}"></div><span class="iname" id="${p}n${i}">${esc(item)}</span><div class="iacts"><button class="bic edt" onclick="${p}Edit(${i})">✏️</button><button class="bic del" onclick="${p}Del(${i})">✕</button></div></div>`; }
+
+function wAdd(){const v=document.getElementById('wInp').value.trim();if(!v)return;wItems.push(v);document.getElementById('wInp').value='';renderWList();toast(`已新增「${v}」✅`);setTimeout(()=>{const l=document.getElementById('wList');l.scrollTop=l.scrollHeight;},50);}
+function wQuick(n){wItems.push(n);renderWList();toast(`已新增「${n}」✅`);}
+function wDel(i){const nm=wItems[i];const r=document.getElementById(`wr${i}`);if(r){r.style.opacity='0';r.style.transform='translateX(20px)';}setTimeout(()=>{wItems.splice(i,1);renderWList();},200);toast(`已刪除「${nm}」🗑`);}
+function wEdit(i){const el=document.getElementById(`wn${i}`);if(!el)return;el.outerHTML=`<input class="iname-edit" id="we${i}" value="${esc(wItems[i])}" maxlength="20" onblur="wSave(${i})" onkeydown="if(event.key==='Enter')wSave(${i});if(event.key==='Escape')renderWList();">`;setTimeout(()=>{const e=document.getElementById(`we${i}`);if(e){e.focus();e.select();}},10);}
+function wSave(i){const e=document.getElementById(`we${i}`);if(!e)return;const v=e.value.trim();if(v){wItems[i]=v;toast('已更新 ✅');}renderWList();}
+function wShuffle(){shuffle(wItems);renderWList();toast('已隨機排序 🔀');}
+function wClear(){if(!wItems.length)return;if(!confirm('確定清空所有選項？'))return;wItems=[];renderWList();toast('已清空 🗑');}
+function loadWheelSample(){wItems=['王小明','李大同','張美麗','陳嘉玲','林志偉','黃雅婷','劉明輝','謝靜茹'];renderWList();toast('已載入範例 🎲');}
+
+/* ═══════════════════════════
+   SLOT MACHINE
+═══════════════════════════ */
+const REEL_H = 104;
+
+function buildReels() {
+  if (!sItems.length) return;
+  for (let r=0;r<3;r++) {
+    const trk=document.getElementById(`rt${r}`);
+    let strip=[...sItems,...sItems,...sItems,...sItems].sort(()=>Math.random()-.5);
+    trk.style.transition='none';
+    trk.style.transform='translateY(0)';
+    trk.innerHTML=strip.map(it=>`<div class="reel-item">${esc(it)}</div>`).join('');
+  }
+}
+
+function slotPull() {
+  if (slotBusy||sItems.length<2){if(sItems.length<2)toast('請至少輸入 2 個選項');return;}
+  slotBusy=true;
+  const btn=document.getElementById('pullBtn'); btn.disabled=true;
+  document.getElementById('slotTxt').className='slot-res-txt';
+  document.getElementById('slotTxt').textContent='🎰 旋轉中…';
+
+  const results=[];
+  for (let r=0;r<3;r++) {
+    const trk=document.getElementById(`rt${r}`);
+    const winner=sItems[randInt(sItems.length)];
+    results.push(winner);
+    // Build a strip that ends on winner
+    let strip=[];
+    for(let k=0;k<4;k++) strip=[...strip,...[...sItems].sort(()=>Math.random()-.5)];
+    strip.push(winner);
+    for(let k=0;k<1;k++) strip=[...strip,...[...sItems].sort(()=>Math.random()-.5)];
+    trk.style.transition='none'; trk.style.transform='translateY(0)';
+    trk.innerHTML=strip.map(it=>`<div class="reel-item">${esc(it)}</div>`).join('');
+    const winIdx=strip.lastIndexOf(winner);
+    const targetY=-(winIdx*REEL_H);
+    const delay=r*280, dur=2.0+r*0.55;
+    setTimeout(()=>{ trk.style.transition=`transform ${dur}s cubic-bezier(.12,0,.08,1)`; trk.style.transform=`translateY(${targetY}px)`; }, 60+delay);
+  }
+  setTimeout(()=>{
+    slotBusy=false; btn.disabled=false;
+    const all3=results[0]===results[1]&&results[1]===results[2];
+    const two=results[0]===results[1]||results[1]===results[2]||results[0]===results[2];
+    const txt=document.getElementById('slotTxt');
+    if(all3){txt.className='slot-res-txt win';txt.textContent=`🎊 JACKPOT！三連 ${results[0]}！`;showResult('🎰','JACKPOT！',`三連 ${results[0]}`);}
+    else if(two){txt.className='slot-res-txt win';txt.textContent=`✨ 兩連！${results.join(' ')}`;}
+    else{txt.className='slot-res-txt';txt.textContent=`結果：${results.join(' ')} `;}
+  },3600);
+}
+
+function renderSList(){
+  const n=sItems.length;
+  document.getElementById('sBadge').textContent=n;
+  document.getElementById('sList').innerHTML=n?sItems.map((x,i)=>iRow(x,i,'s')).join(''):'<div class="empty-hint">尚無選項 🎲</div>';
+  document.getElementById('pullBtn').disabled=n<2;
+}
+function sAdd(){const v=document.getElementById('sInp').value.trim();if(!v)return;sItems.push(v);document.getElementById('sInp').value='';renderSList();buildReels();toast(`已新增「${v}」✅`);}
+function sQuick(n){sItems.push(n);renderSList();buildReels();toast(`已新增「${n}」✅`);}
+function sDel(i){const nm=sItems[i];const r=document.getElementById(`sr${i}`);if(r){r.style.opacity='0';r.style.transform='translateX(20px)';}setTimeout(()=>{sItems.splice(i,1);renderSList();buildReels();},200);toast(`已刪除「${nm}」🗑`);}
+function sEdit(i){const el=document.getElementById(`sn${i}`);if(!el)return;el.outerHTML=`<input class="iname-edit" id="se${i}" value="${esc(sItems[i])}" maxlength="8" onblur="sSave(${i})" onkeydown="if(event.key==='Enter')sSave(${i});if(event.key==='Escape')renderSList();">`;setTimeout(()=>{const e=document.getElementById(`se${i}`);if(e){e.focus();e.select();}},10);}
+function sSave(i){const e=document.getElementById(`se${i}`);if(!e)return;const v=e.value.trim();if(v){sItems[i]=v;toast('已更新 ✅');}renderSList();buildReels();}
+function sShuffle(){shuffle(sItems);renderSList();buildReels();toast('已隨機排序 🔀');}
+function sClear(){if(!sItems.length)return;if(!confirm('確定清空所有選項？'))return;sItems=[];renderSList();buildReels();toast('已清空 🗑');}
+
+/* ═══════════════════════════
+   CARD DRAW
+═══════════════════════════ */
+function buildCards() {
+  cardPool=[...dItems]; shuffle(cardPool); drawn=[];
+  renderFan(); updateDrawStatus();
+}
+
+function renderFan() {
+  const fan=document.getElementById('cardsFan');
+  const total=Math.min(cardPool.length,10);
+  if(!total){fan.innerHTML='<div style="color:var(--text3);font-size:13px;padding:40px 0;text-align:center">所有籤已抽完 🎴<br><small>點擊 🔄 重置</small></div>';return;}
+  const spread=Math.min(total*9,72);
+  fan.innerHTML=cardPool.slice(0,total).map((item,i)=>{
+    const angle=-spread/2+(i/Math.max(total-1,1))*spread;
+    const tx=(i-(total-1)/2)*(total>6?17:21);
+    const ty=Math.abs(angle)*.28;
+    return `<div class="fan-card facedown" id="fc${i}"
+      style="transform:rotate(${angle}deg) translateX(${tx}px) translateY(${ty}px);z-index:${i};"
+      onclick="flipCard(${i})">
+      <div class="fcard-inner"></div>
+    </div>`;
   }).join('');
 }
 
-// ─── FORMULA ────────────────────────────────────────────────────
-function updateFormula() {
-  const n = items.length;
-  document.getElementById('fTotal').textContent = n;
+function flipCard(idx) {
+  if (isFlipping||!cardPool.length) return;
+  isFlipping=true;
+  const card=document.getElementById(`fc${idx}`);
+  const item=cardPool[idx];
+  if(!card||item===undefined){isFlipping=false;return;}
+  const emoji=CEMOJI[randInt(CEMOJI.length)];
+  const color=C[drawn.length%C.length];
 
-  const unique = new Set(items).size;
-  document.getElementById('fUnique').textContent = unique;
-
-  if (n === 0) {
-    document.getElementById('fMax').textContent = '—';
-    document.getElementById('fAvg').textContent = '—';
-    return;
-  }
-
-  const counts = {};
-  items.forEach(x => counts[x] = (counts[x] || 0) + 1);
-  const max = Math.max(...Object.values(counts));
-  document.getElementById('fMax').textContent = (max / n * 100).toFixed(1) + '%';
-  document.getElementById('fAvg').textContent = (100 / unique).toFixed(1) + '%';
+  card.classList.add('flipping');
+  setTimeout(()=>{
+    card.classList.remove('facedown'); card.classList.add('revealed');
+    card.style.borderColor=color; card.style.background=color+'22';
+    card.innerHTML=`<div class="fcard-content"><div class="fcard-emoji">${emoji}</div><div class="fcard-text" style="color:var(--text)">${esc(item)}</div></div>`;
+    card.onclick=null;
+  },300);
+  setTimeout(()=>{
+    card.classList.remove('flipping'); isFlipping=false;
+    cardPool.splice(idx,1); drawn.push({item,emoji});
+    setTimeout(()=>renderFan(),500);
+    updateDrawStatus(); addHistChip(item,emoji,color);
+    showResult(emoji, `第 ${drawn.length} 籤`, item);
+  },600);
 }
 
-// ─── TOAST ──────────────────────────────────────────────────────
-let toastTimer;
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+function drawCard(){
+  if(!cardPool.length){toast('所有籤已抽完，請重置 🔄');return;}
+  flipCard(randInt(Math.min(cardPool.length,10)));
 }
 
-// ─── INIT ───────────────────────────────────────────────────────
-render();
+function resetDraw(){drawn=[];buildCards();clearHistUI();toast('已重置籤筒 🔄');}
+
+function updateDrawStatus(){
+  const el=document.getElementById('drawStatus');
+  const tot=dItems.length, dr=drawn.length, rem=cardPool.length;
+  if(!tot){el.textContent='請先新增籤筒內容';return;}
+  el.textContent=`已抽 ${dr} 籤 ／ 剩餘 ${rem} 籤 ／ 共 ${tot} 籤`;
+  document.getElementById('drawBtn').disabled=rem===0;
+}
+
+function addHistChip(item,emoji,color){
+  const hist=document.getElementById('drawHist');
+  if(drawn.length===1)hist.innerHTML='';
+  const c=document.createElement('div'); c.className='hist-chip';
+  c.innerHTML=`${emoji} ${esc(item)}`; c.style.borderColor=color;
+  hist.appendChild(c);
+}
+function clearHistUI(){drawn=[];buildCards();const h=document.getElementById('drawHist');h.innerHTML='<span style="color:var(--text3);font-size:12px;padding:8px">尚無紀錄</span>';}
+
+function renderDList(){
+  const n=dItems.length;
+  document.getElementById('dBadge').textContent=n;
+  document.getElementById('dList').innerHTML=n?dItems.map((x,i)=>iRow(x,i,'d')).join(''):'<div class="empty-hint">尚無選項 🎴</div>';
+}
+function dAdd(){const v=document.getElementById('dInp').value.trim();if(!v)return;dItems.push(v);document.getElementById('dInp').value='';renderDList();buildCards();toast(`已新增「${v}」✅`);}
+function dQuick(n){dItems.push(n);renderDList();buildCards();toast(`已新增「${n}」✅`);}
+function dDel(i){const nm=dItems[i];const r=document.getElementById(`dr${i}`);if(r){r.style.opacity='0';r.style.transform='translateX(20px)';}setTimeout(()=>{dItems.splice(i,1);renderDList();buildCards();},200);toast(`已刪除「${nm}」🗑`);}
+function dEdit(i){const el=document.getElementById(`dn${i}`);if(!el)return;el.outerHTML=`<input class="iname-edit" id="de${i}" value="${esc(dItems[i])}" maxlength="16" onblur="dSave(${i})" onkeydown="if(event.key==='Enter')dSave(${i});if(event.key==='Escape')renderDList();">`;setTimeout(()=>{const e=document.getElementById(`de${i}`);if(e){e.focus();e.select();}},10);}
+function dSave(i){const e=document.getElementById(`de${i}`);if(!e)return;const v=e.value.trim();if(v){dItems[i]=v;toast('已更新 ✅');}renderDList();buildCards();}
+function dShuffle(){shuffle(dItems);renderDList();buildCards();toast('已隨機排序 🔀');}
+function dClear(){if(!dItems.length)return;if(!confirm('確定清空所有選項？'))return;dItems=[];drawn=[];renderDList();buildCards();clearHistUI();toast('已清空 🗑');}
+
+/* ═══ INIT ═══ */
+renderWList();
+renderSList(); buildReels();
+renderDList(); buildCards();
 </script>
 </body>
 </html>
