@@ -268,17 +268,139 @@ body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;back
 .draw-hist{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;min-height:34px;}
 .hist-chip{background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 11px;font-size:12px;font-weight:600;animation:itin .3s ease;}
 
-/* ── MODALS ── */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;}
+/* ── RESULT MODAL ── */
+.overlay{position:fixed;inset:0;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s;}
 .overlay.show{opacity:1;pointer-events:all;}
-.modal{background:var(--surface);border-radius:var(--r-lg);padding:30px 24px 24px;width:min(86vw,320px);text-align:center;box-shadow:var(--sh-lg);border:1px solid var(--border);transform:scale(.75) translateY(40px);transition:transform .45s cubic-bezier(.34,1.56,.64,1);}
+
+/* Dark scrim with colour tint set by JS */
+#resultOvl{background:rgba(0,0,0,.55);}
+
+.modal{
+  position:relative;
+  border-radius:32px;
+  padding:0;
+  width:min(88vw,340px);
+  text-align:center;
+  overflow:hidden;
+  box-shadow:0 32px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.12);
+  transform:scale(.7) translateY(50px);
+  transition:transform .5s cubic-bezier(.34,1.56,.64,1);
+}
 .overlay.show .modal{transform:scale(1) translateY(0);}
-.m-emoji{font-size:52px;display:block;margin-bottom:5px;animation:mbounce .6s cubic-bezier(.34,1.56,.64,1) forwards;}
-@keyframes mbounce{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
-.m-sub{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);margin-bottom:5px;}
-.m-name{font-family:'Outfit',sans-serif;font-size:36px;font-weight:900;color:var(--text);letter-spacing:-1.5px;word-break:break-word;margin-bottom:22px;line-height:1.1;}
-.btn-close-m{width:100%;background:var(--text);color:var(--bg);border:none;border-radius:var(--r-md);padding:14px;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;}
-.btn-close-m:active{transform:scale(.97);opacity:.85;}
+
+/* Animated gradient header */
+.modal-header{
+  position:relative;
+  padding:36px 24px 28px;
+  background:var(--modal-grad, linear-gradient(135deg,#FF453A,#FF9F0A,#FFD60A));
+  background-size:300% 300%;
+  animation:grad-shift 3s ease infinite;
+  overflow:hidden;
+}
+@keyframes grad-shift{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+
+/* Shimmering overlay on header */
+.modal-header::before{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.18) 0%,transparent 50%,rgba(255,255,255,.08) 100%);
+  pointer-events:none;
+}
+
+/* Floating circles in background */
+.modal-header::after{
+  content:'';
+  position:absolute;
+  width:200px;height:200px;
+  border-radius:50%;
+  background:rgba(255,255,255,.08);
+  top:-60px;right:-60px;
+  pointer-events:none;
+}
+
+.modal-orb{
+  position:absolute;
+  width:120px;height:120px;
+  border-radius:50%;
+  background:rgba(255,255,255,.06);
+  bottom:-40px;left:-30px;
+  pointer-events:none;
+}
+
+/* Emoji with pop + spin */
+.m-emoji{
+  font-size:62px;
+  display:block;
+  margin-bottom:10px;
+  position:relative;z-index:2;
+  animation:emoji-pop .7s cubic-bezier(.34,1.56,.64,1) forwards;
+  filter:drop-shadow(0 4px 12px rgba(0,0,0,.3));
+}
+@keyframes emoji-pop{
+  0%{transform:scale(0) rotate(-30deg);opacity:0;}
+  60%{transform:scale(1.2) rotate(8deg);opacity:1;}
+  100%{transform:scale(1) rotate(0deg);opacity:1;}
+}
+
+.m-sub{
+  font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,255,255,.75);margin-bottom:8px;
+  position:relative;z-index:2;
+  animation:fade-up .4s .2s ease both;
+}
+@keyframes fade-up{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+
+.m-name{
+  font-family:'Outfit',sans-serif;
+  font-size:42px;font-weight:900;
+  color:#fff;
+  letter-spacing:-2px;
+  word-break:break-word;
+  line-height:1.05;
+  position:relative;z-index:2;
+  text-shadow:0 2px 16px rgba(0,0,0,.3);
+  animation:name-pop .5s .15s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes name-pop{from{opacity:0;transform:scale(.8);}to{opacity:1;transform:scale(1);}}
+
+/* Sparkle dots row */
+.m-sparks{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  margin-top:12px;position:relative;z-index:2;
+}
+.m-spark{
+  width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.6);
+  animation:spark-pulse 1.2s ease-in-out infinite;
+}
+.m-spark:nth-child(2){animation-delay:.2s;width:9px;height:9px;background:rgba(255,255,255,.85);}
+.m-spark:nth-child(3){animation-delay:.4s;}
+@keyframes spark-pulse{0%,100%{transform:scale(1);opacity:.6;}50%{transform:scale(1.6);opacity:1;}}
+
+/* Bottom section */
+.modal-footer{
+  background:var(--surface);
+  padding:20px 20px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.m-badge-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.m-badge{
+  padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;
+  background:var(--bg);border:1px solid var(--border);color:var(--text2);
+}
+.btn-close-m{
+  width:100%;
+  background:var(--modal-btn, linear-gradient(135deg,#FF453A,#FF9F0A));
+  color:#fff;border:none;border-radius:var(--r-md);padding:15px;
+  font-size:16px;font-weight:800;cursor:pointer;
+  transition:all .25s;
+  box-shadow:0 6px 20px rgba(0,0,0,.2);
+  letter-spacing:.3px;
+}
+.btn-close-m:active{transform:scale(.97);}
 
 /* ── CUSTOM CONFIRM MODAL ── */
 .confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:400;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}
@@ -563,6 +685,15 @@ body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;back
       <div class="draw-ttl">翻牌抽籤 🃏</div>
       <div class="cards-fan" id="cardsFan"></div>
       <div class="draw-divider"></div>
+      <!-- No-repeat toggle -->
+      <div class="slot-norepeat" onclick="toggleDrawNoRepeat()" style="width:100%">
+        <div class="snr-check on" id="dnrCheck"></div>
+        <div class="snr-info">
+          <div class="snr-title">不重複抽取</div>
+          <div class="snr-sub">每張籤只抽一次，抽完後重置</div>
+        </div>
+        <div class="snr-pool" id="dnrPool"></div>
+      </div>
       <div class="draw-ctrls">
         <button class="btn-draw" id="drawBtn" onclick="drawCard()">✦ 翻牌抽籤</button>
         <button class="btn-reset" onclick="resetDraw()">🔄 重置籤筒</button>
@@ -665,6 +796,16 @@ body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;back
       <button onclick="numReset()" style="background:rgba(255,69,58,.15);border:1px solid rgba(255,69,58,.3);border-radius:10px;padding:9px;color:rgba(255,100,90,.9);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.3px;">🗑 重置 / 清空紀錄</button>
     </div>
 
+    <!-- No-repeat toggle -->
+    <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:var(--r-sm);padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;margin-bottom:4px;" onclick="toggleNumNoRepeat()">
+      <div class="snr-check on" id="nnrCheck" style="flex-shrink:0"></div>
+      <div class="snr-info" style="flex:1">
+        <div class="snr-title" style="color:rgba(255,255,255,.85)">不重複抽號</div>
+        <div class="snr-sub" style="color:rgba(255,255,255,.4)">已抽出號碼不再出現，抽完後可重置</div>
+      </div>
+      <div style="font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;color:#34AADC;flex-shrink:0" id="nnrPool"></div>
+    </div>
+
     <!-- Draw button -->
     <button class="btn-num-draw" id="numDrawBtn" onclick="numDraw()">🎱 開始抽籤</button>
 
@@ -691,11 +832,22 @@ body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;back
 
 <!-- RESULT MODAL -->
 <div class="overlay" id="resultOvl">
-  <div class="modal">
-    <span class="m-emoji" id="mEmoji">🎉</span>
-    <div class="m-sub" id="mSub">恭喜！</div>
-    <div class="m-name" id="mName">—</div>
-    <button class="btn-close-m" onclick="closeResult()">✓ 確認</button>
+  <div class="modal" id="resultModal">
+    <div class="modal-header" id="modalHeader">
+      <div class="modal-orb"></div>
+      <span class="m-emoji" id="mEmoji">🎉</span>
+      <div class="m-sub" id="mSub">恭喜得獎！</div>
+      <div class="m-name" id="mName">—</div>
+      <div class="m-sparks">
+        <div class="m-spark"></div>
+        <div class="m-spark"></div>
+        <div class="m-spark"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="m-badge-row" id="mBadgeRow"></div>
+      <button class="btn-close-m" onclick="closeResult()">✓ 確認</button>
+    </div>
   </div>
 </div>
 
@@ -756,7 +908,7 @@ function switchTab(id, btn) {
   btn.classList.add('active');
   if (id === 'wheel') { drawWheel(); updateWnrPool(); }
   if (id === 'slot')  { renderSList(); buildReels(); updateSnrPool(); }
-  if (id === 'draw')  { renderDList(); renderFan(); updateDrawStatus(); }
+  if (id === 'draw')  { renderDList(); renderFan(); updateDrawStatus(); updateDnrPool(); }
   if (id === 'num')   { numUpdateStats(); }
 }
 
@@ -772,11 +924,46 @@ function fireConfetti() {
   (function f(){ confetti({particleCount:3,angle:60,spread:55,origin:{x:0,y:.7},colors:C}); confetti({particleCount:3,angle:120,spread:55,origin:{x:1,y:.7},colors:C}); if(Date.now()<end)requestAnimationFrame(f); })();
   setTimeout(()=>confetti({particleCount:120,spread:70,origin:{y:.55},colors:C,disableForReducedMotion:true}),250);
 }
-function showResult(emoji, sub, name) {
-  document.getElementById('mEmoji').textContent = emoji;
-  document.getElementById('mSub').textContent = sub;
+// Colour themes for result modal — [gradient, button-gradient, scrim-tint]
+const RESULT_THEMES = [
+  ['linear-gradient(135deg,#FF453A,#FF9F0A,#FFD60A)', 'linear-gradient(135deg,#FF453A,#FF9F0A)', 'rgba(220,60,30,.55)'],
+  ['linear-gradient(135deg,#0071E3,#34AADC,#64D2FF)', 'linear-gradient(135deg,#0071E3,#34AADC)', 'rgba(0,90,200,.55)'],
+  ['linear-gradient(135deg,#BF5AF2,#FF375F,#FF9F0A)', 'linear-gradient(135deg,#BF5AF2,#FF375F)', 'rgba(150,30,180,.55)'],
+  ['linear-gradient(135deg,#32D74B,#34AADC,#0071E3)', 'linear-gradient(135deg,#32D74B,#34AADC)', 'rgba(20,150,60,.55)'],
+  ['linear-gradient(135deg,#FF375F,#BF5AF2,#5856D6)', 'linear-gradient(135deg,#FF375F,#BF5AF2)', 'rgba(180,30,120,.55)'],
+  ['linear-gradient(135deg,#FF9F0A,#32D74B,#34AADC)', 'linear-gradient(135deg,#FF9F0A,#32D74B)', 'rgba(200,120,0,.55)'],
+  ['linear-gradient(135deg,#5856D6,#0071E3,#34AADC)', 'linear-gradient(135deg,#5856D6,#0071E3)', 'rgba(60,50,200,.55)'],
+  ['linear-gradient(135deg,#FFD60A,#FF9F0A,#FF375F)', 'linear-gradient(135deg,#FFD60A,#FF375F)', 'rgba(200,160,0,.55)'],
+];
+let _resultThemeIdx = 0;
+
+function showResult(emoji, sub, name, badges) {
+  // Cycle through themes
+  _resultThemeIdx = (_resultThemeIdx + 1) % RESULT_THEMES.length;
+  const [grad, btnGrad, scrim] = RESULT_THEMES[_resultThemeIdx];
+
+  // Apply theme colours via CSS custom properties on the modal
+  const modal   = document.getElementById('resultModal');
+  const overlay = document.getElementById('resultOvl');
+  modal.style.setProperty('--modal-grad', grad);
+  modal.style.setProperty('--modal-btn',  btnGrad);
+  overlay.style.background = scrim;
+
+  // Re-trigger animations by cloning emoji node
+  const emojiEl = document.getElementById('mEmoji');
+  emojiEl.style.animation = 'none';
+  emojiEl.textContent = emoji;
+  void emojiEl.offsetWidth; // reflow
+  emojiEl.style.animation = '';
+
+  document.getElementById('mSub').textContent  = sub;
   document.getElementById('mName').textContent = name;
-  document.getElementById('resultOvl').classList.add('show');
+
+  // Optional badges (e.g. round number, pool left)
+  const badgeRow = document.getElementById('mBadgeRow');
+  badgeRow.innerHTML = (badges || []).map(b => `<div class="m-badge">${b}</div>`).join('');
+
+  overlay.classList.add('show');
   fireConfetti();
 }
 function closeResult() { document.getElementById('resultOvl').classList.remove('show'); }
@@ -916,7 +1103,8 @@ function wheelSpin() {
       drawWheel(); // re-draw to grey out winner
     }
     renderWList(); // refresh spinBtn + pool count in badge
-    showResult(CEMOJI[randInt(CEMOJI.length)], '恭喜得獎！', winnerName);
+    const badges = wNoRepeat ? [`剩餘 ${wPool.length} 人`] : [];
+    showResult(CEMOJI[randInt(CEMOJI.length)], '恭喜得獎！', winnerName, badges);
   }, 5000);
 }
 
@@ -1118,7 +1306,7 @@ function slotPull() {
     if (all3) {
       txt.className = 'slot-res-txt win';
       txt.textContent = `🎊 JACKPOT！三連 ${results[0]}！`;
-      showResult('🎰', 'JACKPOT！', `三連 ${results[0]}`);
+      showResult('🎰', 'JACKPOT！', `三連 ${results[0]}`, ['🎊 三連大獎！', `🎰 ${results.join(' ')}`]);
     } else if (two) {
       txt.className = 'slot-res-txt win';
       txt.textContent = `✨ 兩連！${results.join('  ')}`;
@@ -1149,26 +1337,49 @@ function sClear(){if(!sItems.length)return;showConfirm('🗑','確定清空所�
 /* ═══════════════════════════
    CARD DRAW
 ═══════════════════════════ */
+let dNoRepeat = true;   // default ON (draws without replacement)
+
+function toggleDrawNoRepeat() {
+  dNoRepeat = !dNoRepeat;
+  const chk = document.getElementById('dnrCheck');
+  chk.classList.toggle('on', dNoRepeat);
+  buildCards();
+  toast(dNoRepeat ? '不重複模式已開啟 ✅' : '可重複模式已開啟');
+}
+
+function updateDnrPool() {
+  const el = document.getElementById('dnrPool');
+  if (!el) return;
+  if (!dNoRepeat) { el.textContent = '可重複'; return; }
+  el.textContent = cardPool.length > 0 ? `剩 ${cardPool.length}` : '已抽完';
+}
+
 function buildCards() {
-  cardPool=[...dItems]; shuffle(cardPool); drawn=[];
-  renderFan(); updateDrawStatus();
+  if (dNoRepeat) {
+    cardPool = [...dItems]; shuffle(cardPool);
+  } else {
+    // In repeat mode, always show full deck
+    cardPool = [...dItems]; shuffle(cardPool);
+  }
+  drawn = [];
+  renderFan(); updateDrawStatus(); updateDnrPool();
 }
 
 function renderFan() {
-  const fan=document.getElementById('cardsFan');
-  const total=Math.min(cardPool.length,10);
-  if(!total){
-    fan.innerHTML='<div style="color:var(--text3);font-size:13px;padding:30px 0;text-align:center">所有籤已抽完 🎴<br><small>點擊「重置籤筒」重新開始</small></div>';
+  const fan = document.getElementById('cardsFan');
+  const source = dNoRepeat ? cardPool : dItems;
+  const total = Math.min(source.length, 10);
+  if (!total) {
+    fan.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:30px 0;text-align:center">' +
+      (dNoRepeat ? '所有籤已抽完 🎴<br><small>點擊「重置籤筒」重新開始</small>' : '請先新增籤筒內容') + '</div>';
     return;
   }
-  // Keep spread modest so cards don't fly too high and overlap buttons
   const maxSpread = Math.min(total * 7, 56);
-  fan.innerHTML=cardPool.slice(0,total).map((item,i)=>{
-    const angle = total === 1 ? 0 : -maxSpread/2 + (i / (total-1)) * maxSpread;
-    const tx = (i - (total-1)/2) * (total > 6 ? 15 : 18);
-    // No vertical drift — cards always anchor at bottom:0 via CSS
+  fan.innerHTML = source.slice(0, total).map((item, i) => {
+    const angle = total === 1 ? 0 : -maxSpread / 2 + (i / (total - 1)) * maxSpread;
+    const tx = (i - (total - 1) / 2) * (total > 6 ? 15 : 18);
     return `<div class="fan-card facedown" id="fc${i}"
-      style="transform:rotate(${angle}deg) translateX(${tx}px);z-index:${i+1};"
+      style="transform:rotate(${angle}deg) translateX(${tx}px);z-index:${i + 1};"
       onclick="flipCard(${i})">
       <div class="fcard-inner"></div>
     </div>`;
@@ -1176,53 +1387,68 @@ function renderFan() {
 }
 
 function flipCard(idx) {
-  if (isFlipping||!cardPool.length) return;
-  isFlipping=true;
-  const card=document.getElementById(`fc${idx}`);
-  const item=cardPool[idx];
-  if(!card||item===undefined){isFlipping=false;return;}
-  const emoji=CEMOJI[randInt(CEMOJI.length)];
-  const color=C[drawn.length%C.length];
+  if (isFlipping) return;
+  const source = dNoRepeat ? cardPool : dItems;
+  if (!source.length) return;
+  isFlipping = true;
+  const card = document.getElementById(`fc${idx}`);
+  const item = source[idx];
+  if (!card || item === undefined) { isFlipping = false; return; }
+  const emoji = CEMOJI[randInt(CEMOJI.length)];
+  const color = C[drawn.length % C.length];
 
   card.classList.add('flipping');
-  setTimeout(()=>{
+  setTimeout(() => {
     card.classList.remove('facedown'); card.classList.add('revealed');
-    card.style.borderColor=color; card.style.background=color+'22';
-    card.innerHTML=`<div class="fcard-content"><div class="fcard-emoji">${emoji}</div><div class="fcard-text" style="color:var(--text)">${esc(item)}</div></div>`;
-    card.onclick=null;
-  },300);
-  setTimeout(()=>{
-    card.classList.remove('flipping'); isFlipping=false;
-    cardPool.splice(idx,1); drawn.push({item,emoji});
-    setTimeout(()=>renderFan(),500);
-    updateDrawStatus(); addHistChip(item,emoji,color);
-    showResult(emoji, `第 ${drawn.length} 籤`, item);
-  },600);
+    card.style.borderColor = color; card.style.background = color + '22';
+    card.innerHTML = `<div class="fcard-content"><div class="fcard-emoji">${emoji}</div><div class="fcard-text" style="color:var(--text)">${esc(item)}</div></div>`;
+    card.onclick = null;
+  }, 300);
+  setTimeout(() => {
+    card.classList.remove('flipping'); isFlipping = false;
+    if (dNoRepeat) cardPool.splice(idx, 1);
+    drawn.push({ item, emoji });
+    setTimeout(() => renderFan(), 500);
+    updateDrawStatus(); updateDnrPool(); addHistChip(item, emoji, color);
+    const remCount = dNoRepeat ? cardPool.length : -1;
+    const badges = dNoRepeat
+      ? (remCount > 0 ? [`剩餘 ${remCount} 籤`] : ['🎉 全部抽完！'])
+      : [`第 ${drawn.length} 次`];
+    showResult(emoji, dNoRepeat ? `第 ${drawn.length} 籤` : '抽籤結果', item, badges);
+  }, 600);
 }
 
-function drawCard(){
-  if(!cardPool.length){toast('所有籤已抽完，請重置 🔄');return;}
-  flipCard(randInt(Math.min(cardPool.length,10)));
+function drawCard() {
+  const source = dNoRepeat ? cardPool : dItems;
+  if (!source.length) { toast('請先新增籤筒內容'); return; }
+  if (dNoRepeat && cardPool.length === 0) { toast('所有籤已抽完，請重置 🔄'); return; }
+  flipCard(randInt(Math.min(source.length, 10)));
 }
 
-function resetDraw(){drawn=[];buildCards();clearHistUI();toast('已重置籤筒 🔄');}
+function resetDraw() { drawn = []; buildCards(); clearHistUI(); toast('已重置籤筒 🔄'); }
 
-function updateDrawStatus(){
-  const el=document.getElementById('drawStatus');
-  const tot=dItems.length, dr=drawn.length, rem=cardPool.length;
-  if(!tot){el.textContent='請先新增籤筒內容';return;}
-  el.textContent=`已抽 ${dr} 籤 ／ 剩餘 ${rem} 籤 ／ 共 ${tot} 籤`;
-  document.getElementById('drawBtn').disabled=rem===0;
+function updateDrawStatus() {
+  const el = document.getElementById('drawStatus');
+  const tot = dItems.length, dr = drawn.length;
+  if (!tot) { el.textContent = '請先新增籤筒內容'; return; }
+  if (dNoRepeat) {
+    const rem = cardPool.length;
+    el.textContent = `已抽 ${dr} 籤 ／ 剩餘 ${rem} 籤 ／ 共 ${tot} 籤`;
+    document.getElementById('drawBtn').disabled = rem === 0;
+  } else {
+    el.textContent = `可重複模式 ── 已抽 ${dr} 次 ／ 共 ${tot} 個選項`;
+    document.getElementById('drawBtn').disabled = tot === 0;
+  }
 }
 
-function addHistChip(item,emoji,color){
-  const hist=document.getElementById('drawHist');
-  if(drawn.length===1)hist.innerHTML='';
-  const c=document.createElement('div'); c.className='hist-chip';
-  c.innerHTML=`${emoji} ${esc(item)}`; c.style.borderColor=color;
+function addHistChip(item, emoji, color) {
+  const hist = document.getElementById('drawHist');
+  if (drawn.length === 1) hist.innerHTML = '';
+  const c = document.createElement('div'); c.className = 'hist-chip';
+  c.innerHTML = `${emoji} ${esc(item)}`; c.style.borderColor = color;
   hist.appendChild(c);
 }
-function clearHistUI(){drawn=[];buildCards();const h=document.getElementById('drawHist');h.innerHTML='<span style="color:var(--text3);font-size:12px;padding:8px">尚無紀錄</span>';}
+function clearHistUI() { drawn = []; buildCards(); const h = document.getElementById('drawHist'); h.innerHTML = '<span style="color:var(--text3);font-size:12px;padding:8px">尚無紀錄</span>'; }
 
 function renderDList(){
   const n=dItems.length;
@@ -1240,20 +1466,42 @@ function dClear(){if(!dItems.length)return;showConfirm('🗑','確定清空所�
 /* ═══════════════════════════
    NUMBER LOTTERY
 ═══════════════════════════ */
-let numPool       = [];   // remaining numbers
-let numDrawnAll   = [];   // all drawn numbers (flat)
-let numHistory    = [];   // [{round, time, nums}]
-let numSortAsc    = false;
-let numAnimating  = false;
+let numPool      = [];
+let numDrawnAll  = [];
+let numHistory   = [];
+let numSortAsc   = false;
+let numAnimating = false;
+let numNoRepeat  = true;   // default ON
 
 const BALL_COLORS = ['color-0','color-1','color-2','color-3','color-4','color-5','color-6','color-7'];
+
+function toggleNumNoRepeat() {
+  numNoRepeat = !numNoRepeat;
+  const chk = document.getElementById('nnrCheck');
+  chk.classList.toggle('on', numNoRepeat);
+  // Reset drawn history when toggling
+  numDrawnAll = []; numHistory = [];
+  document.getElementById('numBallsStage').innerHTML = '<span class="num-ball-placeholder">按下「開始抽籤」產生號碼球</span>';
+  numUpdateStats(); numRenderHistory(); updateNnrPool();
+  toast(numNoRepeat ? '不重複模式已開啟 ✅' : '可重複模式已開啟');
+}
+
+function updateNnrPool() {
+  const el = document.getElementById('nnrPool');
+  if (!el) return;
+  if (!numNoRepeat) { el.textContent = '可重複'; return; }
+  const { min, max, excl } = numGetSettings();
+  const total = Math.max(0, max - min + 1 - excl.filter(n => n >= min && n <= max).length);
+  const left = Math.max(0, total - numDrawnAll.length);
+  el.textContent = left > 0 ? `剩 ${left}` : '已抽完';
+}
 
 function numGetSettings() {
   const min  = parseInt(document.getElementById('numMin').value)  || 1;
   const max  = parseInt(document.getElementById('numMax').value)  || 100;
   const qty  = parseInt(document.getElementById('numQtyVal').textContent) || 1;
   const excRaw = document.getElementById('numExclude').value;
-  const excl = excRaw.split(',').map(s=>parseInt(s.trim())).filter(n=>!isNaN(n));
+  const excl = excRaw.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
   return { min, max, qty, excl };
 }
 
@@ -1261,36 +1509,40 @@ function numBuildPool() {
   const { min, max, excl } = numGetSettings();
   numPool = [];
   for (let i = min; i <= max; i++) {
-    if (!excl.includes(i) && !numDrawnAll.includes(i)) numPool.push(i);
+    if (excl.includes(i)) continue;
+    if (numNoRepeat && numDrawnAll.includes(i)) continue;
+    numPool.push(i);
   }
 }
 
 function numUpdateStats() {
   const { min, max, excl } = numGetSettings();
   const total = Math.max(0, max - min + 1 - excl.filter(n => n >= min && n <= max).length);
-  const drawn = numDrawnAll.length;
-  const left  = Math.max(0, total - drawn);
+  const drawn = numNoRepeat ? numDrawnAll.length : 0;
+  const left  = numNoRepeat ? Math.max(0, total - drawn) : total;
   document.getElementById('nStatTotal').textContent = total || '—';
-  document.getElementById('nStatLeft').textContent  = left  >= 0 ? left : '—';
-  document.getElementById('nStatDrawn').textContent = drawn;
+  document.getElementById('nStatLeft').textContent  = numNoRepeat ? left : '∞';
+  document.getElementById('nStatDrawn').textContent = numDrawnAll.length;
   const btn = document.getElementById('numDrawBtn');
-  btn.disabled = (left === 0 && total > 0);
-  if (left === 0 && total > 0) btn.textContent = '✅ 所有號碼已抽完';
-  else btn.textContent = '🎱 開始抽籤';
+  const exhausted = numNoRepeat && left === 0 && total > 0;
+  btn.disabled = exhausted;
+  btn.textContent = exhausted ? '✅ 所有號碼已抽完' : '🎱 開始抽籤';
+  updateNnrPool();
 }
 
 function numValidate() {
   let min = parseInt(document.getElementById('numMin').value) || 1;
   let max = parseInt(document.getElementById('numMax').value) || 100;
   if (min > max) { min = max; document.getElementById('numMin').value = min; }
-  numUpdateStats();
+  numDrawnAll = []; numHistory = [];
+  document.getElementById('numBallsStage').innerHTML = '<span class="num-ball-placeholder">按下「開始抽籤」產生號碼球</span>';
+  numUpdateStats(); numRenderHistory();
 }
 
 function numStep(field, delta) {
   if (field === 'qty') {
     const cur = parseInt(document.getElementById('numQtyVal').textContent) || 1;
-    const next = Math.max(1, Math.min(50, cur + delta));
-    document.getElementById('numQtyVal').textContent = next;
+    document.getElementById('numQtyVal').textContent = Math.max(1, Math.min(50, cur + delta));
   } else {
     const el = document.getElementById(field === 'min' ? 'numMin' : 'numMax');
     const cur = parseInt(el.value) || (field === 'min' ? 1 : 100);
@@ -1318,7 +1570,14 @@ function numDraw() {
   numBuildPool();
 
   const { qty } = numGetSettings();
-  if (numPool.length === 0) { toast('所有號碼已抽完！請重置 🔄'); return; }
+  if (numPool.length === 0) {
+    if (numNoRepeat) {
+      toast('所有號碼已抽完！請重置 🔄');
+    } else {
+      toast('範圍內沒有可用號碼，請檢查設定');
+    }
+    return;
+  }
 
   const drawCount = Math.min(qty, numPool.length);
   // Fisher-Yates sample
@@ -1329,23 +1588,25 @@ function numDraw() {
     [poolCopy[i], poolCopy[j]] = [poolCopy[j], poolCopy[i]];
     picked.push(poolCopy[i]);
   }
-
   if (numSortAsc) picked.sort((a, b) => a - b);
 
-  // Record
-  numDrawnAll = [...numDrawnAll, ...picked];
-  const rec = { round: numHistory.length + 1, time: new Date().toLocaleTimeString('zh-TW', {hour:'2-digit',minute:'2-digit',second:'2-digit'}), nums: picked };
+  // Track drawn only in no-repeat mode
+  if (numNoRepeat) numDrawnAll = [...numDrawnAll, ...picked];
+
+  const rec = {
+    round: numHistory.length + 1,
+    time: new Date().toLocaleTimeString('zh-TW', { hour:'2-digit', minute:'2-digit', second:'2-digit' }),
+    nums: picked,
+    repeat: !numNoRepeat
+  };
   numHistory.unshift(rec);
 
-  // Animate balls
   numAnimating = true;
   const stage = document.getElementById('numBallsStage');
   stage.innerHTML = '';
-
   picked.forEach((num, i) => {
-    const colorClass = BALL_COLORS[num % BALL_COLORS.length];
     const ball = document.createElement('div');
-    ball.className = `num-ball ${colorClass}`;
+    ball.className = `num-ball ${BALL_COLORS[num % BALL_COLORS.length]}`;
     ball.textContent = num;
     ball.style.animationDelay = `${i * 120}ms`;
     stage.appendChild(ball);
@@ -1355,29 +1616,29 @@ function numDraw() {
     numAnimating = false;
     numUpdateStats();
     numRenderHistory();
-    // Big single result or multi
     if (drawCount === 1) {
-      const colorClass = BALL_COLORS[picked[0] % BALL_COLORS.length];
-      showResult('🎱', `第 ${rec.round} 次抽籤`, `No. ${picked[0]}`);
+      const { min, max } = numGetSettings();
+      const total = max - min + 1;
+      const badges = numNoRepeat
+        ? [`剩餘 ${Math.max(0, total - numDrawnAll.length)} 個`]
+        : ['可重複模式'];
+      showResult('🎱', `第 ${rec.round} 次抽籤`, `No. ${picked[0]}`, badges);
     }
   }, picked.length * 120 + 400);
 }
 
 function numReset() {
-  showConfirm('🔄','確定重置並清空所有號碼紀錄？','重置',()=>{
-    numDrawnAll=[];numHistory=[];
-    document.getElementById('numBallsStage').innerHTML='<span class="num-ball-placeholder">按下「開始抽籤」產生號碼球</span>';
-    numUpdateStats();numRenderHistory();toast('已重置，可重新抽籤 🔄');
+  showConfirm('🔄','確定重置並清空所有號碼紀錄？','重置', () => {
+    numDrawnAll = []; numHistory = [];
+    document.getElementById('numBallsStage').innerHTML = '<span class="num-ball-placeholder">按下「開始抽籤」產生號碼球</span>';
+    numUpdateStats(); numRenderHistory(); toast('已重置，可重新抽籤 🔄');
   });
 }
 
 function numClearHistory() {
-  numHistory  = [];
-  numDrawnAll = [];
+  numHistory = []; numDrawnAll = [];
   document.getElementById('numBallsStage').innerHTML = '<span class="num-ball-placeholder">按下「開始抽籤」產生號碼球</span>';
-  numUpdateStats();
-  numRenderHistory();
-  toast('紀錄已清除 🗑');
+  numUpdateStats(); numRenderHistory(); toast('紀錄已清除 🗑');
 }
 
 function numRenderHistory() {
@@ -1387,13 +1648,13 @@ function numRenderHistory() {
     return;
   }
   el.innerHTML = numHistory.map(rec => {
-    const balls = rec.nums.map(n => {
-      const cc = BALL_COLORS[n % BALL_COLORS.length];
-      return `<div class="num-mini-ball ${cc}">${n}</div>`;
-    }).join('');
+    const balls = rec.nums.map(n =>
+      `<div class="num-mini-ball ${BALL_COLORS[n % BALL_COLORS.length]}">${n}</div>`
+    ).join('');
+    const tag = rec.repeat ? ' <span style="font-size:10px;color:var(--orange)">[可重複]</span>' : '';
     return `<div class="num-record-row">
       <div class="num-record-meta">
-        <span class="num-record-idx">第 ${rec.round} 次</span>
+        <span class="num-record-idx">第 ${rec.round} 次${tag}</span>
         <span class="num-record-time">${rec.time}</span>
       </div>
       <div class="num-record-balls">${balls}</div>
@@ -1419,8 +1680,8 @@ function confirmAnswer(yes) {
 /* ═══ INIT ═══ */
 renderWList();
 renderSList(); buildReels();
-renderDList(); buildCards();
-numUpdateStats();
+renderDList(); buildCards(); updateDnrPool();
+numUpdateStats(); updateNnrPool();
 </script>
 </body>
 </html>
