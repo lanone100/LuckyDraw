@@ -162,21 +162,57 @@ body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;back
 .slot-light:nth-child(4){background:#34AADC;box-shadow:0 0 6px #34AADC;animation-delay:.6s;}
 .slot-light:nth-child(5){background:#BF5AF2;box-shadow:0 0 6px #BF5AF2;animation-delay:.8s;}
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
-.reels-wrap{display:flex;align-items:center;gap:4px;background:#050510;border-radius:12px;padding:8px;border:2px solid rgba(255,213,0,.12);position:relative;}
-.reels-wrap::before{content:'';position:absolute;top:50%;left:8px;right:8px;height:104px;transform:translateY(-50%);background:rgba(255,213,0,.04);border-radius:8px;border-top:1px solid rgba(255,213,0,.12);border-bottom:1px solid rgba(255,213,0,.12);pointer-events:none;z-index:0;}
-.reel-outer{width:84px;height:104px;border-radius:9px;overflow:hidden;position:relative;background:#030308;border:1.5px solid rgba(255,213,0,.18);box-shadow:inset 0 0 20px rgba(0,0,0,.9);}
-.reel-outer::before,.reel-outer::after{content:'';position:absolute;left:0;right:0;height:26px;z-index:10;pointer-events:none;}
-.reel-outer::before{top:0;background:linear-gradient(to bottom,#030308 30%,transparent);}
-.reel-outer::after{bottom:0;background:linear-gradient(to top,#030308 30%,transparent);}
-.win-line{position:absolute;top:50%;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent 0%,rgba(255,213,0,.6) 30%,rgba(255,213,0,.9) 50%,rgba(255,213,0,.6) 70%,transparent 100%);transform:translateY(-50%);z-index:5;pointer-events:none;}
-.win-line::before,.win-line::after{content:'';position:absolute;top:50%;transform:translateY(-50%);width:3px;height:20px;background:rgba(255,213,0,.3);border-radius:2px;}
-.win-line::before{left:0;}
-.win-line::after{right:0;}
+.reels-wrap{display:flex;align-items:center;gap:6px;background:#0a0a18;border-radius:14px;padding:10px;border:2px solid rgba(255,213,0,.15);position:relative;}
+/* golden highlight band behind centre row */
+.reels-wrap::before{content:'';position:absolute;top:50%;left:10px;right:10px;height:92px;transform:translateY(-50%);background:rgba(255,213,0,.05);border-radius:8px;border-top:1.5px solid rgba(255,213,0,.25);border-bottom:1.5px solid rgba(255,213,0,.25);pointer-events:none;z-index:0;}
+.reel-outer{width:88px;height:92px;border-radius:10px;overflow:hidden;position:relative;border:2px solid rgba(255,213,0,.2);box-shadow:0 4px 16px rgba(0,0,0,.5);}
+/* top/bottom fade masks */
+.reel-outer::before,.reel-outer::after{content:'';position:absolute;left:0;right:0;height:22px;z-index:10;pointer-events:none;}
+.reel-outer::before{top:0;background:linear-gradient(to bottom,rgba(10,10,24,.9) 10%,transparent);}
+.reel-outer::after{bottom:0;background:linear-gradient(to top,rgba(10,10,24,.9) 10%,transparent);}
+/* win-line golden bar */
+.win-line{position:absolute;top:50%;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(255,213,0,.7),rgba(255,255,180,1) 50%,rgba(255,213,0,.7),transparent);transform:translateY(-50%);z-index:6;pointer-events:none;box-shadow:0 0 6px rgba(255,213,0,.6);}
 .reel-track{display:flex;flex-direction:column;will-change:transform;}
-.reel-item{width:84px;height:104px;display:flex;align-items:center;justify-content:center;font-size:46px;user-select:none;flex-shrink:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,.8));line-height:1;}
-.reel-sep{width:4px;height:104px;background:linear-gradient(to bottom,rgba(255,213,0,.02),rgba(255,213,0,.1),rgba(255,213,0,.02));border-radius:2px;flex-shrink:0;}
+/* Each cell: vivid coloured background + crisp symbol */
+.reel-item{
+  width:88px;height:92px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;flex-shrink:0;user-select:none;
+  position:relative;
+}
+.reel-item-bg{
+  position:absolute;inset:2px;border-radius:8px;
+  opacity:.92;
+}
+.reel-item-sym{
+  position:relative;z-index:2;
+  font-size:38px;line-height:1;
+  text-shadow:0 2px 4px rgba(0,0,0,.5);
+  -webkit-font-smoothing:antialiased;
+}
+.reel-item-lbl{
+  position:relative;z-index:2;
+  font-family:'Outfit',sans-serif;
+  font-size:11px;font-weight:800;
+  color:rgba(255,255,255,.9);
+  letter-spacing:.5px;
+  text-shadow:0 1px 3px rgba(0,0,0,.7);
+  max-width:80px;text-align:center;
+  overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+}
+.reel-sep{width:4px;height:92px;background:linear-gradient(to bottom,rgba(255,213,0,.03),rgba(255,213,0,.12),rgba(255,213,0,.03));border-radius:2px;flex-shrink:0;}
+/* No-repeat toggle inside slot body */
+.slot-norepeat{display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 14px;margin-bottom:10px;cursor:pointer;user-select:none;transition:border-color .2s;}
+.slot-norepeat:hover{border-color:var(--accent);}
+.snr-check{width:20px;height:20px;border-radius:6px;border:2px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
+.snr-check.on{background:var(--green);border-color:var(--green);}
+.snr-check.on::after{content:'✓';font-size:12px;font-weight:800;color:#fff;}
+.snr-info{flex:1;}
+.snr-title{font-size:14px;font-weight:700;color:var(--text);}
+.snr-sub{font-size:11px;color:var(--text3);margin-top:1px;}
+.snr-pool{font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;color:var(--accent);flex-shrink:0;}
 .slot-body{padding:14px 16px 18px;}
-.btn-pull{width:100%;background:linear-gradient(135deg,#FF453A,#FF9F0A);color:#fff;border:none;padding:15px;border-radius:var(--r-md);font-family:'Outfit',sans-serif;font-size:17px;font-weight:800;letter-spacing:.5px;cursor:pointer;transition:all .3s;box-shadow:0 8px 22px rgba(255,69,58,.4);margin-bottom:12px;position:relative;overflow:hidden;}
+.btn-pull{width:100%;background:linear-gradient(135deg,#FF453A,#FF9F0A);color:#fff;border:none;padding:15px;border-radius:var(--r-md);font-family:'Outfit',sans-serif;font-size:17px;font-weight:800;letter-spacing:.5px;cursor:pointer;transition:all .3s;box-shadow:0 8px 22px rgba(255,69,58,.4);margin-bottom:10px;position:relative;overflow:hidden;}
 .btn-pull::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);transition:left .5s;}
 .btn-pull:not(:disabled):hover::before{left:100%;}
 .btn-pull:not(:disabled):active{transform:scale(.97);}
@@ -188,24 +224,39 @@ body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;back
 
 /* ════ PAGE 3 – CARD DRAW ════ */
 .draw-card{background:var(--surface);border-radius:var(--r-lg);border:1px solid var(--border);box-shadow:var(--sh-md);padding:18px;}
-.draw-stage{display:flex;flex-direction:column;align-items:center;gap:14px;}
+.draw-stage{display:flex;flex-direction:column;align-items:center;gap:12px;}
+/* Divider between fan area and controls */
+.draw-divider{width:100%;height:1px;background:var(--border);border-radius:1px;margin:2px 0;}
 .draw-ttl{font-family:'Outfit',sans-serif;font-size:17px;font-weight:800;color:var(--text);letter-spacing:-.3px;}
-.cards-fan{position:relative;height:175px;width:100%;display:flex;align-items:flex-end;justify-content:center;}
-.fan-card{position:absolute;bottom:0;width:84px;height:124px;border-radius:11px;cursor:pointer;transition:transform .35s cubic-bezier(.34,1.56,.64,1),box-shadow .3s;will-change:transform;transform-origin:bottom center;backface-visibility:hidden;}
+/* Fan container: fixed height, overflow visible so cards can arc upward freely,
+   but the stage has enough bottom space so cards never reach the buttons */
+.cards-fan{
+  position:relative;
+  height:160px;
+  width:100%;
+  overflow:visible;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  /* extra bottom room so the card base never touches the edge */
+  margin-bottom:4px;
+}
+.fan-card{position:absolute;bottom:0;width:82px;height:118px;border-radius:11px;cursor:pointer;transition:transform .35s cubic-bezier(.34,1.56,.64,1),box-shadow .3s;will-change:transform;transform-origin:50% 100%;backface-visibility:hidden;}
 .fan-card.facedown{background:linear-gradient(135deg,#1a237e,#283593);border:2px solid rgba(255,255,255,.12);}
 .fan-card.facedown .fcard-inner{width:100%;height:100%;border-radius:9px;background:repeating-linear-gradient(45deg,rgba(255,255,255,.025) 0,rgba(255,255,255,.025) 3px,transparent 3px,transparent 10px),repeating-linear-gradient(-45deg,rgba(255,255,255,.025) 0,rgba(255,255,255,.025) 3px,transparent 3px,transparent 10px);}
 .fan-card.revealed{border:2px solid;}
-.fan-card:hover:not(.flipping){transform:var(--fan-base-transform,none) translateY(-14px) scale(1.05)!important;}
+/* hover lifts only within the fan area */
+.fan-card:hover:not(.flipping){transform:var(--fan-base-transform,none) translateY(-12px) scale(1.05)!important;}
 .fan-card.flipping{animation:cflip .6s ease forwards;}
 @keyframes cflip{
   0%{transform:rotateY(0) scale(1) translateY(0);}
-  45%{transform:rotateY(90deg) scale(1.1) translateY(-18px);}
-  55%{transform:rotateY(90deg) scale(1.1) translateY(-18px);}
+  45%{transform:rotateY(90deg) scale(1.08) translateY(-14px);}
+  55%{transform:rotateY(90deg) scale(1.08) translateY(-14px);}
   100%{transform:rotateY(0) scale(1) translateY(0);}
 }
 .fcard-content{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:8px;}
 .fcard-emoji{font-size:26px;line-height:1;}
-.fcard-text{font-size:11px;font-weight:700;text-align:center;word-break:break-word;line-height:1.2;}
+.fcard-text{font-size:11px;font-weight:700;text-align:center;word-break:break-word;line-height:1.2;color:var(--text);}
 .draw-ctrls{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:9px;}
 .btn-draw{background:linear-gradient(135deg,#BF5AF2,#FF375F);color:#fff;border:none;padding:14px 10px;border-radius:var(--r-md);font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .3s;box-shadow:0 8px 20px rgba(191,90,242,.35);display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;}
 .btn-draw:not(:disabled):active{transform:scale(.96);}
@@ -229,14 +280,29 @@ body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;back
 .btn-close-m{width:100%;background:var(--text);color:var(--bg);border:none;border-radius:var(--r-md);padding:14px;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;}
 .btn-close-m:active{transform:scale(.97);opacity:.85;}
 
+/* ── CUSTOM CONFIRM MODAL ── */
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:400;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}
+.confirm-overlay.show{opacity:1;pointer-events:all;}
+.confirm-box{background:var(--surface);border-radius:var(--r-lg);padding:26px 22px 20px;width:min(84vw,300px);text-align:center;box-shadow:var(--sh-lg);border:1px solid var(--border);transform:scale(.82) translateY(20px);transition:transform .35s cubic-bezier(.34,1.56,.64,1);}
+.confirm-overlay.show .confirm-box{transform:scale(1) translateY(0);}
+.confirm-icon{font-size:36px;margin-bottom:8px;display:block;}
+.confirm-msg{font-size:15px;font-weight:600;color:var(--text);margin-bottom:18px;line-height:1.4;}
+.confirm-btns{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.confirm-cancel{background:var(--bg);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;font-size:14px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .2s;}
+.confirm-cancel:hover{border-color:var(--accent);color:var(--accent);}
+.confirm-ok{background:var(--red);border:none;border-radius:var(--r-sm);padding:12px;font-size:14px;font-weight:700;color:#fff;cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(255,69,58,.35);}
+.confirm-ok:hover{opacity:.88;}
+.confirm-ok:active,.confirm-cancel:active{transform:scale(.96);}
+
 /* ── TOAST ── */
 .toast{position:fixed;bottom:calc(16px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(80px);background:var(--text);color:var(--bg);padding:9px 17px;border-radius:30px;font-size:12px;font-weight:600;z-index:300;transition:transform .4s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.25);}
 .toast.show{transform:translateX(-50%) translateY(0);}
 
 @media(min-width:580px){
   .wheel-wrap{width:300px;height:300px;}
-  .reel-outer{width:100px;}
-  .reel-item{width:100px;font-size:52px;}
+  .reel-outer{width:104px;}
+  .reel-item{width:104px;}
+  .reel-item-sym{font-size:44px;}
 }
 
 /* ════ PAGE 4 – NUMBER LOTTERY ════ */
@@ -379,6 +445,15 @@ body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;back
         </svg>
       </button>
     </div>
+    <!-- No-repeat toggle -->
+    <div class="slot-norepeat" onclick="toggleWheelNoRepeat()" style="width:100%">
+      <div class="snr-check" id="wnrCheck"></div>
+      <div class="snr-info">
+        <div class="snr-title">不重複抽取</div>
+        <div class="snr-sub">每人只抽一次，抽完全部後自動重置</div>
+      </div>
+      <div class="snr-pool" id="wnrPool"></div>
+    </div>
     <div class="spin-row">
       <button class="btn-spin" id="spinBtn" onclick="wheelSpin()">✦ SPIN</button>
       <button class="btn-lucky" onclick="loadWheelSample()">🎲</button>
@@ -443,6 +518,14 @@ body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;back
       </div>
     </div>
     <div class="slot-body">
+      <div class="slot-norepeat" onclick="toggleSlotNoRepeat()">
+        <div class="snr-check" id="snrCheck"></div>
+        <div class="snr-info">
+          <div class="snr-title">不重複抽取</div>
+          <div class="snr-sub">每個選項只出現一次，抽完後自動重置</div>
+        </div>
+        <div class="snr-pool" id="snrPool"></div>
+      </div>
       <button class="btn-pull" id="pullBtn" onclick="slotPull()">🎰 PULL</button>
       <div class="slot-res"><span class="slot-res-txt" id="slotTxt">準備好了，快拉吧！</span></div>
     </div>
@@ -479,6 +562,7 @@ body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;back
     <div class="draw-stage">
       <div class="draw-ttl">翻牌抽籤 🃏</div>
       <div class="cards-fan" id="cardsFan"></div>
+      <div class="draw-divider"></div>
       <div class="draw-ctrls">
         <button class="btn-draw" id="drawBtn" onclick="drawCard()">✦ 翻牌抽籤</button>
         <button class="btn-reset" onclick="resetDraw()">🔄 重置籤筒</button>
@@ -629,6 +713,18 @@ body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;back
   </div>
 </div>
 
+<!-- CUSTOM CONFIRM MODAL -->
+<div class="confirm-overlay" id="confirmOvl">
+  <div class="confirm-box">
+    <span class="confirm-icon" id="confirmIcon">⚠️</span>
+    <div class="confirm-msg" id="confirmMsg">確定要執行嗎？</div>
+    <div class="confirm-btns">
+      <button class="confirm-cancel" onclick="confirmAnswer(false)">取消</button>
+      <button class="confirm-ok" id="confirmOkBtn" onclick="confirmAnswer(true)">確定清空</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
@@ -658,8 +754,9 @@ function switchTab(id, btn) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
   btn.classList.add('active');
-  if (id === 'wheel') drawWheel();
-  if (id === 'slot')  { renderSList(); buildReels(); }
+  if (id === 'wheel') { drawWheel(); updateWnrPool(); }
+  if (id === 'slot')  { renderSList(); buildReels(); updateSnrPool(); }
+  if (id === 'draw')  { renderDList(); renderFan(); updateDrawStatus(); }
   if (id === 'num')   { numUpdateStats(); }
 }
 
@@ -702,57 +799,176 @@ function confirmImport() {
 const wCvs = document.getElementById('wCanvas');
 const wCtx = wCvs.getContext('2d');
 
+// No-repeat state
+let wNoRepeat = false;
+let wPool     = [];   // items still available
+
+function toggleWheelNoRepeat() {
+  wNoRepeat = !wNoRepeat;
+  document.getElementById('wnrCheck').classList.toggle('on', wNoRepeat);
+  wPool = [...wItems]; shuffle(wPool);
+  updateWnrPool();
+  renderWList(); // refresh spinBtn state
+  toast(wNoRepeat ? '不重複模式已開啟 ✅' : '不重複模式已關閉');
+}
+
+function updateWnrPool() {
+  const el = document.getElementById('wnrPool');
+  if (!el) return;
+  if (!wNoRepeat) { el.textContent = ''; return; }
+  el.textContent = wPool.length > 0 ? `剩 ${wPool.length}` : '已抽完';
+}
+
 function drawWheel() {
-  const n = wItems.length;
-  wCtx.clearRect(0,0,640,640);
-  if (!n) { wCtx.fillStyle='rgba(128,128,128,.15)'; wCtx.beginPath(); wCtx.arc(320,320,310,0,Math.PI*2); wCtx.fill(); return; }
-  const arc = Math.PI*2/n, dark = document.documentElement.getAttribute('data-theme')==='dark';
-  for (let i=0;i<n;i++) {
-    const s=i*arc;
-    wCtx.beginPath(); wCtx.moveTo(320,320); wCtx.arc(320,320,310,s,s+arc); wCtx.closePath();
-    wCtx.fillStyle=C[i%C.length]; wCtx.fill();
-    wCtx.strokeStyle=dark?'rgba(0,0,0,.3)':'rgba(255,255,255,.55)'; wCtx.lineWidth=2; wCtx.stroke();
-    wCtx.save(); wCtx.translate(320,320); wCtx.rotate(s+arc/2);
-    wCtx.textAlign='right'; wCtx.fillStyle='rgba(255,255,255,.95)';
-    const fs=n>10?19:25; wCtx.font=`700 ${fs}px Outfit,'Noto Sans TC',sans-serif`;
-    wCtx.shadowColor='rgba(0,0,0,.3)'; wCtx.shadowBlur=4;
-    let t=wItems[i]; if(t.length>9)t=t.slice(0,8)+'…';
-    wCtx.fillText(t,285,9); wCtx.restore();
+  // Draw based on wItems (full list always shown on wheel)
+  const list = wItems;
+  const n = list.length;
+  wCtx.clearRect(0, 0, 640, 640);
+  if (!n) {
+    wCtx.fillStyle = 'rgba(128,128,128,.15)';
+    wCtx.beginPath(); wCtx.arc(320, 320, 310, 0, Math.PI * 2); wCtx.fill();
+    return;
   }
-  const g=wCtx.createRadialGradient(320,320,0,320,320,50);
-  g.addColorStop(0,dark?'#2C2C2E':'#FFFFFF'); g.addColorStop(1,dark?'#1C1C1E':'#F5F5F7');
-  wCtx.beginPath(); wCtx.arc(320,320,50,0,Math.PI*2); wCtx.fillStyle=g; wCtx.fill();
-  wCtx.strokeStyle=dark?'rgba(255,255,255,.1)':'rgba(0,0,0,.08)'; wCtx.lineWidth=3; wCtx.stroke();
+  const arc = Math.PI * 2 / n;
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  for (let i = 0; i < n; i++) {
+    const s = i * arc;
+    wCtx.beginPath(); wCtx.moveTo(320, 320);
+    wCtx.arc(320, 320, 310, s, s + arc); wCtx.closePath();
+    // Grey out already-drawn items in no-repeat mode
+    const drawn = wNoRepeat && !wPool.includes(list[i]);
+    wCtx.fillStyle = drawn ? (dark ? '#333' : '#ccc') : C[i % C.length];
+    wCtx.fill();
+    wCtx.strokeStyle = dark ? 'rgba(0,0,0,.3)' : 'rgba(255,255,255,.55)';
+    wCtx.lineWidth = 2; wCtx.stroke();
+    wCtx.save(); wCtx.translate(320, 320); wCtx.rotate(s + arc / 2);
+    wCtx.textAlign = 'right';
+    wCtx.fillStyle = drawn ? 'rgba(150,150,150,.6)' : 'rgba(255,255,255,.95)';
+    const fs = n > 10 ? 19 : 25;
+    wCtx.font = `700 ${fs}px Outfit,'Noto Sans TC',sans-serif`;
+    wCtx.shadowColor = 'rgba(0,0,0,.3)'; wCtx.shadowBlur = 4;
+    let t = list[i]; if (t.length > 9) t = t.slice(0, 8) + '…';
+    wCtx.fillText(t, 285, 9); wCtx.restore();
+  }
+  // Centre circle
+  const g = wCtx.createRadialGradient(320, 320, 0, 320, 320, 50);
+  g.addColorStop(0, dark ? '#2C2C2E' : '#FFFFFF');
+  g.addColorStop(1, dark ? '#1C1C1E' : '#F5F5F7');
+  wCtx.beginPath(); wCtx.arc(320, 320, 50, 0, Math.PI * 2);
+  wCtx.fillStyle = g; wCtx.fill();
+  wCtx.strokeStyle = dark ? 'rgba(255,255,255,.1)' : 'rgba(0,0,0,.08)';
+  wCtx.lineWidth = 3; wCtx.stroke();
 }
 
 function wheelSpin() {
-  if (wSpin||wItems.length<2) { if(wItems.length<2)toast('請至少輸入 2 個選項 😅'); return; }
-  wSpin=true;
-  const btn=document.getElementById('spinBtn'); btn.disabled=true; btn.textContent='旋轉中…';
-  wAngle += (6+Math.random()*5)*360 + Math.random()*360;
-  wCvs.style.transition='transform 5s cubic-bezier(.08,0,.05,1)';
-  wCvs.style.transform=`rotate(${wAngle}deg)`;
-  setTimeout(()=>{
-    wSpin=false; btn.disabled=false; btn.innerHTML='✦ SPIN';
-    const idx = Math.floor(((360-(wAngle%360))%360+270)%360/360*wItems.length)%wItems.length;
-    showResult(CEMOJI[randInt(CEMOJI.length)],'恭喜得獎！',wItems[idx]);
-  },5000);
+  const activeItems = wNoRepeat ? wPool : wItems;
+  if (wSpin) return;
+  if (activeItems.length === 0) { toast('所有選項已抽完，自動重置 🔄'); wPool = [...wItems]; shuffle(wPool); updateWnrPool(); drawWheel(); return; }
+  if (wItems.length < 2) { toast('請至少輸入 2 個選項 😅'); return; }
+
+  wSpin = true;
+  const btn = document.getElementById('spinBtn');
+  btn.disabled = true; btn.textContent = '旋轉中…';
+
+  // Pick winner from active pool
+  const winnerIdx_pool = randInt(activeItems.length);
+  const winnerName = activeItems[winnerIdx_pool];
+  // Find this winner's index in full wItems (first occurrence)
+  const winnerIdx_wheel = wItems.indexOf(winnerName);
+
+  // Calculate the exact angle to land the pointer (top = 270° from canvas 0°)
+  // Sector i spans from i/n * 360 to (i+1)/n * 360 degrees (canvas rotates clockwise)
+  // We want the middle of sector winnerIdx_wheel to align with the pointer (top)
+  // Pointer is at 270° in CSS (top of circle). Canvas 0° = right (3 o'clock).
+  // Sector centre angle (CSS) = winnerIdx_wheel/n * 360 + 360/n/2
+  // We need: (wAngle_new) such that wAngle_new % 360 brings sector centre to 270° (top)
+  const n = wItems.length;
+  const sectorCentreDeg = (winnerIdx_wheel / n) * 360 + (360 / n / 2);
+  // Target: sectorCentreDeg + wAngle_new ≡ 270 (mod 360)  →  wAngle_new ≡ 270 - sectorCentreDeg (mod 360)
+  const targetRemainder = ((270 - sectorCentreDeg) % 360 + 360) % 360;
+  // Add enough full spins (minimum 6) so it looks good
+  const fullSpins = (6 + randInt(5)) * 360;
+  // Current remainder
+  const currentRemainder = ((wAngle % 360) + 360) % 360;
+  // Extra degrees needed to go from current remainder to target remainder (always positive)
+  let extraDeg = (targetRemainder - currentRemainder + 360) % 360;
+  if (extraDeg < 10) extraDeg += 360; // ensure at least some rotation in final spin
+  wAngle = wAngle + fullSpins + extraDeg;
+  // Normalise wAngle to prevent float precision issues over many spins
+  // Keep as-is for CSS but normalise the base after settling
+  wCvs.style.transition = 'transform 5s cubic-bezier(.08,0,.05,1)';
+  wCvs.style.transform  = `rotate(${wAngle}deg)`;
+
+  setTimeout(() => {
+    wSpin = false;
+    btn.disabled = false; btn.innerHTML = '✦ SPIN';
+    // Normalise accumulated angle to keep numbers sane
+    wAngle = wAngle % 360;
+    wCvs.style.transition = 'none';
+    wCvs.style.transform  = `rotate(${wAngle}deg)`;
+    // Re-enable transition after a tick
+    setTimeout(() => { wCvs.style.transition = 'transform 5s cubic-bezier(.08,0,.05,1)'; }, 50);
+
+    // Remove from no-repeat pool
+    if (wNoRepeat) {
+      wPool.splice(winnerIdx_pool, 1);
+      updateWnrPool();
+      drawWheel(); // re-draw to grey out winner
+    }
+    renderWList(); // refresh spinBtn + pool count in badge
+    showResult(CEMOJI[randInt(CEMOJI.length)], '恭喜得獎！', winnerName);
+  }, 5000);
 }
 
 function renderWList() {
-  const n=wItems.length;
-  document.getElementById('wBadge').textContent=n;
-  document.getElementById('wList').innerHTML=n?wItems.map((x,i)=>iRow(x,i,'w')).join(''):'<div class="empty-hint">尚無選項 ✏️</div>';
+  const n = wItems.length;
+  document.getElementById('wBadge').textContent = n;
+  document.getElementById('wList').innerHTML = n ? wItems.map((x,i) => iRow(x,i,'w')).join('') : '<div class="empty-hint">尚無選項 ✏️</div>';
   // formula
-  document.getElementById('wFT').textContent=n;
-  const u=new Set(wItems).size; document.getElementById('wFU').textContent=u;
-  if(!n){document.getElementById('wFM').textContent='—';document.getElementById('wFA').textContent='—';}
-  else{const cnt={}; wItems.forEach(x=>cnt[x]=(cnt[x]||0)+1); const mx=Math.max(...Object.values(cnt)); document.getElementById('wFM').textContent=(mx/n*100).toFixed(1)+'%'; document.getElementById('wFA').textContent=(100/u).toFixed(1)+'%';}
+  document.getElementById('wFT').textContent = n;
+  const u = new Set(wItems).size;
+  document.getElementById('wFU').textContent = u;
+  if (!n) {
+    document.getElementById('wFM').textContent = '—';
+    document.getElementById('wFA').textContent = '—';
+  } else {
+    const cnt = {}; wItems.forEach(x => cnt[x] = (cnt[x]||0)+1);
+    const mx = Math.max(...Object.values(cnt));
+    document.getElementById('wFM').textContent = (mx/n*100).toFixed(1) + '%';
+    document.getElementById('wFA').textContent = (100/u).toFixed(1) + '%';
+  }
   // prob table
-  const pb=document.getElementById('wPBody');
-  if(!n){pb.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--text3);padding:14px">尚無資料</td></tr>';} 
-  else{const cnt={}; wItems.forEach(x=>cnt[x]=(cnt[x]||0)+1); const s=Object.entries(cnt).sort((a,b)=>b[1]-a[1]); const mx=s[0][1]; pb.innerHTML=s.map(([nm,c],i)=>`<tr><td style="font-weight:600;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(nm)}</td><td style="color:var(--accent);font-family:'Outfit',sans-serif;font-weight:700">${c}</td><td><div class="pbar-w"><div class="pbar-f" style="width:${(c/mx*100).toFixed(0)}%;background:${C[i%C.length]}"></div></div></td><td class="ppct">${(c/n*100).toFixed(1)}%</td></tr>`).join('');}
-  document.getElementById('spinBtn').disabled=n<2;
+  const pb = document.getElementById('wPBody');
+  if (!n) {
+    pb.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text3);padding:14px">尚無資料</td></tr>';
+  } else {
+    const cnt = {}; wItems.forEach(x => cnt[x] = (cnt[x]||0)+1);
+    const s = Object.entries(cnt).sort((a,b) => b[1]-a[1]);
+    const mx = s[0][1];
+    pb.innerHTML = s.map(([nm,c],i) => `<tr>
+      <td style="font-weight:600;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(nm)}</td>
+      <td style="color:var(--accent);font-family:'Outfit',sans-serif;font-weight:700">${c}</td>
+      <td><div class="pbar-w"><div class="pbar-f" style="width:${(c/mx*100).toFixed(0)}%;background:${C[i%C.length]}"></div></div></td>
+      <td class="ppct">${(c/n*100).toFixed(1)}%</td>
+    </tr>`).join('');
+  }
+  // Rebuild no-repeat pool whenever items change (keep already-drawn ones removed)
+  if (wNoRepeat) {
+    // Preserve draws: only keep items that still exist AND were still in old pool
+    wPool = wPool.filter(x => wItems.includes(x));
+    // Add any new items that aren't in pool yet
+    wItems.forEach(x => { if (!wPool.includes(x)) wPool.push(x); });
+  } else {
+    wPool = [...wItems]; shuffle(wPool);
+  }
+  updateWnrPool();
+  // Disable spin if: not enough items, OR no-repeat pool empty
+  const canSpin = n >= 2 && (!wNoRepeat || wPool.length > 0);
+  const btn = document.getElementById('spinBtn');
+  btn.disabled = !canSpin;
+  if (n < 2) btn.innerHTML = '請先新增選項';
+  else if (wNoRepeat && wPool.length === 0) btn.innerHTML = '✅ 已全部抽完';
+  else btn.innerHTML = '✦ SPIN';
   drawWheel();
 }
 function iRow(item,i,p){ return `<div class="irow" id="${p}r${i}"><div class="idot" style="background:${C[i%C.length]}"></div><span class="iname" id="${p}n${i}">${esc(item)}</span><div class="iacts"><button class="bic edt" onclick="${p}Edit(${i})">✏️</button><button class="bic del" onclick="${p}Del(${i})">✕</button></div></div>`; }
@@ -763,58 +979,154 @@ function wDel(i){const nm=wItems[i];const r=document.getElementById(`wr${i}`);if
 function wEdit(i){const el=document.getElementById(`wn${i}`);if(!el)return;el.outerHTML=`<input class="iname-edit" id="we${i}" value="${esc(wItems[i])}" maxlength="20" onblur="wSave(${i})" onkeydown="if(event.key==='Enter')wSave(${i});if(event.key==='Escape')renderWList();">`;setTimeout(()=>{const e=document.getElementById(`we${i}`);if(e){e.focus();e.select();}},10);}
 function wSave(i){const e=document.getElementById(`we${i}`);if(!e)return;const v=e.value.trim();if(v){wItems[i]=v;toast('已更新 ✅');}renderWList();}
 function wShuffle(){shuffle(wItems);renderWList();toast('已隨機排序 🔀');}
-function wClear(){if(!wItems.length)return;if(!confirm('確定清空所有選項？'))return;wItems=[];renderWList();toast('已清空 🗑');}
-function loadWheelSample(){wItems=['王小明','李大同','張美麗','陳嘉玲','林志偉','黃雅婷','劉明輝','謝靜茹'];renderWList();toast('已載入範例 🎲');}
+function wClear() {
+  if (!wItems.length) return;
+  showConfirm('🗑','確定清空所有轉盤選項？','清空', () => {
+    wItems = []; wPool = [];
+    wAngle = 0;
+    wCvs.style.transition = 'none';
+    wCvs.style.transform = 'rotate(0deg)';
+    setTimeout(() => { wCvs.style.transition = 'transform 5s cubic-bezier(.08,0,.05,1)'; }, 50);
+    renderWList();
+    toast('已清空 🗑');
+  });
+}
+function loadWheelSample() {
+  wItems = ['王小明','李大同','張美麗','陳嘉玲','林志偉','黃雅婷','劉明輝','謝靜茹'];
+  wPool = [...wItems]; shuffle(wPool);
+  renderWList();
+  toast('已載入範例 🎲');
+}
 
 /* ═══════════════════════════
    SLOT MACHINE
 ═══════════════════════════ */
-const REEL_H = 104;
+const REEL_H = 92;
+// Vivid background gradients per colour index
+const REEL_BGSRC = [
+  'linear-gradient(145deg,#c0392b,#e74c3c)',
+  'linear-gradient(145deg,#d35400,#e67e22)',
+  'linear-gradient(145deg,#b7950b,#f1c40f)',
+  'linear-gradient(145deg,#1e8449,#27ae60)',
+  'linear-gradient(145deg,#1a6fa8,#2980b9)',
+  'linear-gradient(145deg,#1a5276,#2471a3)',
+  'linear-gradient(145deg,#6c3483,#8e44ad)',
+  'linear-gradient(145deg,#922b21,#c0392b)',
+  'linear-gradient(145deg,#0e6655,#1abc9c)',
+  'linear-gradient(145deg,#515a5a,#717d7e)',
+];
+
+let slotNoRepeat = false;
+let slotPool = [];   // remaining items when no-repeat ON
+
+function toggleSlotNoRepeat() {
+  slotNoRepeat = !slotNoRepeat;
+  const chk = document.getElementById('snrCheck');
+  chk.classList.toggle('on', slotNoRepeat);
+  slotPool = [...sItems];
+  shuffle(slotPool);
+  updateSnrPool();
+  toast(slotNoRepeat ? '不重複模式已開啟 ✅' : '不重複模式已關閉');
+}
+
+function updateSnrPool() {
+  const el = document.getElementById('snrPool');
+  if (!slotNoRepeat) { el.textContent = ''; return; }
+  el.textContent = slotPool.length > 0 ? `剩 ${slotPool.length}` : '已抽完';
+}
+
+/* Build a reel-item HTML with coloured tile + label */
+function reelItemHTML(item, idx) {
+  const bg = REEL_BGSRC[idx % REEL_BGSRC.length];
+  // Detect if item is purely emoji (no ASCII letters/digits)
+  const isEmoji = /^\p{Emoji}/u.test(item) && item.replace(/[\p{Emoji}\uFE0F\u200D]/gu,'').length === 0;
+  const lbl = isEmoji ? '' : `<div class="reel-item-lbl">${esc(item)}</div>`;
+  return `<div class="reel-item"><div class="reel-item-bg" style="background:${bg}"></div><div class="reel-item-sym">${esc(item)}</div>${lbl}</div>`;
+}
 
 function buildReels() {
   if (!sItems.length) return;
-  for (let r=0;r<3;r++) {
-    const trk=document.getElementById(`rt${r}`);
-    let strip=[...sItems,...sItems,...sItems,...sItems].sort(()=>Math.random()-.5);
-    trk.style.transition='none';
-    trk.style.transform='translateY(0)';
-    trk.innerHTML=strip.map(it=>`<div class="reel-item">${esc(it)}</div>`).join('');
+  for (let r = 0; r < 3; r++) {
+    const trk = document.getElementById(`rt${r}`);
+    // Build a shuffled strip, assign colour based on item index in sItems
+    const strip = [...sItems, ...sItems, ...sItems, ...sItems].sort(() => Math.random() - .5);
+    trk.style.transition = 'none';
+    trk.style.transform = 'translateY(0)';
+    trk.innerHTML = strip.map((it, si) => reelItemHTML(it, sItems.indexOf(it))).join('');
   }
 }
 
 function slotPull() {
-  if (slotBusy||sItems.length<2){if(sItems.length<2)toast('請至少輸入 2 個選項');return;}
-  slotBusy=true;
-  const btn=document.getElementById('pullBtn'); btn.disabled=true;
-  document.getElementById('slotTxt').className='slot-res-txt';
-  document.getElementById('slotTxt').textContent='🎰 旋轉中…';
+  if (slotBusy || sItems.length < 2) { if (sItems.length < 2) toast('請至少輸入 2 個選項'); return; }
 
-  const results=[];
-  for (let r=0;r<3;r++) {
-    const trk=document.getElementById(`rt${r}`);
-    const winner=sItems[randInt(sItems.length)];
-    results.push(winner);
-    // Build a strip that ends on winner
-    let strip=[];
-    for(let k=0;k<4;k++) strip=[...strip,...[...sItems].sort(()=>Math.random()-.5)];
-    strip.push(winner);
-    for(let k=0;k<1;k++) strip=[...strip,...[...sItems].sort(()=>Math.random()-.5)];
-    trk.style.transition='none'; trk.style.transform='translateY(0)';
-    trk.innerHTML=strip.map(it=>`<div class="reel-item">${esc(it)}</div>`).join('');
-    const winIdx=strip.lastIndexOf(winner);
-    const targetY=-(winIdx*REEL_H);
-    const delay=r*280, dur=2.0+r*0.55;
-    setTimeout(()=>{ trk.style.transition=`transform ${dur}s cubic-bezier(.12,0,.08,1)`; trk.style.transform=`translateY(${targetY}px)`; }, 60+delay);
+  // No-repeat: check pool
+  if (slotNoRepeat) {
+    if (slotPool.length === 0) {
+      slotPool = [...sItems]; shuffle(slotPool);
+      toast('已抽完所有選項，自動重置 🔄');
+      updateSnrPool();
+    }
   }
-  setTimeout(()=>{
-    slotBusy=false; btn.disabled=false;
-    const all3=results[0]===results[1]&&results[1]===results[2];
-    const two=results[0]===results[1]||results[1]===results[2]||results[0]===results[2];
-    const txt=document.getElementById('slotTxt');
-    if(all3){txt.className='slot-res-txt win';txt.textContent=`🎊 JACKPOT！三連 ${results[0]}！`;showResult('🎰','JACKPOT！',`三連 ${results[0]}`);}
-    else if(two){txt.className='slot-res-txt win';txt.textContent=`✨ 兩連！${results.join(' ')}`;}
-    else{txt.className='slot-res-txt';txt.textContent=`結果：${results.join(' ')} `;}
-  },3600);
+
+  slotBusy = true;
+  const btn = document.getElementById('pullBtn'); btn.disabled = true;
+  document.getElementById('slotTxt').className = 'slot-res-txt';
+  document.getElementById('slotTxt').textContent = '🎰 旋轉中…';
+
+  const results = [];
+  for (let r = 0; r < 3; r++) {
+    const trk = document.getElementById(`rt${r}`);
+
+    let winner;
+    if (slotNoRepeat && slotPool.length > 0) {
+      // Pick from pool for first reel, allow repeats on reel 2 & 3 from original
+      winner = r === 0 ? slotPool.splice(randInt(slotPool.length), 1)[0]
+                       : sItems[randInt(sItems.length)];
+    } else {
+      winner = sItems[randInt(sItems.length)];
+    }
+    results.push(winner);
+
+    // Build strip: 3 full shuffles + winner at a specific position + 1 more shuffle
+    let strip = [];
+    for (let k = 0; k < 3; k++) strip = [...strip, ...[...sItems].sort(() => Math.random() - .5)];
+    strip.push(winner);
+    strip = [...strip, ...[...sItems].sort(() => Math.random() - .5)];
+
+    trk.style.transition = 'none';
+    trk.style.transform = 'translateY(0)';
+    trk.innerHTML = strip.map(it => reelItemHTML(it, sItems.indexOf(it))).join('');
+
+    const winIdx = strip.lastIndexOf(winner);
+    const targetY = -(winIdx * REEL_H);
+    const delay = r * 300;
+    const dur = 2.2 + r * 0.6;
+    setTimeout(() => {
+      trk.style.transition = `transform ${dur}s cubic-bezier(.12,0,.08,1)`;
+      trk.style.transform = `translateY(${targetY}px)`;
+    }, 60 + delay);
+  }
+
+  const totalTime = 3800;
+  setTimeout(() => {
+    slotBusy = false; btn.disabled = false;
+    if (slotNoRepeat) updateSnrPool();
+
+    const all3 = results[0] === results[1] && results[1] === results[2];
+    const two  = results[0] === results[1] || results[1] === results[2] || results[0] === results[2];
+    const txt  = document.getElementById('slotTxt');
+    if (all3) {
+      txt.className = 'slot-res-txt win';
+      txt.textContent = `🎊 JACKPOT！三連 ${results[0]}！`;
+      showResult('🎰', 'JACKPOT！', `三連 ${results[0]}`);
+    } else if (two) {
+      txt.className = 'slot-res-txt win';
+      txt.textContent = `✨ 兩連！${results.join('  ')}`;
+    } else {
+      txt.className = 'slot-res-txt';
+      txt.textContent = `結果：${results.join('  ')}`;
+    }
+  }, totalTime);
 }
 
 function renderSList(){
@@ -822,6 +1134,9 @@ function renderSList(){
   document.getElementById('sBadge').textContent=n;
   document.getElementById('sList').innerHTML=n?sItems.map((x,i)=>iRow(x,i,'s')).join(''):'<div class="empty-hint">尚無選項 🎲</div>';
   document.getElementById('pullBtn').disabled=n<2;
+  // Reset no-repeat pool when items change
+  slotPool=[...sItems]; shuffle(slotPool);
+  updateSnrPool();
 }
 function sAdd(){const v=document.getElementById('sInp').value.trim();if(!v)return;sItems.push(v);document.getElementById('sInp').value='';renderSList();buildReels();toast(`已新增「${v}」✅`);}
 function sQuick(n){sItems.push(n);renderSList();buildReels();toast(`已新增「${n}」✅`);}
@@ -829,7 +1144,7 @@ function sDel(i){const nm=sItems[i];const r=document.getElementById(`sr${i}`);if
 function sEdit(i){const el=document.getElementById(`sn${i}`);if(!el)return;el.outerHTML=`<input class="iname-edit" id="se${i}" value="${esc(sItems[i])}" maxlength="8" onblur="sSave(${i})" onkeydown="if(event.key==='Enter')sSave(${i});if(event.key==='Escape')renderSList();">`;setTimeout(()=>{const e=document.getElementById(`se${i}`);if(e){e.focus();e.select();}},10);}
 function sSave(i){const e=document.getElementById(`se${i}`);if(!e)return;const v=e.value.trim();if(v){sItems[i]=v;toast('已更新 ✅');}renderSList();buildReels();}
 function sShuffle(){shuffle(sItems);renderSList();buildReels();toast('已隨機排序 🔀');}
-function sClear(){if(!sItems.length)return;if(!confirm('確定清空所有選項？'))return;sItems=[];renderSList();buildReels();toast('已清空 🗑');}
+function sClear(){if(!sItems.length)return;showConfirm('🗑','確定清空所有拉霸選項？','清空',()=>{sItems=[];renderSList();buildReels();toast('已清空 🗑');});}
 
 /* ═══════════════════════════
    CARD DRAW
@@ -842,14 +1157,18 @@ function buildCards() {
 function renderFan() {
   const fan=document.getElementById('cardsFan');
   const total=Math.min(cardPool.length,10);
-  if(!total){fan.innerHTML='<div style="color:var(--text3);font-size:13px;padding:40px 0;text-align:center">所有籤已抽完 🎴<br><small>點擊 🔄 重置</small></div>';return;}
-  const spread=Math.min(total*9,72);
+  if(!total){
+    fan.innerHTML='<div style="color:var(--text3);font-size:13px;padding:30px 0;text-align:center">所有籤已抽完 🎴<br><small>點擊「重置籤筒」重新開始</small></div>';
+    return;
+  }
+  // Keep spread modest so cards don't fly too high and overlap buttons
+  const maxSpread = Math.min(total * 7, 56);
   fan.innerHTML=cardPool.slice(0,total).map((item,i)=>{
-    const angle=-spread/2+(i/Math.max(total-1,1))*spread;
-    const tx=(i-(total-1)/2)*(total>6?17:21);
-    const ty=Math.abs(angle)*.28;
+    const angle = total === 1 ? 0 : -maxSpread/2 + (i / (total-1)) * maxSpread;
+    const tx = (i - (total-1)/2) * (total > 6 ? 15 : 18);
+    // No vertical drift — cards always anchor at bottom:0 via CSS
     return `<div class="fan-card facedown" id="fc${i}"
-      style="transform:rotate(${angle}deg) translateX(${tx}px) translateY(${ty}px);z-index:${i};"
+      style="transform:rotate(${angle}deg) translateX(${tx}px);z-index:${i+1};"
       onclick="flipCard(${i})">
       <div class="fcard-inner"></div>
     </div>`;
@@ -916,7 +1235,7 @@ function dDel(i){const nm=dItems[i];const r=document.getElementById(`dr${i}`);if
 function dEdit(i){const el=document.getElementById(`dn${i}`);if(!el)return;el.outerHTML=`<input class="iname-edit" id="de${i}" value="${esc(dItems[i])}" maxlength="16" onblur="dSave(${i})" onkeydown="if(event.key==='Enter')dSave(${i});if(event.key==='Escape')renderDList();">`;setTimeout(()=>{const e=document.getElementById(`de${i}`);if(e){e.focus();e.select();}},10);}
 function dSave(i){const e=document.getElementById(`de${i}`);if(!e)return;const v=e.value.trim();if(v){dItems[i]=v;toast('已更新 ✅');}renderDList();buildCards();}
 function dShuffle(){shuffle(dItems);renderDList();buildCards();toast('已隨機排序 🔀');}
-function dClear(){if(!dItems.length)return;if(!confirm('確定清空所有選項？'))return;dItems=[];drawn=[];renderDList();buildCards();clearHistUI();toast('已清空 🗑');}
+function dClear(){if(!dItems.length)return;showConfirm('🗑','確定清空所有籤筒內容？','清空',()=>{dItems=[];drawn=[];renderDList();buildCards();clearHistUI();toast('已清空 🗑');});}
 
 /* ═══════════════════════════
    NUMBER LOTTERY
@@ -1045,13 +1364,11 @@ function numDraw() {
 }
 
 function numReset() {
-  if (!confirm('確定重置並清空所有紀錄？')) return;
-  numDrawnAll = [];
-  numHistory  = [];
-  document.getElementById('numBallsStage').innerHTML = '<span class="num-ball-placeholder">按下「開始抽籤」產生號碼球</span>';
-  numUpdateStats();
-  numRenderHistory();
-  toast('已重置，可重新抽籤 🔄');
+  showConfirm('🔄','確定重置並清空所有號碼紀錄？','重置',()=>{
+    numDrawnAll=[];numHistory=[];
+    document.getElementById('numBallsStage').innerHTML='<span class="num-ball-placeholder">按下「開始抽籤」產生號碼球</span>';
+    numUpdateStats();numRenderHistory();toast('已重置，可重新抽籤 🔄');
+  });
 }
 
 function numClearHistory() {
@@ -1082,6 +1399,21 @@ function numRenderHistory() {
       <div class="num-record-balls">${balls}</div>
     </div>`;
   }).join('');
+}
+
+/* ═══ CUSTOM CONFIRM ═══ */
+let _confirmCb = null;
+function showConfirm(icon, msg, okLabel, cb) {
+  _confirmCb = cb;
+  document.getElementById('confirmIcon').textContent = icon;
+  document.getElementById('confirmMsg').textContent  = msg;
+  document.getElementById('confirmOkBtn').textContent = okLabel;
+  document.getElementById('confirmOvl').classList.add('show');
+}
+function confirmAnswer(yes) {
+  document.getElementById('confirmOvl').classList.remove('show');
+  if (yes && typeof _confirmCb === 'function') _confirmCb();
+  _confirmCb = null;
 }
 
 /* ═══ INIT ═══ */
