@@ -2,40 +2,51 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>極簡轉盤 Pro - Apple Style</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Lucky Wheel Pro - Apple Style</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
+            /* Apple System Colors - Light */
             --bg: #F2F2F7;
-            --card-bg: rgba(255, 255, 255, 0.8);
+            --card-bg: rgba(255, 255, 255, 0.75);
             --text: #000000;
-            --accent: #007AFF;
-            --secondary: #8E8E93;
-            --glass: blur(20px);
+            --secondary-text: #8E8E93;
+            --accent: #007AFF; /* System Blue */
+            --success: #34C759; /* System Green */
+            --border: rgba(60, 60, 67, 0.1);
+            --glass: blur(20px) saturate(180%);
+            --safe-area-bottom: env(safe-area-inset-bottom);
         }
 
         [data-theme="dark"] {
+            /* Apple System Colors - Dark */
             --bg: #000000;
-            --card-bg: rgba(28, 28, 30, 0.8);
+            --card-bg: rgba(28, 28, 30, 0.75);
             --text: #FFFFFF;
-            --accent: #0A84FF;
-            --secondary: #98989D;
+            --secondary-text: #98989D;
+            --accent: #0A84FF; /* System Blue Dark */
+            --success: #30D158; /* System Green Dark */
+            --border: rgba(84, 84, 88, 0.2);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        
         body {
             margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
             background-color: var(--bg);
             color: var(--text);
-            transition: background 0.3s ease;
+            transition: background-color 0.4s ease, color 0.2s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
+            padding-bottom: calc(20px + var(--safe-area-bottom));
         }
 
-        /* Header & Toggle */
+        /* 導覽列 */
         .nav {
             width: 100%;
             padding: 20px;
@@ -43,249 +54,501 @@
             justify-content: space-between;
             align-items: center;
             max-width: 500px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background-color: rgba(242, 242, 247, 0.8);
+            backdrop-filter: blur(10px);
         }
+        [data-theme="dark"] .nav { background-color: rgba(0, 0, 0, 0.8); }
+
+        .nav h1 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
 
         .theme-btn {
             background: var(--card-bg);
-            border: none;
-            padding: 8px 15px;
+            border: 1px solid var(--border);
+            padding: 8px 16px;
             border-radius: 20px;
             color: var(--text);
             backdrop-filter: var(--glass);
             cursor: pointer;
             font-size: 14px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: 0.2s;
+        }
+        .theme-btn:active { transform: scale(0.95); background: var(--border); }
+
+        /* 轉盤主要區域 */
+        .wheel-stage {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 20px 0;
+            width: 100%;
         }
 
-        /* 轉盤主體 */
-        .wheel-container {
+        .wheel-outer {
             position: relative;
-            margin: 20px 0;
-            width: 320px;
-            height: 320px;
+            width: 85vw;
+            height: 85vw;
+            max-width: 360px;
+            max-height: 360px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            border-radius: 50%;
+            padding: 5px;
+            background: #fff; /* 轉盤外圈白色 */
         }
+        [data-theme="dark"] .wheel-outer { background: #333; }
 
         #wheel {
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            transition: transform 5s cubic-bezier(0.15, 0, 0.15, 1);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transition: transform 5s cubic-bezier(0.1, 0, 0.1, 1);
+            display: block;
         }
 
+        /* Apple 風格指針 */
         .pointer {
             position: absolute;
-            top: -10px;
+            top: -15px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 10;
-            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
         }
 
-        /* 控制卡片 */
-        .card {
+        /* 下方控制卡片 */
+        .controls-card {
             width: 90%;
             max-width: 500px;
             background: var(--card-bg);
             backdrop-filter: var(--glass);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            -webkit-backdrop-filter: var(--glass);
+            border-radius: 24px;
+            padding: 24px;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
         }
 
-        textarea {
-            width: 100%;
-            height: 120px;
-            background: rgba(120, 120, 128, 0.12);
-            border: none;
-            border-radius: 12px;
-            padding: 12px;
-            color: var(--text);
-            font-size: 16px;
-            margin: 15px 0;
-            outline: none;
-        }
-
-        .btn-main {
+        /* SPIN 按鈕 */
+        .btn-spin {
             width: 100%;
             background: var(--accent);
             color: white;
             border: none;
-            padding: 16px;
-            border-radius: 14px;
-            font-size: 18px;
-            font-weight: 600;
+            padding: 18px;
+            border-radius: 16px;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
             cursor: pointer;
-            transition: transform 0.1s;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-bottom: 20px;
+            box-shadow: 0 10px 20px rgba(0, 122, 255, 0.3);
         }
+        .btn-spin:disabled { background-color: var(--secondary-text); box-shadow: none; opacity: 0.6; }
+        .btn-spin:not(:disabled):active { transform: scale(0.96); box-shadow: 0 4px 10px rgba(0, 122, 255, 0.2); }
 
-        .btn-main:active { transform: scale(0.98); opacity: 0.9; }
+        /* 文字輸入區 */
+        .input-group h2 { margin: 0 0 10px 0; font-size: 17px; font-weight: 600; color: var(--secondary-text); }
+        .input-group p { margin: 0 0 15px 0; font-size: 13px; color: var(--secondary-text); line-height: 1.4; }
+        
+        textarea {
+            width: 100%;
+            height: 140px;
+            background: rgba(120, 120, 128, 0.12); /* Apple systemGray6 */
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px;
+            color: var(--text);
+            font-size: 16px;
+            font-family: inherit;
+            margin-bottom: 20px;
+            resize: none;
+            transition: 0.2s;
+        }
+        textarea:focus { background: rgba(120, 120, 128, 0.18); border-color: var(--accent); }
 
-        /* 表格與公式 */
+        /* 機率表格 */
+        .table-section h3 { margin: 0 0 12px 0; font-size: 17px; font-weight: 600; }
+        .table-container { max-height: 200px; overflow-y: auto; }
+        
         .info-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
-            font-size: 13px;
+            font-size: 14px;
         }
-        .info-table th { color: var(--secondary); text-align: left; padding: 8px; border-bottom: 1px solid var(--secondary); }
-        .info-table td { padding: 8px; border-bottom: 1px solid rgba(120, 120, 128, 0.1); }
-
-        .formula {
-            background: rgba(120, 120, 128, 0.08);
-            padding: 10px;
-            border-radius: 8px;
-            font-family: monospace;
-            font-size: 12px;
-            margin-top: 10px;
-        }
+        .info-table th { color: var(--secondary-text); text-align: left; padding: 10px; font-weight: 500; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--card-bg); }
+        .info-table td { padding: 12px 10px; border-bottom: 1px solid rgba(120, 120, 128, 0.08); color: var(--text); }
+        .info-table tr:last-child td { border-bottom: none; }
 
         /* 結果彈窗 */
-        #modal {
+        .modal-overlay {
             position: fixed;
-            top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8);
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .modal-overlay.show { display: flex; opacity: 1; }
+
+        .modal {
             background: var(--card-bg);
             backdrop-filter: var(--glass);
             padding: 30px;
-            border-radius: 25px;
+            border-radius: 28px;
             text-align: center;
-            display: none;
-            z-index: 100;
-            width: 280px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 80%;
+            max-width: 300px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+            border: 1px solid var(--border);
+            transform: scale(0.8);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2);
         }
+        .modal-overlay.show .modal { transform: scale(1); }
+
+        .modal-tag { font-size: 13px; font-weight: 600; color: var(--success); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
+        .modal-name { margin: 0 0 25px 0; font-size: 36px; font-weight: 800; color: var(--text); letter-spacing: -1px; word-wrap: break-word; }
+        
+        .btn-modal-close {
+            width: 100%;
+            background: var(--text);
+            color: var(--bg);
+            border: none;
+            padding: 16px;
+            border-radius: 14px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-modal-close:active { transform: scale(0.97); opacity: 0.8; }
+
     </style>
 </head>
-<body>
+<body data-theme="light">
 
     <div class="nav">
-        <h2 style="margin:0; font-weight:700;">Lucky Wheel</h2>
-        <button class="theme-btn" onclick="toggleTheme()">切換外觀</button>
+        <h1>Lucky Wheel</h1>
+        <button class="theme-btn" id="themeToggle">深色模式</button>
     </div>
 
-    <div class="wheel-container">
-        <svg class="pointer" width="30" height="40" viewBox="0 0 30 40">
-            <path d="M15 40 L30 0 L0 0 Z" fill="#FF3B30"/>
-        </svg>
-        <canvas id="wheel" width="640" height="640"></canvas>
-    </div>
-
-    <div class="card">
-        <button class="btn-main" id="spinTrigger">SPIN</button>
-        <textarea id="listInput" placeholder="輸入選項，每行一個...">咖啡
-綠茶
-珍奶
-可樂
-果汁</textarea>
-        
-        <h4 style="margin: 10px 0 5px 0;">機率計算方案</h4>
-        <table class="info-table" id="probTable">
-            <thead>
-                <tr><th>選項</th><th>權重</th><th>機率 (%)</th></tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-
-        <div class="formula">
-            $P(x) = \frac{count(x)}{\sum count(i)} \times 100\%$
+    <div class="wheel-stage">
+        <div class="wheel-outer">
+            <svg class="pointer" width="40" height="50" viewBox="0 0 40 50">
+                <defs>
+                    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+                        <feOffset dx="0" dy="3" result="offsetblur"/>
+                        <feFlood flood-color="rgba(0,0,0,0.3)"/>
+                        <feComposite in2="offsetblur" operator="in"/>
+                        <feMerge>
+                            <feMergeNode/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+                <path d="M20 50 L40 10 A5 5 0 0 0 35 0 L5 0 A5 5 0 0 0 0 10 Z" fill="#FF3B30" filter="url(#shadow)"/>
+            </svg>
+            <canvas id="wheel" width="720" height="720"></canvas>
         </div>
     </div>
 
-    <div id="modal">
-        <p style="color: var(--secondary); margin-bottom: 5px;">結果是</p>
-        <h1 id="resultName" style="margin: 0 0 20px 0; font-size: 32px;"></h1>
-        <button class="btn-main" onclick="closeModal()">確認</button>
+    <div class="controls-card">
+        <button class="btn-spin" id="spinBtn">SPIN</button>
+        
+        <div class="input-group">
+            <h2>編輯選項</h2>
+            <p>可以直接從 Excel 或 Google 試算表複製並貼上整欄名單。</p>
+            <textarea id="listInput" placeholder="輸入選項，每行一個...&#10;項目 A&#10;項目 B">王小明
+李大同
+張美麗
+陳嘉玲
+多喝水
+咖啡</textarea>
+        </div>
+
+        <div class="table-section">
+            <h3>中獎機率</h3>
+            <div class="table-container">
+                <table class="info-table" id="probTable">
+                    <thead>
+                        <tr>
+                            <th>選項</th>
+                            <th style="text-align: center;">權重 (行數)</th>
+                            <th style="text-align: right;">機率</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <span class="modal-tag">Congratulation!</span>
+            <h1 class="modal-name" id="resultName">--</h1>
+            <button class="btn-modal-close" onclick="closeModal()">確認</button>
+        </div>
     </div>
 
     <script>
+        // 核心變數
         const canvas = document.getElementById('wheel');
         const ctx = canvas.getContext('2d');
         const input = document.getElementById('listInput');
+        const spinBtn = document.getElementById('spinBtn');
         const tableBody = document.querySelector('#probTable tbody');
+        const themeToggle = document.getElementById('themeToggle');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const resultNameDisplay = document.getElementById('resultName');
+
         let items = [];
-        let angle = 0;
+        let currentAngle = 0; // 紀錄轉盤當前角度
+        let isSpinning = false;
 
-        const colors = ['#FF3B30', '#FF9500', '#FFCC00', '#34C759', '#007AFF', '#5856D6', '#AF52DE', '#FF2D55'];
+        // Apple System Palette - 轉盤用色 (Rich and Vibrant)
+        const appleColors = [
+            '#FF3B30', // Red
+            '#FF9500', // Orange
+            '#FFCC00', // Yellow
+            '#34C759', // Green
+            '#007AFF', // Blue
+            '#5856D6', // Indigo
+            '#AF52DE', // Purple
+            '#FF2D55'  // Pink
+        ];
 
+        // 初始化：解析輸入、繪製轉盤、更新表格
         function init() {
-            items = input.value.split('\n').filter(t => t.trim() !== "");
-            draw();
-            updateTable();
+            // Excel 貼上處理：過濾掉空行，並去除空白
+            items = input.value.split('\n')
+                                .map(t => t.trim())
+                                .filter(t => t !== "");
+            
+            drawWheel();
+            updateProbabilityTable();
+
+            if(items.length < 2) {
+                spinBtn.disabled = true;
+                spinBtn.innerText = "請輸入至少兩個選項";
+            } else {
+                spinBtn.disabled = false;
+                spinBtn.innerText = "SPIN";
+            }
         }
 
-        function draw() {
-            const n = items.length;
-            const arc = (Math.PI * 2) / n;
-            ctx.clearRect(0, 0, 640, 640);
+        // 繪製轉盤
+        function drawWheel() {
+            const numSegments = items.length;
+            if (numSegments === 0) {
+                ctx.clearRect(0, 0, 720, 720);
+                return;
+            }
+
+            const arcSize = (Math.PI * 2) / numSegments;
+            ctx.clearRect(0, 0, 720, 720);
             
-            items.forEach((text, i) => {
-                const curAngle = i * arc;
-                ctx.fillStyle = colors[i % colors.length];
+            // 繪製扇形
+            for (let i = 0; i < numSegments; i++) {
+                const angle = i * arcSize;
+                ctx.fillStyle = appleColors[i % appleColors.length];
+                
+                // 畫扇形
                 ctx.beginPath();
-                ctx.moveTo(320, 320);
-                ctx.arc(320, 320, 310, curAngle, curAngle + arc);
+                ctx.moveTo(360, 360);
+                ctx.arc(360, 360, 350, angle, angle + arcSize);
                 ctx.fill();
 
+                // 畫分隔線
+                ctx.strokeStyle = "rgba(255,255,255,0.5)";
+                [data-theme="dark"] ? ctx.strokeStyle = "rgba(0,0,0,0.2)" : null;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                // 繪製文字
                 ctx.save();
-                ctx.translate(320, 320);
-                ctx.rotate(curAngle + arc / 2);
+                ctx.translate(360, 360);
+                ctx.rotate(angle + arcSize / 2);
                 ctx.textAlign = "right";
-                ctx.fillStyle = "#fff";
-                ctx.font = "bold 24px -apple-system";
-                ctx.fillText(text.substring(0, 10), 280, 10);
+                ctx.fillStyle = "#FFFFFF";
+                ctx.font = "bold 26px -apple-system, sans-serif";
+                
+                // 文字過長處理
+                let text = items[i];
+                if(text.length > 12) text = text.substring(0, 10) + "...";
+                ctx.fillText(text, 330, 10);
+                
                 ctx.restore();
-            });
+            }
+
+            // 繪製中心圓（Apple Design 簡約感）
+            ctx.beginPath();
+            ctx.arc(360, 360, 40, 0, Math.PI * 2);
+            ctx.fillStyle = "#FFFFFF";
+            [data-theme="dark"] ? ctx.fillStyle = "#333333" : null;
+            ctx.fill();
+            ctx.strokeStyle = "rgba(0,0,0,0.05)";
+            ctx.lineWidth = 4;
+            ctx.stroke();
         }
 
-        function updateTable() {
+        // 更新機率計算表格
+        function updateProbabilityTable() {
+            if (items.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--secondary-text);">尚無資料</td></tr>';
+                return;
+            }
+
+            // 計算重複項目的權重
             const counts = {};
             items.forEach(x => counts[x] = (counts[x] || 0) + 1);
-            tableBody.innerHTML = Object.entries(counts).map(([name, count]) => `
-                <tr>
-                    <td>${name}</td>
-                    <td>${count}</td>
-                    <td>${((count/items.length)*100).toFixed(1)}%</td>
-                </tr>
-            `).join('');
+            
+            // 排序：按權重降序
+            const sortedEntries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+
+            // 生成表格 HTML
+            const total = items.length;
+            tableBody.innerHTML = sortedEntries.map(([name, count]) => {
+                const probability = ((count / total) * 100).toFixed(1) + '%';
+                return `
+                    <tr>
+                        <td style="font-weight:600;">${name}</td>
+                        <td style="text-align: center; color: var(--accent);">${count}</td>
+                        <td style="text-align: right; font-weight:700;">${probability}</td>
+                    </tr>
+                `;
+            }).join('');
         }
 
+        // 執行旋轉
         function spin() {
-            if(items.length < 2) return;
-            const randomDeg = Math.floor(Math.random() * 360) + 3600; 
-            angle += randomDeg;
-            canvas.style.transform = `rotate(${angle}deg)`;
+            if (isSpinning || items.length < 2) return;
+            
+            isSpinning = true;
+            spinBtn.disabled = true;
+            spinBtn.innerText = "旋轉中...";
 
+            // 計算旋轉角度：隨機基礎圈數 + 隨機角度
+            const baseSpins = 5 + Math.random() * 5; // 5-10 圈
+            const randomDegrees = Math.random() * 360;
+            const totalRotation = baseSpins * 360 + randomDegrees;
+            
+            // 累積角度（避免轉盤逆轉）
+            currentAngle += totalRotation;
+            
+            // 應用 CSS Transition 動畫
+            canvas.style.transform = `rotate(${currentAngle}deg)`;
+
+            // 動畫結束後（5s），計算結果
             setTimeout(() => {
-                const actualDeg = (360 - (angle % 360)) % 360;
-                const corrected = (actualDeg + 270) % 360; // 補償 pointer 位置
-                const idx = Math.floor((corrected / 360) * items.length);
-                showResult(items[idx]);
-            }, 5000);
+                isSpinning = false;
+                spinBtn.innerText = "SPIN";
+                
+                // 計算指標指向的項目 (指標在正上方，即 CSS rotate(-90deg) 的位置)
+                const normalizedAngle = (360 - (currentAngle % 360)) % 360;
+                const correctedAngle = (normalizedAngle + 270) % 360; // 修正 0 度在 3 點鐘方向的問題
+                const index = Math.floor((correctedAngle / 360) * items.length);
+                
+                showResult(items[index]);
+            }, 5000); // 對應 CSS 5s
         }
 
+        // 顯示結果並播放彩帶
         function showResult(name) {
-            document.getElementById('resultName').innerText = name;
-            const m = document.getElementById('modal');
-            m.style.display = 'block';
-            setTimeout(() => m.style.transform = 'translate(-50%, -50%) scale(1)', 10);
+            resultNameDisplay.innerText = name;
+            modalOverlay.classList.add('show');
+            
+            // 播放全螢幕彩帶特效 (使用 canvas-confetti 庫)
+            // 特效 1：兩側噴射
+            const duration = 2 * 1000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 3,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0, y: 0.7 },
+                    colors: appleColors
+                });
+                confetti({
+                    particleCount: 3,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1, y: 0.7 },
+                    colors: appleColors
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+
+            // 特效 2：中心爆炸一次
+            setTimeout(() => {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: appleColors,
+                    disableForReducedMotion: true
+                });
+            }, 200);
         }
 
+        // 關閉彈窗
         function closeModal() {
-            document.getElementById('modal').style.display = 'none';
+            modalOverlay.classList.remove('show');
+            // 如果輸入框有更新，關閉彈窗後重新繪製
+            canvas.style.transition = 'none';
+            // 可選：可以讓轉盤回到起始位置，但保留當前累積角度通常體驗更好
+            setTimeout(() => canvas.style.transition = 'transform 5s cubic-bezier(0.1, 0, 0.1, 1)', 50);
+            init(); 
         }
 
+        // 切換主題 (淺色/深色)
         function toggleTheme() {
             const body = document.body;
-            const current = body.getAttribute('data-theme');
-            body.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+            if (body.getAttribute('data-theme') === 'light') {
+                body.setAttribute('data-theme', 'dark');
+                themeToggle.innerText = '淺色模式';
+                themeToggle.style.backgroundColor = '#1C1C1E';
+                themeToggle.style.color = '#FFFFFF';
+            } else {
+                body.setAttribute('data-theme', 'light');
+                themeToggle.innerText = '深色模式';
+                themeToggle.style.backgroundColor = '';
+                themeToggle.style.color = '';
+            }
+            drawWheel(); // 重新繪製以更新分隔線顏色
         }
 
-        input.addEventListener('input', init);
-        document.getElementById('spinTrigger').addEventListener('click', spin);
+        // 事件監聽
+        input.addEventListener('input', init); // 文字區更新時自動重繪
+        spinBtn.addEventListener('click', spin);
+        themeToggle.addEventListener('click', toggleTheme);
         
+        // Excel 貼上處理：在貼上後瞬間觸發初始化
+        input.addEventListener('paste', () => {
+            setTimeout(init, 10); // 延遲 10ms 確保內容已完全貼入
+        });
+
+        // 初始化
         init();
+
     </script>
 </body>
 </html>
