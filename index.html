@@ -211,6 +211,72 @@ body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;back
 .snr-title{font-size:14px;font-weight:700;color:var(--text);}
 .snr-sub{font-size:11px;color:var(--text3);margin-top:1px;}
 .snr-pool{font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;color:var(--accent);flex-shrink:0;}
+
+/* ── REMAINING COUNT BAR (all games) ── */
+.game-status{
+  width:100%;
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:6px;
+}
+.gs-cell{
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:var(--r-sm);
+  padding:8px 6px 7px;
+  text-align:center;
+  transition:background .3s, border-color .3s;
+}
+.gs-cell.highlight{
+  border-color:var(--accent);
+  background:rgba(0,113,227,.07);
+}
+.gs-cell.done{
+  border-color:var(--green);
+  background:rgba(50,215,75,.07);
+}
+.gs-label{
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.6px;
+  text-transform:uppercase;
+  color:var(--text3);
+  margin-bottom:3px;
+}
+.gs-value{
+  font-family:'Outfit',sans-serif;
+  font-size:22px;
+  font-weight:900;
+  letter-spacing:-1px;
+  color:var(--text);
+  line-height:1;
+}
+.gs-value.accent{color:var(--accent);}
+.gs-value.green{color:var(--green);}
+.gs-value.orange{color:var(--orange);}
+/* Progress bar under the grid */
+.gs-progress{
+  width:100%;
+  height:5px;
+  background:var(--border);
+  border-radius:3px;
+  overflow:hidden;
+  margin-top:2px;
+}
+.gs-bar{
+  height:100%;
+  border-radius:3px;
+  background:linear-gradient(90deg,var(--accent),var(--green));
+  transition:width .5s cubic-bezier(.34,1.56,.64,1);
+  min-width:0;
+}
+/* Wrapper that groups status + progress */
+.game-counter{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  width:100%;
+}
 .slot-body{padding:14px 16px 18px;}
 .btn-pull{width:100%;background:linear-gradient(135deg,#FF453A,#FF9F0A);color:#fff;border:none;padding:15px;border-radius:var(--r-md);font-family:'Outfit',sans-serif;font-size:17px;font-weight:800;letter-spacing:.5px;cursor:pointer;transition:all .3s;box-shadow:0 8px 22px rgba(255,69,58,.4);margin-bottom:10px;position:relative;overflow:hidden;}
 .btn-pull::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);transition:left .5s;}
@@ -267,6 +333,17 @@ body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;back
 .draw-status{width:100%;text-align:center;padding:7px 12px;background:var(--bg);border-radius:var(--r-sm);font-size:12px;color:var(--text2);font-weight:500;border:1px solid var(--border);}
 .draw-hist{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;min-height:34px;}
 .hist-chip{background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:4px 11px;font-size:12px;font-weight:600;animation:itin .3s ease;}
+
+/* ── GAME HISTORY LIST (wheel + slot + shared) ── */
+.hist-list{display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto;padding-right:2px;}
+.hist-list::-webkit-scrollbar{width:4px;}
+.hist-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.hist-row{display:flex;align-items:center;gap:9px;background:var(--bg);border-radius:var(--r-sm);padding:9px 12px;border:1px solid var(--border);animation:itin .3s ease;}
+.hist-round{font-family:'Outfit',sans-serif;font-size:11px;font-weight:800;color:var(--text3);min-width:36px;}
+.hist-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.hist-name{flex:1;font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hist-time{font-size:11px;color:var(--text3);flex-shrink:0;}
+.hist-empty{text-align:center;padding:16px;color:var(--text3);font-size:13px;}
 
 /* ── RESULT MODAL ── */
 .overlay{position:fixed;inset:0;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s;}
@@ -580,6 +657,24 @@ body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;back
       <button class="btn-spin" id="spinBtn" onclick="wheelSpin()">✦ SPIN</button>
       <button class="btn-lucky" onclick="loadWheelSample()">🎲</button>
     </div>
+    <!-- Remaining counter -->
+    <div class="game-counter" id="wCounter" style="display:none">
+      <div class="game-status">
+        <div class="gs-cell">
+          <div class="gs-label">已抽出</div>
+          <div class="gs-value orange" id="wCntDrawn">0</div>
+        </div>
+        <div class="gs-cell highlight">
+          <div class="gs-label">剩餘</div>
+          <div class="gs-value accent" id="wCntLeft">—</div>
+        </div>
+        <div class="gs-cell">
+          <div class="gs-label">總計</div>
+          <div class="gs-value" id="wCntTotal">—</div>
+        </div>
+      </div>
+      <div class="gs-progress"><div class="gs-bar" id="wCntBar" style="width:0%"></div></div>
+    </div>
   </div>
 
   <div class="card">
@@ -620,6 +715,16 @@ body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;back
     <div class="card-hd"><div class="card-title"><div class="c-ico" style="background:rgba(52,210,75,.15)">🎰</div>中獎機率</div></div>
     <div style="overflow-x:auto"><table class="ptbl"><thead><tr><th>選項</th><th>權重</th><th style="min-width:60px">分布</th><th>機率</th></tr></thead><tbody id="wPBody"></tbody></table></div>
   </div>
+
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-title"><div class="c-ico" style="background:rgba(255,55,95,.15)">📜</div>抽籤紀錄</div>
+      <button class="btn-sm" style="flex:none;padding:5px 11px;" onclick="wClearHistory()">清除</button>
+    </div>
+    <div class="hist-list" id="wHistList">
+      <div class="hist-empty">尚無紀錄，開始旋轉後顯示於此</div>
+    </div>
+  </div>
 </div>
 
 <!-- ═══ PAGE 2 – SLOT ═══ -->
@@ -650,6 +755,24 @@ body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;back
       </div>
       <button class="btn-pull" id="pullBtn" onclick="slotPull()">🎰 PULL</button>
       <div class="slot-res"><span class="slot-res-txt" id="slotTxt">準備好了，快拉吧！</span></div>
+      <!-- Remaining counter -->
+      <div class="game-counter" id="sCounter" style="display:none;margin-top:10px">
+        <div class="game-status">
+          <div class="gs-cell">
+            <div class="gs-label">已抽出</div>
+            <div class="gs-value orange" id="sCntDrawn">0</div>
+          </div>
+          <div class="gs-cell highlight">
+            <div class="gs-label">剩餘</div>
+            <div class="gs-value accent" id="sCntLeft">—</div>
+          </div>
+          <div class="gs-cell">
+            <div class="gs-label">總計</div>
+            <div class="gs-value" id="sCntTotal">—</div>
+          </div>
+        </div>
+        <div class="gs-progress"><div class="gs-bar" id="sCntBar" style="width:0%"></div></div>
+      </div>
     </div>
   </div>
 
@@ -676,6 +799,16 @@ body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;back
       <button class="btn-sm danger" onclick="sClear()">🗑 清空</button>
     </div>
   </div>
+
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-title"><div class="c-ico" style="background:rgba(255,55,95,.15)">📜</div>抽籤紀錄</div>
+      <button class="btn-sm" style="flex:none;padding:5px 11px;" onclick="sClearHistory()">清除</button>
+    </div>
+    <div class="hist-list" id="sHistList">
+      <div class="hist-empty">尚無紀錄，開始拉霸後顯示於此</div>
+    </div>
+  </div>
 </div>
 
 <!-- ═══ PAGE 3 – CARD DRAW ═══ -->
@@ -699,6 +832,24 @@ body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;back
         <button class="btn-reset" onclick="resetDraw()">🔄 重置籤筒</button>
       </div>
       <div class="draw-status" id="drawStatus">尚未抽籤，點擊按鈕開始</div>
+      <!-- Remaining counter -->
+      <div class="game-counter" style="width:100%">
+        <div class="game-status">
+          <div class="gs-cell">
+            <div class="gs-label">已抽出</div>
+            <div class="gs-value orange" id="dCntDrawn">0</div>
+          </div>
+          <div class="gs-cell highlight">
+            <div class="gs-label">剩餘</div>
+            <div class="gs-value accent" id="dCntLeft">—</div>
+          </div>
+          <div class="gs-cell">
+            <div class="gs-label">總計</div>
+            <div class="gs-value" id="dCntTotal">—</div>
+          </div>
+        </div>
+        <div class="gs-progress"><div class="gs-bar" id="dCntBar" style="width:0%"></div></div>
+      </div>
     </div>
   </div>
 
@@ -809,11 +960,25 @@ body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;back
     <!-- Draw button -->
     <button class="btn-num-draw" id="numDrawBtn" onclick="numDraw()">🎱 開始抽籤</button>
 
-    <!-- Stats -->
-    <div class="num-stats">
-      <div class="num-stat"><div class="num-stat-lbl">總數</div><div class="num-stat-val gold" id="nStatTotal">—</div></div>
-      <div class="num-stat"><div class="num-stat-lbl">剩餘</div><div class="num-stat-val cyan" id="nStatLeft">—</div></div>
-      <div class="num-stat"><div class="num-stat-lbl">已抽出</div><div class="num-stat-val green" id="nStatDrawn">0</div></div>
+    <!-- Stats / counter -->
+    <div class="game-counter" style="margin-top:14px">
+      <div class="game-status">
+        <div class="gs-cell" style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1)">
+          <div class="gs-label" style="color:rgba(255,255,255,.4)">已抽出</div>
+          <div class="gs-value orange" id="nStatDrawn">0</div>
+        </div>
+        <div class="gs-cell highlight" style="background:rgba(0,113,227,.18);border-color:rgba(52,170,220,.5)">
+          <div class="gs-label" style="color:rgba(255,255,255,.4)">剩餘</div>
+          <div class="gs-value accent" id="nStatLeft">—</div>
+        </div>
+        <div class="gs-cell" style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1)">
+          <div class="gs-label" style="color:rgba(255,255,255,.4)">總計</div>
+          <div class="gs-value" id="nStatTotal">—</div>
+        </div>
+      </div>
+      <div class="gs-progress" style="background:rgba(255,255,255,.1)">
+        <div class="gs-bar" id="nCntBar" style="width:0%"></div>
+      </div>
     </div>
   </div>
 
@@ -1002,8 +1167,28 @@ function toggleWheelNoRepeat() {
 function updateWnrPool() {
   const el = document.getElementById('wnrPool');
   if (!el) return;
-  if (!wNoRepeat) { el.textContent = ''; return; }
-  el.textContent = wPool.length > 0 ? `剩 ${wPool.length}` : '已抽完';
+  if (!wNoRepeat) { el.textContent = ''; } else {
+    el.textContent = wPool.length > 0 ? `剩 ${wPool.length}` : '已抽完';
+  }
+  updateWCounter();
+}
+
+function updateWCounter() {
+  const ctr = document.getElementById('wCounter');
+  if (!ctr) return;
+  const total = wItems.length;
+  if (!wNoRepeat || total === 0) { ctr.style.display = 'none'; return; }
+  ctr.style.display = 'flex';
+  const left    = wPool.length;
+  const drawnN  = total - left;
+  const pct     = total > 0 ? (drawnN / total * 100).toFixed(1) : 0;
+  document.getElementById('wCntDrawn').textContent = drawnN;
+  document.getElementById('wCntLeft').textContent  = left;
+  document.getElementById('wCntTotal').textContent = total;
+  document.getElementById('wCntBar').style.width   = pct + '%';
+  // Highlight done state
+  document.getElementById('wCntLeft').closest('.gs-cell').className = left === 0 ? 'gs-cell done' : 'gs-cell highlight';
+  document.getElementById('wCntLeft').className = left === 0 ? 'gs-value green' : 'gs-value accent';
 }
 
 function drawWheel() {
@@ -1104,6 +1289,7 @@ function wheelSpin() {
     }
     renderWList(); // refresh spinBtn + pool count in badge
     const badges = wNoRepeat ? [`剩餘 ${wPool.length} 人`] : [];
+    wAddHistory(winnerName, winnerIdx_wheel);
     showResult(CEMOJI[randInt(CEMOJI.length)], '恭喜得獎！', winnerName, badges);
   }, 5000);
 }
@@ -1158,6 +1344,7 @@ function renderWList() {
   else if (wNoRepeat && wPool.length === 0) btn.innerHTML = '✅ 已全部抽完';
   else btn.innerHTML = '✦ SPIN';
   drawWheel();
+  updateWCounter();
 }
 function iRow(item,i,p){ return `<div class="irow" id="${p}r${i}"><div class="idot" style="background:${C[i%C.length]}"></div><span class="iname" id="${p}n${i}">${esc(item)}</span><div class="iacts"><button class="bic edt" onclick="${p}Edit(${i})">✏️</button><button class="bic del" onclick="${p}Del(${i})">✕</button></div></div>`; }
 
@@ -1170,12 +1357,13 @@ function wShuffle(){shuffle(wItems);renderWList();toast('已隨機排序 🔀');
 function wClear() {
   if (!wItems.length) return;
   showConfirm('🗑','確定清空所有轉盤選項？','清空', () => {
-    wItems = []; wPool = [];
+    wItems = []; wPool = []; wHistory = [];
     wAngle = 0;
     wCvs.style.transition = 'none';
     wCvs.style.transform = 'rotate(0deg)';
     setTimeout(() => { wCvs.style.transition = 'transform 5s cubic-bezier(.08,0,.05,1)'; }, 50);
     renderWList();
+    wRenderHistory();
     toast('已清空 🗑');
   });
 }
@@ -1184,6 +1372,32 @@ function loadWheelSample() {
   wPool = [...wItems]; shuffle(wPool);
   renderWList();
   toast('已載入範例 🎲');
+}
+
+/* ── Wheel history ── */
+let wHistory = [];
+
+function wAddHistory(name, colorIdx) {
+  const now = new Date().toLocaleTimeString('zh-TW', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  wHistory.unshift({ round: wHistory.length + 1, name, colorIdx, time: now });
+  wRenderHistory();
+}
+function wRenderHistory() {
+  const el = document.getElementById('wHistList');
+  if (!el) return;
+  if (!wHistory.length) { el.innerHTML = '<div class="hist-empty">尚無紀錄，開始旋轉後顯示於此</div>'; return; }
+  el.innerHTML = wHistory.map(h => `
+    <div class="hist-row">
+      <span class="hist-round">#${h.round}</span>
+      <div class="hist-dot" style="background:${C[h.colorIdx % C.length]}"></div>
+      <span class="hist-name">${esc(h.name)}</span>
+      <span class="hist-time">${h.time}</span>
+    </div>`).join('');
+}
+function wClearHistory() {
+  wHistory = [];
+  wRenderHistory();
+  toast('紀錄已清除 🗑');
 }
 
 /* ═══════════════════════════
@@ -1219,8 +1433,26 @@ function toggleSlotNoRepeat() {
 
 function updateSnrPool() {
   const el = document.getElementById('snrPool');
-  if (!slotNoRepeat) { el.textContent = ''; return; }
-  el.textContent = slotPool.length > 0 ? `剩 ${slotPool.length}` : '已抽完';
+  if (el) { if (!slotNoRepeat) { el.textContent = ''; } else { el.textContent = slotPool.length > 0 ? `剩 ${slotPool.length}` : '已抽完'; } }
+  updateSCounter();
+}
+
+function updateSCounter() {
+  const ctr = document.getElementById('sCounter');
+  if (!ctr) return;
+  const total = sItems.length;
+  if (!slotNoRepeat || total === 0) { ctr.style.display = 'none'; return; }
+  ctr.style.display = 'flex';
+  const left  = slotPool.length;
+  const drawn = total - left;
+  const pct   = total > 0 ? (drawn / total * 100).toFixed(1) : 0;
+  document.getElementById('sCntDrawn').textContent = drawn;
+  document.getElementById('sCntLeft').textContent  = left;
+  document.getElementById('sCntTotal').textContent = total;
+  document.getElementById('sCntBar').style.width   = pct + '%';
+  const leftCell = document.getElementById('sCntLeft');
+  leftCell.closest('.gs-cell').className = left === 0 ? 'gs-cell done' : 'gs-cell highlight';
+  leftCell.className = left === 0 ? 'gs-value green' : 'gs-value accent';
 }
 
 /* Build a reel-item HTML with coloured tile + label */
@@ -1303,6 +1535,7 @@ function slotPull() {
     const all3 = results[0] === results[1] && results[1] === results[2];
     const two  = results[0] === results[1] || results[1] === results[2] || results[0] === results[2];
     const txt  = document.getElementById('slotTxt');
+    sAddHistory(results, all3, two);
     if (all3) {
       txt.className = 'slot-res-txt win';
       txt.textContent = `🎊 JACKPOT！三連 ${results[0]}！`;
@@ -1332,7 +1565,36 @@ function sDel(i){const nm=sItems[i];const r=document.getElementById(`sr${i}`);if
 function sEdit(i){const el=document.getElementById(`sn${i}`);if(!el)return;el.outerHTML=`<input class="iname-edit" id="se${i}" value="${esc(sItems[i])}" maxlength="8" onblur="sSave(${i})" onkeydown="if(event.key==='Enter')sSave(${i});if(event.key==='Escape')renderSList();">`;setTimeout(()=>{const e=document.getElementById(`se${i}`);if(e){e.focus();e.select();}},10);}
 function sSave(i){const e=document.getElementById(`se${i}`);if(!e)return;const v=e.value.trim();if(v){sItems[i]=v;toast('已更新 ✅');}renderSList();buildReels();}
 function sShuffle(){shuffle(sItems);renderSList();buildReels();toast('已隨機排序 🔀');}
-function sClear(){if(!sItems.length)return;showConfirm('🗑','確定清空所有拉霸選項？','清空',()=>{sItems=[];renderSList();buildReels();toast('已清空 🗑');});}
+function sClear(){if(!sItems.length)return;showConfirm('🗑','確定清空所有拉霸選項？','清空',()=>{sItems=[];sHistory=[];renderSList();buildReels();sRenderHistory();toast('已清空 🗑');});}
+
+/* ── Slot history ── */
+let sHistory = [];
+
+function sAddHistory(results, isJackpot, isTwo) {
+  const now = new Date().toLocaleTimeString('zh-TW', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  sHistory.unshift({ round: sHistory.length + 1, results, isJackpot, isTwo, time: now });
+  sRenderHistory();
+}
+function sRenderHistory() {
+  const el = document.getElementById('sHistList');
+  if (!el) return;
+  if (!sHistory.length) { el.innerHTML = '<div class="hist-empty">尚無紀錄，開始拉霸後顯示於此</div>'; return; }
+  el.innerHTML = sHistory.map(h => {
+    const badge = h.isJackpot
+      ? `<span style="font-size:10px;font-weight:800;color:var(--green);margin-left:4px">JACKPOT!</span>`
+      : h.isTwo ? `<span style="font-size:10px;font-weight:700;color:var(--orange);margin-left:4px">兩連</span>` : '';
+    return `<div class="hist-row">
+      <span class="hist-round">#${h.round}</span>
+      <span class="hist-name">${h.results.join(' ')}${badge}</span>
+      <span class="hist-time">${h.time}</span>
+    </div>`;
+  }).join('');
+}
+function sClearHistory() {
+  sHistory = [];
+  sRenderHistory();
+  toast('紀錄已清除 🗑');
+}
 
 /* ═══════════════════════════
    CARD DRAW
@@ -1349,20 +1611,35 @@ function toggleDrawNoRepeat() {
 
 function updateDnrPool() {
   const el = document.getElementById('dnrPool');
-  if (!el) return;
-  if (!dNoRepeat) { el.textContent = '可重複'; return; }
-  el.textContent = cardPool.length > 0 ? `剩 ${cardPool.length}` : '已抽完';
+  if (el) { if (!dNoRepeat) { el.textContent = '可重複'; } else { el.textContent = cardPool.length > 0 ? `剩 ${cardPool.length}` : '已抽完'; } }
+  updateDCounter();
 }
+
+function updateDCounter() {
+  const total = dItems.length;
+  const drawn = drawn_count();
+  const left  = dNoRepeat ? cardPool.length : (total > 0 ? '∞' : 0);
+  const pct   = (dNoRepeat && total > 0) ? ((total - cardPool.length) / total * 100).toFixed(1) : 0;
+  const leftEl = document.getElementById('dCntLeft');
+  if (!leftEl) return;
+  document.getElementById('dCntDrawn').textContent = drawn;
+  leftEl.textContent = left;
+  document.getElementById('dCntTotal').textContent = total || '—';
+  document.getElementById('dCntBar').style.width   = pct + '%';
+  const done = dNoRepeat && cardPool.length === 0 && total > 0;
+  leftEl.closest('.gs-cell').className = done ? 'gs-cell done' : 'gs-cell highlight';
+  leftEl.className = done ? 'gs-value green' : 'gs-value accent';
+}
+function drawn_count() { return drawn.length; }
 
 function buildCards() {
   if (dNoRepeat) {
     cardPool = [...dItems]; shuffle(cardPool);
   } else {
-    // In repeat mode, always show full deck
     cardPool = [...dItems]; shuffle(cardPool);
   }
   drawn = [];
-  renderFan(); updateDrawStatus(); updateDnrPool();
+  renderFan(); updateDrawStatus(); updateDnrPool(); updateDCounter();
 }
 
 function renderFan() {
@@ -1430,7 +1707,7 @@ function resetDraw() { drawn = []; buildCards(); clearHistUI(); toast('已重置
 function updateDrawStatus() {
   const el = document.getElementById('drawStatus');
   const tot = dItems.length, dr = drawn.length;
-  if (!tot) { el.textContent = '請先新增籤筒內容'; return; }
+  if (!tot) { el.textContent = '請先新增籤筒內容'; updateDCounter(); return; }
   if (dNoRepeat) {
     const rem = cardPool.length;
     el.textContent = `已抽 ${dr} 籤 ／ 剩餘 ${rem} 籤 ／ 共 ${tot} 籤`;
@@ -1439,6 +1716,7 @@ function updateDrawStatus() {
     el.textContent = `可重複模式 ── 已抽 ${dr} 次 ／ 共 ${tot} 個選項`;
     document.getElementById('drawBtn').disabled = tot === 0;
   }
+  updateDCounter();
 }
 
 function addHistChip(item, emoji, color) {
@@ -1518,11 +1796,23 @@ function numBuildPool() {
 function numUpdateStats() {
   const { min, max, excl } = numGetSettings();
   const total = Math.max(0, max - min + 1 - excl.filter(n => n >= min && n <= max).length);
-  const drawn = numNoRepeat ? numDrawnAll.length : 0;
-  const left  = numNoRepeat ? Math.max(0, total - drawn) : total;
+  const drawnN = numNoRepeat ? numDrawnAll.length : 0;
+  const left   = numNoRepeat ? Math.max(0, total - drawnN) : total;
   document.getElementById('nStatTotal').textContent = total || '—';
   document.getElementById('nStatLeft').textContent  = numNoRepeat ? left : '∞';
   document.getElementById('nStatDrawn').textContent = numDrawnAll.length;
+
+  // Progress bar
+  const pct = (numNoRepeat && total > 0) ? (drawnN / total * 100).toFixed(1) : 0;
+  const barEl = document.getElementById('nCntBar');
+  if (barEl) barEl.style.width = pct + '%';
+  const leftEl = document.getElementById('nStatLeft');
+  if (leftEl) {
+    const done = numNoRepeat && left === 0 && total > 0;
+    leftEl.closest('.gs-cell').style.borderColor = done ? 'rgba(50,215,75,.5)' : 'rgba(52,170,220,.5)';
+    leftEl.className = done ? 'gs-value green' : 'gs-value accent';
+  }
+
   const btn = document.getElementById('numDrawBtn');
   const exhausted = numNoRepeat && left === 0 && total > 0;
   btn.disabled = exhausted;
@@ -1678,8 +1968,8 @@ function confirmAnswer(yes) {
 }
 
 /* ═══ INIT ═══ */
-renderWList();
-renderSList(); buildReels();
+renderWList(); wRenderHistory();
+renderSList(); buildReels(); sRenderHistory();
 renderDList(); buildCards(); updateDnrPool();
 numUpdateStats(); updateNnrPool();
 </script>
