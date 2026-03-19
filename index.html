@@ -646,11 +646,11 @@ let _themeIdx = 0;
 /* ═══ STATE ═══ */
 // Wheel
 let wItems=['王小明','李大同','張美麗','陳嘉玲','多喝水','咖啡'];
-let wNR=false, wPool=[], wAngle=0, wSpinning=false, wDrawnCount=0;
+let wNR=false, wPool=[], wAngle=0, wSpinning=false;
 let wHistory=[];
 // Slot
 let sItems=['🍒','🍋','🍊','7️⃣','💎','⭐','🎰','🃏'];
-let sNR=false, sPool=[], sSlotBusy=false, sPullCount=0;
+let sNR=false, sPool=[], sSlotBusy=false;
 let sHistory=[];
 // Draw
 let dItems=['上上籤','大吉','中籤','小吉','平籤','下下籤','大凶','求財大吉'];
@@ -690,9 +690,14 @@ function rnd(n){return Math.floor(Math.random()*n);}
 function nowTime(){return new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
 
 function fireConfetti(){
+  const opts={useWorker:false,disableForReducedMotion:true};
   const end=Date.now()+2000;
-  (function f(){confetti({particleCount:3,angle:60,spread:55,origin:{x:0,y:.7},colors:C});confetti({particleCount:3,angle:120,spread:55,origin:{x:1,y:.7},colors:C});if(Date.now()<end)requestAnimationFrame(f);})();
-  setTimeout(()=>confetti({particleCount:120,spread:70,origin:{y:.55},colors:C,disableForReducedMotion:true}),250);
+  (function f(){
+    confetti({...opts,particleCount:3,angle:60,spread:55,origin:{x:0,y:.7},colors:C});
+    confetti({...opts,particleCount:3,angle:120,spread:55,origin:{x:1,y:.7},colors:C});
+    if(Date.now()<end)requestAnimationFrame(f);
+  })();
+  setTimeout(()=>confetti({...opts,particleCount:120,spread:70,origin:{y:.55},colors:C}),250);
 }
 
 function showResult(emoji,sub,name,badges){
@@ -721,8 +726,8 @@ function closeImport(){document.getElementById('importOvl').classList.remove('sh
 function confirmImport(){
   const arr=document.getElementById('importTA').value.split(/[\n\r\t]/).map(s=>s.trim()).filter(s=>s);
   if(!arr.length){toast('沒有偵測到有效資料 ⚠️');return;}
-  if(importTarget==='w'){wItems=[...wItems,...arr];renderWList();}
-  if(importTarget==='s'){sItems=[...sItems,...arr];renderSList();buildReels();}
+  if(importTarget==='w'){wItems=[...wItems,...arr];renderWListAndResetPool();}
+  if(importTarget==='s'){sItems=[...sItems,...arr];renderSListAndResetPool();buildReels();}
   if(importTarget==='d'){dItems=[...dItems,...arr];renderDList();buildCards();}
   closeImport();toast(`已匯入 ${arr.length} 個選項 ✅`);
 }
@@ -768,8 +773,8 @@ function drawWheel(){
   for(let i=0;i<n;i++){
     const s=i*arc;
     wCtx.beginPath();wCtx.moveTo(320,320);wCtx.arc(320,320,310,s,s+arc);wCtx.closePath();
-    // grey out drawn items in NR mode
-    const drawn=wNR&&!wPool.includes(wItems[i]);
+    // grey out drawn items in NR mode — compare by index position
+    const drawn=wNR&&!wPool.includes(i);
     wCtx.fillStyle=drawn?(dark?'#333':'#ccc'):C[i%C.length];wCtx.fill();
     wCtx.strokeStyle=dark?'rgba(0,0,0,.3)':'rgba(255,255,255,.55)';wCtx.lineWidth=2;wCtx.stroke();
     wCtx.save();wCtx.translate(320,320);wCtx.rotate(s+arc/2);
@@ -786,17 +791,22 @@ function drawWheel(){
 }
 
 function wheelSpin(){
-  const active=wNR?wPool:wItems;
+  // wPool stores available INDICES into wItems
+  const activeIdxs=wNR?wPool:wItems.map((_,i)=>i);
   if(wSpinning)return;
-  if(active.length===0){toast('所有選項已抽完，自動重置 🔄');wPool=[...wItems];shuffle(wPool);wDrawnCount=0;updateWNR();drawWheel();return;}
+  if(activeIdxs.length===0){
+    toast('所有選項已抽完，自動重置 🔄');
+    wPool=wItems.map((_,i)=>i);shuffle(wPool);
+    updateWNR();drawWheel();return;
+  }
   if(wItems.length<2){toast('請至少輸入 2 個選項 😅');return;}
   wSpinning=true;
   const btn=document.getElementById('spinBtn');btn.disabled=true;btn.textContent='旋轉中…';
-  // Pick winner
-  const pIdx=rnd(active.length);
-  const winner=active[pIdx];
-  const wIdx=wItems.indexOf(winner); // index in full wheel
-  // Calculate exact stop angle so pointer (top = 270°) lands on winner sector centre
+  // Pick a random index from the active pool
+  const pickPos=rnd(activeIdxs.length);
+  const wIdx=activeIdxs[pickPos];   // index in wItems
+  const winner=wItems[wIdx];
+  // Calculate exact stop angle: pointer at top (270°), sector centre of wIdx
   const n=wItems.length;
   const sectorCentre=(wIdx/n)*360+(360/n/2);
   const targetRem=((270-sectorCentre)%360+360)%360;
@@ -808,13 +818,14 @@ function wheelSpin(){
   wCvs.style.transform=`rotate(${wAngle}deg)`;
   setTimeout(()=>{
     wSpinning=false;btn.disabled=false;btn.innerHTML='✦ SPIN';
-    // Normalise angle to avoid float drift
     wAngle=wAngle%360;
     wCvs.style.transition='none';wCvs.style.transform=`rotate(${wAngle}deg)`;
     setTimeout(()=>{wCvs.style.transition='transform 5s cubic-bezier(.08,0,.05,1)';},50);
-    // Update NR pool
-    if(wNR){wPool.splice(pIdx,1);}
-    wDrawnCount++;
+    if(wNR){
+      // Remove this index from pool
+      const poolPos=wPool.indexOf(wIdx);
+      if(poolPos!==-1)wPool.splice(poolPos,1);
+    }
     wAddHist(winner,wIdx);
     renderWList();
     const badges=wNR?[`剩餘 ${wPool.length} 人`]:[];
@@ -825,7 +836,7 @@ function wheelSpin(){
 function toggleWNR(){
   wNR=!wNR;
   document.getElementById('wnrChk').classList.toggle('on',wNR);
-  wPool=[...wItems];shuffle(wPool);wDrawnCount=0;
+  wPool=wItems.map((_,i)=>i);shuffle(wPool);
   updateWNR();renderWList();
   toast(wNR?'不重複模式已開啟 ✅':'可重複模式已開啟');
 }
@@ -840,8 +851,9 @@ function updateWCounter(){
   const total=wItems.length;
   if(!wNR||total===0){ctr.style.display='none';return;}
   ctr.style.display='flex';
-  const left=wPool.length,drawn=wDrawnCount;
-  const pct=total>0?Math.min(100,(drawn/total*100)).toFixed(1):0;
+  const left=wPool.length;
+  const drawn=total-left;  // always consistent: drawn + left = total
+  const pct=total>0?(drawn/total*100).toFixed(1):0;
   document.getElementById('wCntD').textContent=drawn;
   document.getElementById('wCntL').textContent=left;
   document.getElementById('wCntT').textContent=total;
@@ -864,9 +876,8 @@ function renderWList(){
   const pb=document.getElementById('wPBody');
   if(!n){pb.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--text3);padding:14px">尚無資料</td></tr>';}
   else{const cnt={};wItems.forEach(x=>cnt[x]=(cnt[x]||0)+1);const s=Object.entries(cnt).sort((a,b)=>b[1]-a[1]);const mx=s[0][1];pb.innerHTML=s.map(([nm,c],i)=>`<tr><td style="font-weight:600;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(nm)}</td><td style="color:var(--accent);font-family:'Outfit',sans-serif;font-weight:700">${c}</td><td><div class="pbar-w"><div class="pbar-f" style="width:${(c/mx*100).toFixed(0)}%;background:${C[i%C.length]}"></div></div></td><td class="ppct">${(c/n*100).toFixed(1)}%</td></tr>`).join('');}
-  // Rebuild NR pool intelligently (preserve already-drawn state)
-  if(wNR){wPool=wPool.filter(x=>wItems.includes(x));wItems.forEach(x=>{if(!wPool.includes(x))wPool.push(x);});}
-  else{wPool=[...wItems];shuffle(wPool);}
+  // NOTE: wPool is NOT reset here — it is managed by wheelSpin, toggleWNR, wClear, loadWSample
+  // Only rebuild pool when called from item-change functions (add/del/edit/shuffle)
   updateWNR();
   const canSpin=n>=2&&(!wNR||wPool.length>0);
   const btn=document.getElementById('spinBtn');btn.disabled=!canSpin;
@@ -875,14 +886,19 @@ function renderWList(){
   else btn.innerHTML='✦ SPIN';
   drawWheel();
 }
-function wAdd(){const v=document.getElementById('wInp').value.trim();if(!v)return;wItems.push(v);document.getElementById('wInp').value='';renderWList();toast(`已新增「${v}」✅`);setTimeout(()=>{const l=document.getElementById('wList');l.scrollTop=l.scrollHeight;},50);}
-function wQk(n){wItems.push(n);renderWList();toast(`已新增「${n}」✅`);}
-function wDel(i){const nm=wItems[i];const r=document.getElementById(`wr${i}`);if(r){r.style.opacity='0';r.style.transform='translateX(20px)';}setTimeout(()=>{wItems.splice(i,1);renderWList();},200);toast(`已刪除「${nm}」🗑`);}
+// Call this whenever items change to also reset the pool
+function renderWListAndResetPool(){
+  wPool=wItems.map((_,i)=>i);shuffle(wPool);
+  renderWList();
+}
+function wAdd(){const v=document.getElementById('wInp').value.trim();if(!v)return;wItems.push(v);document.getElementById('wInp').value='';renderWListAndResetPool();toast(`已新增「${v}」✅`);setTimeout(()=>{const l=document.getElementById('wList');l.scrollTop=l.scrollHeight;},50);}
+function wQk(n){wItems.push(n);renderWListAndResetPool();toast(`已新增「${n}」✅`);}
+function wDel(i){const nm=wItems[i];const r=document.getElementById(`wr${i}`);if(r){r.style.opacity='0';r.style.transform='translateX(20px)';}setTimeout(()=>{wItems.splice(i,1);renderWListAndResetPool();},200);toast(`已刪除「${nm}」🗑`);}
 function wEdit(i){const el=document.getElementById(`wn${i}`);if(!el)return;el.outerHTML=`<input class="iname-edit" id="we${i}" value="${esc(wItems[i])}" maxlength="20" onblur="wSave(${i})" onkeydown="if(event.key==='Enter')wSave(${i});if(event.key==='Escape')renderWList();">`;setTimeout(()=>{const e=document.getElementById(`we${i}`);if(e){e.focus();e.select();}},10);}
-function wSave(i){const e=document.getElementById(`we${i}`);if(!e)return;const v=e.value.trim();if(v){wItems[i]=v;toast('已更新 ✅');}renderWList();}
-function wShuffle(){shuffle(wItems);renderWList();toast('已隨機排序 🔀');}
-function wClear(){if(!wItems.length)return;showConfirm('🗑','確定清空所有轉盤選項？','清空',()=>{wItems=[];wPool=[];wHistory=[];wDrawnCount=0;wAngle=0;wCvs.style.transition='none';wCvs.style.transform='rotate(0deg)';setTimeout(()=>{wCvs.style.transition='transform 5s cubic-bezier(.08,0,.05,1)';},50);renderWList();wRenderHist();toast('已清空 🗑');});}
-function loadWSample(){wItems=['王小明','李大同','張美麗','陳嘉玲','林志偉','黃雅婷','劉明輝','謝靜茹'];wPool=[...wItems];shuffle(wPool);wDrawnCount=0;renderWList();toast('已載入範例 🎲');}
+function wSave(i){const e=document.getElementById(`we${i}`);if(!e)return;const v=e.value.trim();if(v){wItems[i]=v;toast('已更新 ✅');}renderWListAndResetPool();}
+function wShuffle(){shuffle(wItems);renderWListAndResetPool();toast('已隨機排序 🔀');}
+function wClear(){if(!wItems.length)return;showConfirm('🗑','確定清空所有轉盤選項？','清空',()=>{wItems=[];wPool=[];wHistory=[];wAngle=0;wCvs.style.transition='none';wCvs.style.transform='rotate(0deg)';setTimeout(()=>{wCvs.style.transition='transform 5s cubic-bezier(.08,0,.05,1)';},50);renderWList();wRenderHist();toast('已清空 🗑');});}
+function loadWSample(){wItems=['王小明','李大同','張美麗','陳嘉玲','林志偉','黃雅婷','劉明輝','謝靜茹'];wPool=wItems.map((_,i)=>i);shuffle(wPool);renderWList();toast('已載入範例 🎲');}
 // Wheel history
 function wAddHist(name,colorIdx){wHistory.unshift({round:wHistory.length+1,name,colorIdx,time:nowTime()});wRenderHist();}
 function wRenderHist(){const el=document.getElementById('wHistList');if(!el)return;if(!wHistory.length){el.innerHTML='<div class="hist-empty">尚無紀錄，開始旋轉後顯示於此</div>';return;}el.innerHTML=wHistory.map(h=>`<div class="hist-row"><span class="hr-round">#${h.round}</span><div class="hr-dot" style="background:${C[h.colorIdx%C.length]}"></div><span class="hr-name">${esc(h.name)}</span><span class="hr-time">${h.time}</span></div>`).join('');}
@@ -911,7 +927,7 @@ function buildReels(){
 function toggleSNR(){
   sNR=!sNR;
   document.getElementById('snrChk').classList.toggle('on',sNR);
-  sPool=[...sItems];shuffle(sPool);sPullCount=0;
+  sPool=[...sItems];shuffle(sPool);
   updateSNR();
   toast(sNR?'不重複模式已開啟 ✅':'可重複模式已開啟');
 }
@@ -925,8 +941,9 @@ function updateSCounter(){
   const total=sItems.length;
   if(!sNR||total===0){ctr.style.display='none';return;}
   ctr.style.display='flex';
-  const left=sPool.length,drawn=sPullCount;
-  const pct=total>0?Math.min(100,(drawn/total*100)).toFixed(1):0;
+  const left=sPool.length;
+  const drawn=total-left;  // consistent: drawn + left = total
+  const pct=total>0?(drawn/total*100).toFixed(1):0;
   document.getElementById('sCntD').textContent=drawn;
   document.getElementById('sCntL').textContent=left;
   document.getElementById('sCntT').textContent=total;
@@ -937,7 +954,7 @@ function updateSCounter(){
 }
 function slotPull(){
   if(sSlotBusy||sItems.length<2){if(sItems.length<2)toast('請至少輸入 2 個選項');return;}
-  if(sNR&&sPool.length===0){sPool=[...sItems];shuffle(sPool);sPullCount=0;toast('已抽完所有選項，自動重置 🔄');updateSNR();}
+  if(sNR&&sPool.length===0){sPool=[...sItems];shuffle(sPool);toast('已抽完所有選項，自動重置 🔄');updateSNR();}
   sSlotBusy=true;
   const btn=document.getElementById('pullBtn');btn.disabled=true;
   document.getElementById('slotTxt').className='slot-res-txt';
@@ -962,7 +979,7 @@ function slotPull(){
   }
   setTimeout(()=>{
     sSlotBusy=false;btn.disabled=false;
-    if(sNR){sPullCount++;updateSNR();}
+    if(sNR){updateSNR();}
     const all3=results[0]===results[1]&&results[1]===results[2];
     const two=results[0]===results[1]||results[1]===results[2]||results[0]===results[2];
     const txt=document.getElementById('slotTxt');
@@ -977,15 +994,20 @@ function renderSList(){
   document.getElementById('sBadge').textContent=n;
   document.getElementById('sList').innerHTML=n?sItems.map((x,i)=>iRow(x,i,'s')).join(''):'<div class="empty-hint">尚無選項 🎲</div>';
   document.getElementById('pullBtn').disabled=n<2;
-  sPool=[...sItems];shuffle(sPool);sPullCount=0;updateSNR();
+  // NOTE: sPool is NOT reset here — managed by slotPull, toggleSNR, sClear, item-change fns
+  updateSNR();
 }
-function sAdd(){const v=document.getElementById('sInp').value.trim();if(!v)return;sItems.push(v);document.getElementById('sInp').value='';renderSList();buildReels();toast(`已新增「${v}」✅`);}
-function sQk(n){sItems.push(n);renderSList();buildReels();toast(`已新增「${n}」✅`);}
-function sDel(i){const nm=sItems[i];const r=document.getElementById(`sr${i}`);if(r){r.style.opacity='0';r.style.transform='translateX(20px)';}setTimeout(()=>{sItems.splice(i,1);renderSList();buildReels();},200);toast(`已刪除「${nm}」🗑`);}
+function renderSListAndResetPool(){
+  sPool=[...sItems];shuffle(sPool);
+  renderSList();
+}
+function sAdd(){const v=document.getElementById('sInp').value.trim();if(!v)return;sItems.push(v);document.getElementById('sInp').value='';renderSListAndResetPool();buildReels();toast(`已新增「${v}」✅`);}
+function sQk(n){sItems.push(n);renderSListAndResetPool();buildReels();toast(`已新增「${n}」✅`);}
+function sDel(i){const nm=sItems[i];const r=document.getElementById(`sr${i}`);if(r){r.style.opacity='0';r.style.transform='translateX(20px)';}setTimeout(()=>{sItems.splice(i,1);renderSListAndResetPool();buildReels();},200);toast(`已刪除「${nm}」🗑`);}
 function sEdit(i){const el=document.getElementById(`sn${i}`);if(!el)return;el.outerHTML=`<input class="iname-edit" id="se${i}" value="${esc(sItems[i])}" maxlength="8" onblur="sSave(${i})" onkeydown="if(event.key==='Enter')sSave(${i});if(event.key==='Escape')renderSList();">`;setTimeout(()=>{const e=document.getElementById(`se${i}`);if(e){e.focus();e.select();}},10);}
-function sSave(i){const e=document.getElementById(`se${i}`);if(!e)return;const v=e.value.trim();if(v){sItems[i]=v;toast('已更新 ✅');}renderSList();buildReels();}
-function sShuffle(){shuffle(sItems);renderSList();buildReels();toast('已隨機排序 🔀');}
-function sClear(){if(!sItems.length)return;showConfirm('🗑','確定清空所有拉霸選項？','清空',()=>{sItems=[];sHistory=[];sPool=[];sPullCount=0;renderSList();buildReels();sRenderHist();toast('已清空 🗑');});}
+function sSave(i){const e=document.getElementById(`se${i}`);if(!e)return;const v=e.value.trim();if(v){sItems[i]=v;toast('已更新 ✅');}renderSListAndResetPool();buildReels();}
+function sShuffle(){shuffle(sItems);renderSListAndResetPool();buildReels();toast('已隨機排序 🔀');}
+function sClear(){if(!sItems.length)return;showConfirm('🗑','確定清空所有拉霸選項？','清空',()=>{sItems=[];sHistory=[];sPool=[];renderSList();buildReels();sRenderHist();toast('已清空 🗑');});}
 // Slot history
 function sAddHist(results,isJackpot,isTwo){const now=nowTime();sHistory.unshift({round:sHistory.length+1,results,isJackpot,isTwo,time:now});sRenderHist();}
 function sRenderHist(){const el=document.getElementById('sHistList');if(!el)return;if(!sHistory.length){el.innerHTML='<div class="hist-empty">尚無紀錄，開始拉霸後顯示於此</div>';return;}el.innerHTML=sHistory.map(h=>{const badge=h.isJackpot?`<span style="font-size:11px;font-weight:800;color:var(--green);margin-left:4px">JACKPOT!</span>`:h.isTwo?`<span style="font-size:11px;font-weight:700;color:var(--orange);margin-left:4px">兩連</span>`:'';return `<div class="hist-row"><span class="hr-round">#${h.round}</span><span class="hr-name">${esc(h.results.join(' '))}${badge}</span><span class="hr-time">${h.time}</span></div>`;}).join('');}
@@ -1064,7 +1086,7 @@ function drawCard(){
   const src=dNR?dPool:dItems;if(!src.length){toast(dNR?'所有籤已抽完，請重置 🔄':'請先新增籤筒內容');return;}
   flipCard(rnd(Math.min(src.length,10)));
 }
-function resetDraw(){dDrawn=[];buildCards();dClearHist();toast('已重置籤筒 🔄');}
+function resetDraw(){dClearHist();toast('已重置籤筒 🔄');}
 function updateDStatus(){
   const el=document.getElementById('drawStatus');
   const tot=dItems.length,dr=dDrawn.length;
@@ -1080,7 +1102,11 @@ function addDChip(item,emoji,color){
   c.innerHTML=`${emoji} ${esc(item)}`;c.style.borderColor=color;
   hist.appendChild(c);
 }
-function dClearHist(){dDrawn=[];buildCards();document.getElementById('drawHist').innerHTML='<span style="color:var(--text3);font-size:13px;padding:8px">尚無紀錄</span>';}
+function dClearHist(){
+  dDrawn=[];
+  buildCards();
+  document.getElementById('drawHist').innerHTML='<span style="color:var(--text3);font-size:13px;padding:8px">尚無紀錄</span>';
+}
 function renderDList(){
   const n=dItems.length;
   document.getElementById('dBadge').textContent=n;
@@ -1196,6 +1222,9 @@ function nRenderHist(){
 }
 
 /* ═══ INIT ═══ */
+// Initialise pools before first render
+wPool=wItems.map((_,i)=>i); shuffle(wPool);
+sPool=[...sItems]; shuffle(sPool);
 renderWList(); wRenderHist();
 renderSList(); buildReels(); sRenderHist();
 renderDList(); buildCards();
