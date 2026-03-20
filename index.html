@@ -121,12 +121,12 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
 .hist-list{display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto;padding-right:2px;}
 .hist-list::-webkit-scrollbar{width:4px;}
 .hist-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
-.hist-row{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:var(--r-sm);padding:11px 13px;border:1px solid var(--border);animation:itin .3s ease;min-height:44px;}
-.hr-round{font-family:'Outfit',sans-serif;font-size:12px;font-weight:800;color:var(--text3);min-width:36px;}
+.hist-row{display:flex;align-items:center;gap:10px;background:var(--surface);border-radius:var(--r-sm);padding:11px 13px;border:1px solid var(--border);animation:itin .3s ease;min-height:44px;box-shadow:var(--sh-sm);}
+.hr-round{font-family:'Outfit',sans-serif;font-size:12px;font-weight:800;color:var(--accent);min-width:36px;}
 .hr-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;}
 .hr-name{flex:1;font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.hr-time{font-size:12px;color:var(--text3);flex-shrink:0;}
-.hist-empty{text-align:center;padding:18px;color:var(--text3);font-size:14px;}
+.hr-time{font-size:12px;color:var(--text2);flex-shrink:0;}
+.hist-empty{text-align:center;padding:18px;color:var(--text2);font-size:14px;}
 
 /* FORMULA */
 .fcard{background:linear-gradient(135deg,rgba(0,113,227,.07),rgba(191,90,242,.07));border:1px solid rgba(0,113,227,.13);}
@@ -188,7 +188,7 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
 .btn-reset:active{transform:scale(.96);}
 .draw-status{width:100%;text-align:center;padding:9px 14px;background:var(--bg);border-radius:var(--r-sm);font-size:13px;color:var(--text2);font-weight:600;border:1px solid var(--border);}
 .draw-hist{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;min-height:36px;overflow-y:auto;max-height:120px;}
-.hist-chip{background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:6px 13px;font-size:13px;font-weight:600;animation:itin .3s ease;}
+.hist-chip{background:var(--surface);border:1.5px solid var(--border);border-radius:20px;padding:6px 13px;font-size:13px;font-weight:700;color:var(--text);animation:itin .3s ease;box-shadow:var(--sh-sm);}
 
 /* NUMBER */
 .num-hero{background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);border-radius:var(--r-lg);border:1px solid rgba(255,255,255,.08);box-shadow:var(--sh-lg);overflow:hidden;padding:22px 18px 20px;}
@@ -198,8 +198,8 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
 @keyframes ball-pop{from{transform:scale(0) rotate(-180deg);opacity:0;}to{transform:scale(1) rotate(0);opacity:1;}}
 .num-ball.c0{background:radial-gradient(circle at 35% 35%,#FF6B6B,#FF3B30);}
 .num-ball.c1{background:radial-gradient(circle at 35% 35%,#FFB347,#FF9F0A);}
-.num-ball.c2{background:radial-gradient(circle at 35% 35%,#FFE066,#FFD60A);}
-.num-ball.c3{background:radial-gradient(circle at 35% 35%,#6BCB77,#32D74B);}
+.num-ball.c2{background:radial-gradient(circle at 35% 35%,#FFE066,#FFD60A);color:#6b5200;}
+.num-ball.c3{background:radial-gradient(circle at 35% 35%,#6BCB77,#32D74B);color:#0a4a1a;}
 .num-ball.c4{background:radial-gradient(circle at 35% 35%,#74C7EC,#34AADC);}
 .num-ball.c5{background:radial-gradient(circle at 35% 35%,#4D9DE0,#0071E3);}
 .num-ball.c6{background:radial-gradient(circle at 35% 35%,#C77DFF,#BF5AF2);}
@@ -253,13 +253,15 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
 .num-records{display:flex;flex-direction:column;gap:8px;max-height:360px;overflow-y:auto;padding-right:2px;}
 .num-records::-webkit-scrollbar{width:4px;}
 .num-records::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
-.num-rec-row{background:var(--bg);border-radius:var(--r-sm);padding:12px 14px;border:1px solid var(--border);animation:itin .3s ease;}
+.num-rec-row{background:var(--surface);border-radius:var(--r-sm);padding:12px 14px;border:1px solid var(--border);animation:itin .3s ease;box-shadow:var(--sh-sm);}
 .num-rec-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-.num-rec-time{font-size:12px;color:var(--text3);}
+.num-rec-time{font-size:12px;color:var(--text2);}
 .num-rec-idx{font-size:13px;font-weight:700;color:var(--accent);}
 .num-rec-balls{display:flex;flex-wrap:wrap;gap:6px;}
-.num-mini-ball{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:12px;font-weight:900;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.2);}
-.num-empty{text-align:center;padding:22px;color:var(--text3);font-size:14px;}
+.num-mini-ball{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:12px;font-weight:900;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.25),inset 0 1px 3px rgba(255,255,255,.3);}
+.num-mini-ball.c2{color:#6b5200;}
+.num-mini-ball.c3{color:#0a4a1a;}
+.num-empty{text-align:center;padding:22px;color:var(--text2);font-size:14px;}
 
 /* MODALS */
 .overlay{position:fixed;inset:0;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s;}
@@ -433,9 +435,8 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
 
 <!-- PAGE 1: WHEEL -->
 <div class="page active" id="page-wheel">
-  <!-- pc-left: game widget (order 1) + history (order 2) + formula (order 3) + prob (order 4) -->
+  <!-- pc-left: 轉盤主體 -->
   <div class="pc-left">
-    <!-- ① 遊戲主體 -->
     <div class="wheel-card">
       <div class="wheel-wrap">
         <div class="w-ring"><div class="w-ring-inner"></div></div>
@@ -464,12 +465,20 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
         <div class="cg-prog"><div class="cg-bar" id="wCntBar" style="width:0%"></div></div>
       </div>
     </div>
-    <!-- ② 抽籤紀錄 (必須在統計公式上方) -->
+  </div>
+  <!-- pc-right: 抽籤紀錄 → 編輯選項 → 統計公式 → 中獎機率 -->
+  <div class="pc-right">
     <div class="card">
       <div class="card-hd"><div class="card-title"><div class="c-ico" style="background:rgba(255,55,95,.15)">📜</div>抽籤紀錄</div><button class="btn-sm" style="flex:none;padding:6px 12px;" onclick="wClearHist()">清除</button></div>
       <div class="hist-list" id="wHistList"><div class="hist-empty">尚無紀錄，開始旋轉後顯示於此</div></div>
     </div>
-    <!-- ③ 統計公式 -->
+    <div class="card">
+      <div class="card-hd"><div class="card-title"><div class="c-ico" style="background:rgba(255,159,10,.15)">✏️</div>編輯選項<span class="badge" id="wBadge">0</span></div><button class="bic" onclick="openImport('w')" style="background:rgba(0,113,227,.1);color:var(--accent);border-radius:9px;width:30px;height:30px;">📋</button></div>
+      <div class="qrow"><span class="qchip" onclick="wQk('王小明')">+ 王小明</span><span class="qchip" onclick="wQk('李大同')">+ 李大同</span><span class="qchip" onclick="wQk('張美麗')">+ 張美麗</span><span class="qchip" onclick="wQk('陳嘉玲')">+ 陳嘉玲</span><span class="qchip" onclick="wQk('多喝水')">+ 多喝水</span></div>
+      <div class="add-row"><input class="add-inp" id="wInp" type="text" placeholder="輸入選項，按 Enter 新增…" maxlength="20" onkeydown="if(event.key==='Enter')wAdd()"><button class="btn-add" onclick="wAdd()">+</button></div>
+      <div class="ilist" id="wList"></div>
+      <div class="act-row"><button class="btn-sm" onclick="openImport('w')">📥 批次</button><button class="btn-sm" onclick="wShuffle()">🔀 排序</button><button class="btn-sm danger" onclick="wClear()">🗑 清空</button></div>
+    </div>
     <div class="card fcard">
       <div class="card-hd"><div class="card-title"><div class="c-ico" style="background:rgba(191,90,242,.15)">📊</div>統計公式</div></div>
       <div class="fg">
@@ -479,20 +488,9 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
         <div class="fc"><div class="fl">平均機率</div><div class="fv" id="wFA" style="color:var(--green)">—</div></div>
       </div>
     </div>
-    <!-- ④ 中獎機率 -->
     <div class="card">
       <div class="card-hd"><div class="card-title"><div class="c-ico" style="background:rgba(52,210,75,.15)">🎰</div>中獎機率</div></div>
       <div style="overflow-x:auto"><table class="ptbl"><thead><tr><th>選項</th><th>權重</th><th style="min-width:60px">分布</th><th>機率</th></tr></thead><tbody id="wPBody"></tbody></table></div>
-    </div>
-  </div>
-  <!-- pc-right: 編輯選項 only -->
-  <div class="pc-right">
-    <div class="card">
-      <div class="card-hd"><div class="card-title"><div class="c-ico" style="background:rgba(255,159,10,.15)">✏️</div>編輯選項<span class="badge" id="wBadge">0</span></div><button class="bic" onclick="openImport('w')" style="background:rgba(0,113,227,.1);color:var(--accent);border-radius:9px;width:30px;height:30px;">📋</button></div>
-      <div class="qrow"><span class="qchip" onclick="wQk('王小明')">+ 王小明</span><span class="qchip" onclick="wQk('李大同')">+ 李大同</span><span class="qchip" onclick="wQk('張美麗')">+ 張美麗</span><span class="qchip" onclick="wQk('陳嘉玲')">+ 陳嘉玲</span><span class="qchip" onclick="wQk('多喝水')">+ 多喝水</span></div>
-      <div class="add-row"><input class="add-inp" id="wInp" type="text" placeholder="輸入選項，按 Enter 新增…" maxlength="20" onkeydown="if(event.key==='Enter')wAdd()"><button class="btn-add" onclick="wAdd()">+</button></div>
-      <div class="ilist" id="wList"></div>
-      <div class="act-row"><button class="btn-sm" onclick="openImport('w')">📥 批次</button><button class="btn-sm" onclick="wShuffle()">🔀 排序</button><button class="btn-sm danger" onclick="wClear()">🗑 清空</button></div>
     </div>
   </div>
 </div>
