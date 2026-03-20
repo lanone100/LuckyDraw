@@ -7,6 +7,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script>
+// Force confetti to never use Worker (fixes SecurityError in sandboxed iframes)
+(function(){
+  if(typeof confetti === 'undefined') return;
+  const _orig = confetti;
+  window.confetti = function(opts){
+    return _orig(Object.assign({useWorker:false}, opts||{}));
+  };
+  window.confetti.reset = _orig.reset ? _orig.reset.bind(_orig) : function(){};
+})();
+</script>
 <style>
 :root{
   --bg:#F5F5F7;--surface:#fff;--border:rgba(0,0,0,.08);
@@ -503,7 +514,7 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
 
 <!-- PAGE 2: DRAW -->
 <div class="page" id="page-draw">
-  <!-- pc-left: draw widget + history -->
+  <!-- pc-left: 翻牌主體 -->
   <div class="pc-left">
     <div class="draw-card">
       <div class="draw-stage">
@@ -530,14 +541,13 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
         </div>
       </div>
     </div>
-    <!-- 抽籤紀錄：在籤筒內容上方 -->
+  </div>
+  <!-- pc-right: 抽籤紀錄（上）+ 籤筒內容（下） -->
+  <div class="pc-right">
     <div class="card">
       <div class="card-hd"><div class="card-title"><div class="c-ico" style="background:rgba(255,55,95,.15)">📜</div>抽籤紀錄</div><button class="btn-sm" style="flex:none;padding:6px 12px;" onclick="dClearHist()">清除</button></div>
       <div class="draw-hist" id="drawHist"><span style="color:var(--text3);font-size:13px;padding:8px">尚無紀錄</span></div>
     </div>
-  </div>
-  <!-- pc-right: 籤筒內容 -->
-  <div class="pc-right">
     <div class="card">
       <div class="card-hd"><div class="card-title"><div class="c-ico" style="background:rgba(191,90,242,.15)">🎴</div>籤筒內容<span class="badge" id="dBadge">0</span></div><button class="bic" onclick="openImport('d')" style="background:rgba(0,113,227,.1);color:var(--accent);border-radius:9px;width:30px;height:30px;">📋</button></div>
       <div class="qrow"><span class="qchip" onclick="dQk('上上籤')">+ 上上籤</span><span class="qchip" onclick="dQk('大吉')">+ 大吉</span><span class="qchip" onclick="dQk('中籤')">+ 中籤</span><span class="qchip" onclick="dQk('小吉')">+ 小吉</span><span class="qchip" onclick="dQk('下下籤')">+ 下下籤</span></div>
