@@ -165,12 +165,24 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
 .w-ptr{position:absolute;top:-17px;left:50%;transform:translateX(-50%);z-index:10;filter:drop-shadow(0 4px 8px rgba(0,0,0,.25));}
 .w-ctr{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;width:50px;height:50px;background:var(--surface);border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.18);transition:transform .2s;}
 .w-ctr:active{transform:translate(-50%,-50%) scale(.9);}
+/* 轉盤旋轉時的光暈效果 */
+.wheel-wrap.spinning #wCvs{filter:drop-shadow(0 0 18px rgba(0,113,227,.55));}
+.wheel-wrap.spinning .w-ring{animation:rspin .6s linear infinite;}
+/* 停止時閃光脈衝 */
+.wheel-wrap.win-flash{animation:wflash .5s ease;}
+@keyframes wflash{0%,100%{filter:none;}30%{filter:drop-shadow(0 0 32px rgba(255,213,0,.95)) drop-shadow(0 0 64px rgba(255,159,10,.6));}60%{filter:drop-shadow(0 0 16px rgba(255,213,0,.5));}}
+/* 指針彈跳 */
+.w-ptr.bounce{animation:ptrbounce .35s cubic-bezier(.34,1.56,.64,1);}
+@keyframes ptrbounce{0%,100%{transform:translateX(-50%) scale(1);}50%{transform:translateX(-50%) scale(1.4) rotate(-15deg);}}
 .spin-row{width:100%;display:flex;gap:9px;}
 .btn-spin{flex:1;background:linear-gradient(135deg,#0071E3,#34AADC);color:#fff;border:none;padding:15px;border-radius:var(--r-md);font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;cursor:pointer;transition:all .3s;box-shadow:0 8px 20px rgba(0,113,227,.35);overflow:hidden;position:relative;}
 .btn-spin::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);transition:left .5s;}
 .btn-spin:not(:disabled):hover::before{left:100%;}
 .btn-spin:not(:disabled):active{transform:scale(.96);}
 .btn-spin:disabled{background:var(--text3);box-shadow:none;cursor:not-allowed;}
+/* SPIN 按下漣漪 */
+.btn-spin .ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.35);transform:scale(0);animation:ripple .6s linear;pointer-events:none;}
+@keyframes ripple{to{transform:scale(4);opacity:0;}}
 .btn-lucky{background:linear-gradient(135deg,#FF9F0A,#FF453A);color:#fff;border:none;padding:15px 16px;border-radius:var(--r-md);font-size:19px;cursor:pointer;transition:all .2s;box-shadow:0 8px 20px rgba(255,100,0,.3);}
 .btn-lucky:active{transform:scale(.93);}
 
@@ -186,14 +198,22 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
 .fan-card:hover:not(.flipping){transform:var(--fan-base,none) translateY(-12px) scale(1.05)!important;}
 .fan-card.flipping{animation:cflip .6s ease forwards;}
 @keyframes cflip{0%{transform:rotateY(0) scale(1) translateY(0);}45%{transform:rotateY(90deg) scale(1.08) translateY(-14px);}55%{transform:rotateY(90deg) scale(1.08) translateY(-14px);}100%{transform:rotateY(0) scale(1) translateY(0);}}
+/* 翻牌揭曉後的光暈 */
+.fan-card.revealed.reveal-glow{animation:cardglow .8s ease forwards;}
+@keyframes cardglow{0%{box-shadow:0 0 0 rgba(255,255,255,0);}40%{box-shadow:0 0 24px 8px rgba(255,213,0,.7),0 0 48px 16px rgba(255,159,10,.4);}100%{box-shadow:none;}}
+/* 粒子爆炸容器 */
+.card-burst{position:absolute;pointer-events:none;z-index:50;top:50%;left:50%;width:0;height:0;}
+.burst-dot{position:absolute;width:8px;height:8px;border-radius:50%;animation:burstfly .7s ease forwards;}
+@keyframes burstfly{0%{transform:translate(0,0) scale(1);opacity:1;}100%{opacity:0;transform:translate(var(--bx),var(--by)) scale(0);}}
 .fcard-content{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:8px;}
 .fcard-emoji{font-size:26px;line-height:1;}
 .fcard-text{font-size:11px;font-weight:700;text-align:center;word-break:break-word;line-height:1.2;color:var(--text);}
 .draw-divider{width:100%;height:1px;background:var(--border);}
 .draw-ctrls{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.btn-draw{background:linear-gradient(135deg,#BF5AF2,#FF375F);color:#fff;border:none;padding:15px 10px;border-radius:var(--r-md);font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all .3s;box-shadow:0 8px 20px rgba(191,90,242,.35);display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;min-height:50px;}
+.btn-draw{background:linear-gradient(135deg,#BF5AF2,#FF375F);color:#fff;border:none;padding:15px 10px;border-radius:var(--r-md);font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all .3s;box-shadow:0 8px 20px rgba(191,90,242,.35);display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;min-height:50px;overflow:hidden;position:relative;}
 .btn-draw:not(:disabled):active{transform:scale(.96);}
 .btn-draw:disabled{background:var(--text3);box-shadow:none;cursor:not-allowed;}
+.btn-draw .ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.3);transform:scale(0);animation:ripple .6s linear;pointer-events:none;}
 .btn-reset{background:var(--bg);border:1px solid var(--border);border-radius:var(--r-md);padding:15px 10px;font-size:15px;font-weight:700;color:var(--text2);cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;min-height:50px;}
 .btn-reset:hover{border-color:var(--orange);color:var(--orange);}
 .btn-reset:active{transform:scale(.96);}
@@ -205,8 +225,10 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
 .num-hero{background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);border-radius:var(--r-lg);border:1px solid rgba(255,255,255,.08);box-shadow:var(--sh-lg);overflow:hidden;padding:22px 18px 20px;}
 .num-title{font-family:'Outfit',sans-serif;font-size:16px;font-weight:900;color:#FFD60A;text-align:center;letter-spacing:2px;text-transform:uppercase;text-shadow:0 0 12px rgba(255,213,0,.4);margin-bottom:16px;}
 .num-balls-stage{min-height:72px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px;margin-bottom:16px;}
+.num-balls-stage.drawing{animation:stagedrop .4s cubic-bezier(.34,1.56,.64,1);}
+@keyframes stagedrop{0%{transform:translateY(-8px);opacity:.4;}100%{transform:translateY(0);opacity:1;}}
 .num-ball{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:18px;font-weight:900;color:#fff;box-shadow:0 4px 16px rgba(0,0,0,.4),inset 0 -3px 6px rgba(0,0,0,.25),inset 0 3px 6px rgba(255,255,255,.2);animation:ball-pop .5s cubic-bezier(.34,1.56,.64,1) forwards;opacity:0;}
-@keyframes ball-pop{from{transform:scale(0) rotate(-180deg);opacity:0;}to{transform:scale(1) rotate(0);opacity:1;}}
+@keyframes ball-pop{0%{transform:scale(0) rotate(-180deg);opacity:0;}70%{transform:scale(1.15) rotate(8deg);opacity:1;}100%{transform:scale(1) rotate(0);opacity:1;}}
 .num-ball.c0{background:radial-gradient(circle at 35% 35%,#FF6B6B,#FF3B30);}
 .num-ball.c1{background:radial-gradient(circle at 35% 35%,#FFB347,#FF9F0A);}
 .num-ball.c2{background:radial-gradient(circle at 35% 35%,#FFE066,#FFD60A);color:#6b5200;}
@@ -460,7 +482,7 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
         <div class="w-shadow"></div>
         <canvas id="wCvs" width="640" height="640"></canvas>
         <svg class="w-ptr" width="32" height="42" viewBox="0 0 32 42" fill="none"><path d="M16 42 L32 8 A5 5 0 0 0 27 0 L5 0 A5 5 0 0 0 0 8 Z" fill="#FF3B30"/><circle cx="16" cy="6" r="3" fill="rgba(255,255,255,.5)"/></svg>
-        <button class="w-ctr" onclick="wheelSpin()" title="SPIN">
+        <button class="w-ctr" onclick="wheelSpin(event)" title="SPIN">
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round"/></svg>
         </button>
       </div>
@@ -470,7 +492,7 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
         <div class="nr-pool" id="wnrPool"></div>
       </div>
       <div class="spin-row">
-        <button class="btn-spin" id="spinBtn" onclick="wheelSpin()">✦ SPIN</button>
+        <button class="btn-spin" id="spinBtn" onclick="wheelSpin(event)">✦ SPIN</button>
         <button class="btn-lucky" onclick="loadWSample()">🎲</button>
       </div>
       <div class="counter-wrap" id="wCtr" style="display:none">
@@ -527,7 +549,7 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
           <div class="nr-pool" id="dnrPool"></div>
         </div>
         <div class="draw-ctrls">
-          <button class="btn-draw" id="drawBtn" onclick="drawCard()">✦ 翻牌抽籤</button>
+          <button class="btn-draw" id="drawBtn" onclick="drawCard(event)">✦ 翻牌抽籤</button>
           <button class="btn-reset" onclick="resetDraw()">🔄 重置籤筒</button>
         </div>
         <div class="draw-status" id="drawStatus">尚未抽籤，點擊按鈕開始</div>
@@ -581,7 +603,7 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
         <div class="num-adv-field"><div class="num-sort-row" onclick="toggleNSort()"><div class="num-sort-chk" id="nSortChk"></div><span class="num-sort-lbl">結果由小到大排序</span></div></div>
         <button onclick="nReset()" style="background:rgba(255,69,58,.15);border:1px solid rgba(255,69,58,.3);border-radius:10px;padding:10px;color:rgba(255,100,90,.9);font-size:13px;font-weight:700;cursor:pointer;width:100%;">🗑 重置 / 清空紀錄</button>
       </div>
-      <button class="btn-num-draw" id="nDrawBtn" onclick="nDraw()">🎱 開始抽籤</button>
+      <button class="btn-num-draw" id="nDrawBtn" onclick="nDraw(event)">🎱 開始抽籤</button>
       <div class="num-counter">
         <div class="counter-grid">
           <div class="cg-cell"><div class="cg-lbl" style="color:rgba(255,255,255,.4)">已抽出</div><div class="cg-val or" id="nCntD">0</div></div>
@@ -673,8 +695,28 @@ let importTarget='w',_confirmCb=null;
 /* ═══ AUDIO ═══ */
 let _actx=null;
 function getACtx(){if(!_actx)_actx=new(window.AudioContext||window.webkitAudioContext)();if(_actx.state==='suspended')_actx.resume();return _actx;}
+
+// 喀 — 轉盤滾動 tick
 function playTick(){try{const ctx=getACtx(),sr=ctx.sampleRate,buf=ctx.createBuffer(1,sr*.04,sr),d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,4);const src=ctx.createBufferSource();src.buffer=buf;const g=ctx.createGain();g.gain.setValueAtTime(.18,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.04);src.connect(g);g.connect(ctx.destination);src.start();}catch(e){}}
+
+// 掌聲 — 抽中結果
 function playClap(){try{const ctx=getACtx(),sr=ctx.sampleRate;[0,.08,.16,.26,.38,.52,.68].forEach((delay,i)=>{const dur=.12+i*.01,buf=ctx.createBuffer(2,sr*dur,sr);for(let ch=0;ch<2;ch++){const d=buf.getChannelData(ch);for(let j=0;j<d.length;j++){const env=Math.sin(Math.PI*j/d.length)*Math.pow(1-j/d.length,1.5);d[j]=(Math.random()*2-1)*env;}}const src=ctx.createBufferSource();src.buffer=buf;const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=1800;bp.Q.value=.8;const g=ctx.createGain();g.gain.setValueAtTime(.55-i*.04,ctx.currentTime+delay);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+delay+dur);src.connect(bp);bp.connect(g);g.connect(ctx.destination);src.start(ctx.currentTime+delay);});const nb=ctx.createBuffer(1,sr*.9,sr),nd=nb.getChannelData(0);for(let i=0;i<nd.length;i++)nd[i]=(Math.random()*2-1)*.1*Math.sin(Math.PI*i/nd.length);const ns=ctx.createBufferSource();ns.buffer=nb;const ng=ctx.createGain();ng.gain.setValueAtTime(.001,ctx.currentTime+.1);ng.gain.linearRampToValueAtTime(.12,ctx.currentTime+.5);ng.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.9);ns.connect(ng);ng.connect(ctx.destination);ns.start(ctx.currentTime+.1);}catch(e){}}
+
+// 咻 — 轉盤啟動
+function playWhoosh(){try{const ctx=getACtx(),sr=ctx.sampleRate,dur=.55,buf=ctx.createBuffer(1,sr*dur,sr),d=buf.getChannelData(0);for(let i=0;i<d.length;i++){const t=i/sr;d[i]=(Math.random()*2-1)*Math.sin(Math.PI*t/dur)*Math.pow(1-t/dur,2)*.7;}const src=ctx.createBufferSource();src.buffer=buf;const g=ctx.createGain();g.gain.setValueAtTime(.001,ctx.currentTime);g.gain.linearRampToValueAtTime(.5,ctx.currentTime+.08);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+dur);const f=ctx.createBiquadFilter();f.type='bandpass';f.frequency.setValueAtTime(800,ctx.currentTime);f.frequency.linearRampToValueAtTime(3200,ctx.currentTime+dur);f.Q.value=1.2;src.connect(f);f.connect(g);g.connect(ctx.destination);src.start();}catch(e){}}
+
+// 清脆鐘聲 — 翻牌揭曉
+function playChime(){try{const ctx=getACtx();[[880,0,.5],[1320,.06,.4],[1760,.12,.3],[2200,.18,.2]].forEach(([freq,delay,vol])=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=freq;g.gain.setValueAtTime(0,ctx.currentTime+delay);g.gain.linearRampToValueAtTime(vol,ctx.currentTime+delay+.02);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+delay+.8);o.connect(g);g.connect(ctx.destination);o.start(ctx.currentTime+delay);o.stop(ctx.currentTime+delay+.85);});}catch(e){}}
+
+// 鼓聲滾動 — 號碼抽籤
+function playDrum(){try{const ctx=getACtx(),sr=ctx.sampleRate;for(let i=0;i<6;i++){const t=i*.06,dur=.08,buf=ctx.createBuffer(1,sr*dur,sr),d=buf.getChannelData(0);for(let j=0;j<d.length;j++){const env=Math.pow(1-j/(sr*dur),3);d[j]=(Math.random()*2-1)*env;}const src=ctx.createBufferSource();src.buffer=buf;const f=ctx.createBiquadFilter();f.type='bandpass';f.frequency.value=120+i*20;f.Q.value=.5;const g=ctx.createGain();g.gain.setValueAtTime(.6-i*.07,ctx.currentTime+t);src.connect(f);f.connect(g);g.connect(ctx.destination);src.start(ctx.currentTime+t);}// 最後重擊
+const bBuf=ctx.createBuffer(1,sr*.15,sr),bD=bBuf.getChannelData(0);for(let j=0;j<bD.length;j++)bD[j]=(Math.random()*2-1)*Math.pow(1-j/(sr*.15),2);const bSrc=ctx.createBufferSource();bSrc.buffer=bBuf;const bf=ctx.createBiquadFilter();bf.type='lowpass';bf.frequency.value=200;const bg=ctx.createGain();bg.gain.setValueAtTime(.9,ctx.currentTime+.38);bg.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.54);bSrc.connect(bf);bf.connect(bg);bg.connect(ctx.destination);bSrc.start(ctx.currentTime+.38);}catch(e){}}
+
+// 手感點擊 — 按鈕通用
+function playClick(){try{const ctx=getACtx(),sr=ctx.sampleRate,dur=.04,buf=ctx.createBuffer(1,sr*dur,sr),d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/(sr*dur),5)*.3;const src=ctx.createBufferSource();src.buffer=buf;const f=ctx.createBiquadFilter();f.type='highpass';f.frequency.value=2000;const g=ctx.createGain();g.gain.setValueAtTime(.25,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+dur);src.connect(f);f.connect(g);g.connect(ctx.destination);src.start();}catch(e){}}
+
+// 慶祝升調 — 全部抽完
+function playFanfare(){try{const ctx=getACtx();[[523,.0],[659,.12],[784,.24],[1047,.36],[1319,.44]].forEach(([freq,delay])=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='triangle';o.frequency.value=freq;g.gain.setValueAtTime(0,ctx.currentTime+delay);g.gain.linearRampToValueAtTime(.35,ctx.currentTime+delay+.05);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+delay+.4);o.connect(g);g.connect(ctx.destination);o.start(ctx.currentTime+delay);o.stop(ctx.currentTime+delay+.45);});}catch(e){}}
 
 /* ═══ THEME ═══ */
 function toggleTheme(){const dark=document.documentElement.getAttribute('data-theme')==='dark';document.documentElement.setAttribute('data-theme',dark?'light':'dark');document.getElementById('tglBtn').textContent=dark?'☀️':'🌙';drawWheel();}
@@ -693,6 +735,69 @@ function nowTime(){return new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',
 /* ═══ CONFETTI ═══ */
 function fireConfetti(){const o={useWorker:false,disableForReducedMotion:true},end=Date.now()+2000;(function f(){confetti({...o,particleCount:3,angle:60,spread:55,origin:{x:0,y:.7},colors:C});confetti({...o,particleCount:3,angle:120,spread:55,origin:{x:1,y:.7},colors:C});if(Date.now()<end)requestAnimationFrame(f);})();setTimeout(()=>confetti({...o,particleCount:120,spread:70,origin:{y:.55},colors:C}),250);}
 
+// 轉盤停止閃光 + 指針彈跳
+function wheelWinFlash(){
+  const wrap=document.querySelector('.wheel-wrap');
+  if(!wrap)return;
+  wrap.classList.remove('win-flash');
+  void wrap.offsetWidth;
+  wrap.classList.add('win-flash');
+  setTimeout(()=>wrap.classList.remove('win-flash'),600);
+  const ptr=document.querySelector('.w-ptr');
+  if(ptr){ptr.classList.remove('bounce');void ptr.offsetWidth;ptr.classList.add('bounce');setTimeout(()=>ptr.classList.remove('bounce'),400);}
+}
+
+// SPIN 按鈕漣漪
+function addRipple(btn,e){
+  const r=btn.getBoundingClientRect(),rEl=document.createElement('span');
+  rEl.className='ripple';
+  const sz=Math.max(r.width,r.height);
+  rEl.style.cssText=`width:${sz}px;height:${sz}px;left:${(e.clientX-r.left)-sz/2}px;top:${(e.clientY-r.top)-sz/2}px;`;
+  btn.appendChild(rEl);
+  setTimeout(()=>rEl.remove(),700);
+}
+
+// 翻牌粒子爆炸
+function cardBurst(card,color){
+  const fan=document.getElementById('cardsFan');if(!fan)return;
+  const cr=card.getBoundingClientRect(),fr=fan.getBoundingClientRect();
+  const cx=cr.left-fr.left+cr.width/2,cy=cr.top-fr.top+cr.height/2;
+  const burst=document.createElement('div');burst.className='card-burst';
+  burst.style.cssText=`left:${cx}px;top:${cy}px;`;
+  for(let i=0;i<12;i++){
+    const dot=document.createElement('div');dot.className='burst-dot';
+    const angle=(i/12)*Math.PI*2,dist=40+Math.random()*40;
+    dot.style.cssText=`background:${i%2===0?color:C[(i+2)%C.length]};--bx:${Math.cos(angle)*dist}px;--by:${Math.sin(angle)*dist}px;animation-delay:${i*20}ms;left:-4px;top:-4px;`;
+    burst.appendChild(dot);
+  }
+  fan.appendChild(burst);
+  setTimeout(()=>burst.remove(),900);
+}
+
+// 翻牌揭曉光暈
+function cardRevealGlow(card){
+  card.classList.add('reveal-glow');
+  setTimeout(()=>card.classList.remove('reveal-glow'),900);
+}
+
+// 慶祝彩帶加強版（全部抽完用）
+function fireCelebration(){
+  const o={useWorker:false,disableForReducedMotion:true};
+  [.1,.3,.5,.7,.9].forEach((x,i)=>{
+    setTimeout(()=>{
+      confetti({...o,particleCount:60,angle:60+i*15,spread:80,origin:{x,y:.5},colors:C});
+      confetti({...o,particleCount:40,startVelocity:30,spread:360,ticks:60,origin:{x:x+.1,y:.4},colors:C});
+    },i*150);
+  });
+}
+
+// num-balls-stage 動畫觸發
+function triggerStageAnim(){
+  const s=document.getElementById('numStage');if(!s)return;
+  s.classList.remove('drawing');void s.offsetWidth;s.classList.add('drawing');
+  setTimeout(()=>s.classList.remove('drawing'),500);
+}
+
 /* ═══ RESULT MODAL ═══ */
 function showResult(emoji,sub,name,badges){_ti=(_ti+1)%THEMES.length;const[g,bg,sc]=THEMES[_ti];const ovl=document.getElementById('resultOvl');document.getElementById('modalHd').style.background=g;document.getElementById('modalHd').style.backgroundSize='300% 300%';document.getElementById('mCloseBtn').style.background=bg;ovl.style.background=sc;const em=document.getElementById('mEmoji');em.style.animation='none';em.textContent=emoji;void em.offsetWidth;em.style.animation='';document.getElementById('mSub').textContent=sub;document.getElementById('mName').textContent=name;document.getElementById('mBadges').innerHTML=(badges||[]).map(b=>`<div class="m-badge">${b}</div>`).join('');ovl.classList.add('show');fireConfetti();}
 function closeResult(){document.getElementById('resultOvl').classList.remove('show');}
@@ -709,13 +814,18 @@ function iRow(item,i,p){return `<div class="irow" id="${p}r${i}"><div class="ido
 const wCvs=document.getElementById('wCvs'),wCtx=wCvs.getContext('2d');
 function drawWheel(){const n=wItems.length;wCtx.clearRect(0,0,640,640);if(!n){wCtx.fillStyle='rgba(128,128,128,.15)';wCtx.beginPath();wCtx.arc(320,320,310,0,Math.PI*2);wCtx.fill();return;}const arc=Math.PI*2/n,dark=document.documentElement.getAttribute('data-theme')==='dark';for(let i=0;i<n;i++){const s=i*arc;wCtx.beginPath();wCtx.moveTo(320,320);wCtx.arc(320,320,310,s,s+arc);wCtx.closePath();const isDrawn=wNR&&!wPool.includes(i);wCtx.fillStyle=isDrawn?(dark?'#333':'#ccc'):C[i%C.length];wCtx.fill();wCtx.strokeStyle=dark?'rgba(0,0,0,.3)':'rgba(255,255,255,.55)';wCtx.lineWidth=2;wCtx.stroke();wCtx.save();wCtx.translate(320,320);wCtx.rotate(s+arc/2);wCtx.textAlign='right';wCtx.fillStyle=isDrawn?'rgba(150,150,150,.55)':'rgba(255,255,255,.95)';const fs=n>10?19:25;wCtx.font=`700 ${fs}px Outfit,'Noto Sans TC',sans-serif`;wCtx.shadowColor='rgba(0,0,0,.3)';wCtx.shadowBlur=4;let t=wItems[i];if(t.length>9)t=t.slice(0,8)+'…';wCtx.fillText(t,285,9);wCtx.restore();}const g2=wCtx.createRadialGradient(320,320,0,320,320,50);g2.addColorStop(0,dark?'#2C2C2E':'#FFFFFF');g2.addColorStop(1,dark?'#1C1C1E':'#F5F5F7');wCtx.beginPath();wCtx.arc(320,320,50,0,Math.PI*2);wCtx.fillStyle=g2;wCtx.fill();wCtx.strokeStyle=dark?'rgba(255,255,255,.1)':'rgba(0,0,0,.08)';wCtx.lineWidth=3;wCtx.stroke();}
 
-function wheelSpin(){
+function wheelSpin(e){
   const activeIdxs=wNR?wPool:wItems.map((_,i)=>i);
   if(wSpinning)return;
   if(activeIdxs.length===0){toast('所有選項已抽完，自動重置 🔄');wPool=wItems.map((_,i)=>i);shuffle(wPool);updateWNR();drawWheel();return;}
   if(wItems.length<2){toast('請至少輸入 2 個選項 😅');return;}
+  // 漣漪特效
+  const spinBtn=document.getElementById('spinBtn');
+  if(e&&e.clientX){addRipple(spinBtn,e);}
+  playWhoosh();
   wSpinning=true;
-  const btn=document.getElementById('spinBtn');btn.disabled=true;btn.textContent='旋轉中…';
+  spinBtn.disabled=true;spinBtn.textContent='旋轉中…';
+  document.querySelector('.wheel-wrap').classList.add('spinning');
   const pickPos=rnd(activeIdxs.length),wIdx=activeIdxs[pickPos],winner=wItems[wIdx];
   const n=wItems.length,sc=(wIdx/n)*360+(360/n/2),tr=((270-sc)%360+360)%360,cr=((wAngle%360)+360)%360;
   let extra=(tr-cr+360)%360;if(extra<20)extra+=360;
@@ -726,12 +836,16 @@ function wheelSpin(){
   function tick(){const e=Date.now()-t0;if(e>=4800)return;playTick();tickMs=60+Math.floor((e/5000)*(e/5000)*360);setTimeout(tick,tickMs);}
   setTimeout(tick,tickMs);
   setTimeout(()=>{
-    wSpinning=false;btn.disabled=false;btn.innerHTML='✦ SPIN';
+    wSpinning=false;spinBtn.disabled=false;spinBtn.innerHTML='✦ SPIN';
+    document.querySelector('.wheel-wrap').classList.remove('spinning');
     wAngle=wAngle%360;wCvs.style.transition='none';wCvs.style.transform=`rotate(${wAngle}deg)`;
     setTimeout(()=>{wCvs.style.transition='transform 5s cubic-bezier(.08,0,.05,1)';},50);
     if(wNR){const p=wPool.indexOf(wIdx);if(p!==-1)wPool.splice(p,1);}
     wAddHist(winner,wIdx);renderWList();
+    wheelWinFlash();
     playClap();
+    const allDone=wNR&&wPool.length===0;
+    if(allDone)fireCelebration();
     showResult(EMOJIS[rnd(EMOJIS.length)],'恭喜得獎！',winner,wNR?[`剩餘 ${wPool.length} 人`]:[]);
   },5000);
 }
@@ -759,8 +873,9 @@ function updateDNR(){const el=document.getElementById('dnrPool');el.textContent=
 function updateDCounter(){const total=dItems.length,drawn=dDrawn.length,left=dNR?dPool.length:(total>0?'∞':0),pct=(dNR&&total>0)?((total-dPool.length)/total*100).toFixed(1):0;const lEl=document.getElementById('dCntL');if(!lEl)return;document.getElementById('dCntD').textContent=drawn;lEl.textContent=left;document.getElementById('dCntT').textContent=total||'—';document.getElementById('dCntBar').style.width=pct+'%';const done=dNR&&dPool.length===0&&total>0;lEl.closest('.cg-cell').className=done?'cg-cell done':'cg-cell hi';lEl.className=done?'cg-val gr':'cg-val ac';}
 function buildCards(){dPool=[...dItems];shuffle(dPool);dDrawn=[];renderFan();updateDStatus();updateDNR();}
 function renderFan(){const fan=document.getElementById('cardsFan');const src=dNR?dPool:dItems;const total=Math.min(src.length,10);if(!total){fan.innerHTML=`<div style="color:var(--text3);font-size:13px;padding:30px 0;text-align:center">${dNR?'所有籤已抽完 🎴<br><small>點擊「重置籤筒」重新開始</small>':'請先新增籤筒內容'}</div>`;return;}const maxSpread=Math.min(total*7,56);fan.innerHTML=src.slice(0,total).map((item,i)=>{const angle=total===1?0:-maxSpread/2+(i/(total-1))*maxSpread;const tx=(i-(total-1)/2)*(total>6?15:18);return `<div class="fan-card facedown" id="fc${i}" style="transform:rotate(${angle}deg) translateX(${tx}px);z-index:${i+1};" onclick="flipCard(${i})"><div class="fcard-inner"></div></div>`;}).join('');}
-function flipCard(idx){if(dFlipping)return;const src=dNR?dPool:dItems;if(!src.length)return;dFlipping=true;const card=document.getElementById(`fc${idx}`),item=src[idx];if(!card||item===undefined){dFlipping=false;return;}const emoji=EMOJIS[rnd(EMOJIS.length)],color=C[dDrawn.length%C.length];playTick();card.classList.add('flipping');setTimeout(()=>{card.classList.remove('facedown');card.classList.add('revealed');card.style.borderColor=color;card.style.background=color+'22';card.innerHTML=`<div class="fcard-content"><div class="fcard-emoji">${emoji}</div><div class="fcard-text">${esc(item)}</div></div>`;card.onclick=null;},300);setTimeout(()=>{card.classList.remove('flipping');dFlipping=false;if(dNR)dPool.splice(idx,1);dDrawn.push({item,emoji});setTimeout(()=>renderFan(),500);updateDStatus();updateDNR();addDChip(item,emoji,color);const rem=dNR?dPool.length:-1;const badges=dNR?(rem>0?[`剩餘 ${rem} 籤`]:['🎉 全部抽完！']):[`第 ${dDrawn.length} 次`];playClap();showResult(emoji,dNR?`第 ${dDrawn.length} 籤`:'抽籤結果',item,badges);},600);}
-function drawCard(){const src=dNR?dPool:dItems;if(!src.length){toast(dNR?'所有籤已抽完，請重置 🔄':'請先新增籤筒內容');return;}flipCard(rnd(Math.min(src.length,10)));}
+function flipCard(idx){if(dFlipping)return;const src=dNR?dPool:dItems;if(!src.length)return;dFlipping=true;const card=document.getElementById(`fc${idx}`),item=src[idx];if(!card||item===undefined){dFlipping=false;return;}const emoji=EMOJIS[rnd(EMOJIS.length)],color=C[dDrawn.length%C.length];playTick();card.classList.add('flipping');setTimeout(()=>{card.classList.remove('facedown');card.classList.add('revealed');card.style.borderColor=color;card.style.background=color+'22';card.innerHTML=`<div class="fcard-content"><div class="fcard-emoji">${emoji}</div><div class="fcard-text">${esc(item)}</div></div>`;card.onclick=null;},300);setTimeout(()=>{card.classList.remove('flipping');dFlipping=false;if(dNR)dPool.splice(idx,1);dDrawn.push({item,emoji});// 揭曉特效
+cardRevealGlow(card);cardBurst(card,color);playChime();setTimeout(()=>renderFan(),500);updateDStatus();updateDNR();addDChip(item,emoji,color);const rem=dNR?dPool.length:-1;const allDone=dNR&&rem===0;const badges=dNR?(rem>0?[`剩餘 ${rem} 籤`]:['🎉 全部抽完！']):[`第 ${dDrawn.length} 次`];playClap();if(allDone){fireCelebration();playFanfare();}showResult(emoji,dNR?`第 ${dDrawn.length} 籤`:'抽籤結果',item,badges);},600);}
+function drawCard(e){const src=dNR?dPool:dItems;if(!src.length){toast(dNR?'所有籤已抽完，請重置 🔄':'請先新增籤筒內容');return;}const btn=document.getElementById('drawBtn');if(e&&e.clientX)addRipple(btn,e);flipCard(rnd(Math.min(src.length,10)));}
 function resetDraw(){dClearHist();toast('已重置籤筒 🔄');}
 function updateDStatus(){const el=document.getElementById('drawStatus'),tot=dItems.length,dr=dDrawn.length;if(!tot){el.textContent='請先新增籤筒內容';updateDCounter();return;}if(dNR){const rem=dPool.length;el.textContent=`已抽 ${dr} 籤 ／ 剩餘 ${rem} 籤 ／ 共 ${tot} 籤`;document.getElementById('drawBtn').disabled=rem===0;}else{el.textContent=`可重複模式 ── 已抽 ${dr} 次 ／ 共 ${tot} 個選項`;document.getElementById('drawBtn').disabled=tot===0;}updateDCounter();}
 function addDChip(item,emoji,color){const hist=document.getElementById('drawHist');if(dDrawn.length===1)hist.innerHTML='';const c=document.createElement('div');c.className='hist-chip';c.innerHTML=`${emoji} ${esc(item)}`;c.style.borderColor=color;hist.appendChild(c);}
@@ -783,7 +898,11 @@ function nValidate(){let min=parseInt(document.getElementById('nMin').value)||1,
 function nStep(field,delta){if(field==='qty'){const cur=parseInt(document.getElementById('nQty').textContent)||1;document.getElementById('nQty').textContent=Math.max(1,Math.min(50,cur+delta));}else{const el=document.getElementById(field==='min'?'nMin':'nMax');const cur=parseInt(el.value)||(field==='min'?1:100);el.value=Math.max(0,Math.min(9999,cur+delta));nValidate();}}
 function toggleNAdv(el){const body=document.getElementById('nAdvBody'),arrow=document.getElementById('nAdvArrow'),open=body.classList.toggle('open');arrow.classList.toggle('open',open);}
 function toggleNSort(){nSortAsc=!nSortAsc;const chk=document.getElementById('nSortChk');chk.classList.toggle('on',nSortAsc);chk.textContent=nSortAsc?'✓':'';}
-function nDraw(){if(nAnimating)return;nBuildPool();const{qty}=nGetSettings();if(nPool.length===0){toast(nNoRepeat?'所有號碼已抽完！請重置 🔄':'範圍內沒有可用號碼');return;}const drawCount=Math.min(qty,nPool.length),copy=[...nPool],picked=[];for(let i=0;i<drawCount;i++){const j=i+Math.floor(Math.random()*(copy.length-i));[copy[i],copy[j]]=[copy[j],copy[i]];picked.push(copy[i]);}if(nSortAsc)picked.sort((a,b)=>a-b);if(nNoRepeat)nDrawnAll=[...nDrawnAll,...picked];const rec={round:nHistory.length+1,time:nowTime(),nums:picked,repeat:!nNoRepeat};nHistory.unshift(rec);nAnimating=true;const stage=document.getElementById('numStage');stage.innerHTML='';picked.forEach((num,i)=>{const ball=document.createElement('div');ball.className=`num-ball ${BALL_CLS[num%BALL_CLS.length]}`;ball.textContent=num;ball.style.animationDelay=`${i*120}ms`;stage.appendChild(ball);});setTimeout(()=>{nAnimating=false;nUpdateStats();nRenderHist();if(drawCount===1){const{min,max}=nGetSettings();const badges=nNoRepeat?[`剩餘 ${Math.max(0,max-min+1-nDrawnAll.length)} 個`]:['可重複模式'];playClap();showResult('🎱',`第 ${rec.round} 次抽籤`,`No. ${picked[0]}`,badges);}},picked.length*120+400);}
+function nDraw(e){if(nAnimating)return;nBuildPool();const{qty}=nGetSettings();if(nPool.length===0){toast(nNoRepeat?'所有號碼已抽完！請重置 🔄':'範圍內沒有可用號碼');return;}const drawCount=Math.min(qty,nPool.length),copy=[...nPool],picked=[];for(let i=0;i<drawCount;i++){const j=i+Math.floor(Math.random()*(copy.length-i));[copy[i],copy[j]]=[copy[j],copy[i]];picked.push(copy[i]);}if(nSortAsc)picked.sort((a,b)=>a-b);if(nNoRepeat)nDrawnAll=[...nDrawnAll,...picked];const rec={round:nHistory.length+1,time:nowTime(),nums:picked,repeat:!nNoRepeat};nHistory.unshift(rec);nAnimating=true;
+// 鼓聲 + 按鈕漣漪
+playDrum();const nBtn=document.getElementById('nDrawBtn');if(e&&e.clientX)addRipple(nBtn,e);
+triggerStageAnim();
+const stage=document.getElementById('numStage');stage.innerHTML='';picked.forEach((num,i)=>{const ball=document.createElement('div');ball.className=`num-ball ${BALL_CLS[num%BALL_CLS.length]}`;ball.textContent=num;ball.style.animationDelay=`${i*120}ms`;stage.appendChild(ball);});setTimeout(()=>{nAnimating=false;nUpdateStats();nRenderHist();const allDone=nNoRepeat&&nPool.length===0;if(allDone){fireCelebration();playFanfare();}if(drawCount===1){const{min,max}=nGetSettings();const badges=nNoRepeat?[`剩餘 ${Math.max(0,max-min+1-nDrawnAll.length)} 個`]:['可重複模式'];playClap();showResult('🎱',`第 ${rec.round} 次抽籤`,`No. ${picked[0]}`,badges);}},picked.length*120+400);}
 function nReset(){showConfirm('🔄','確定重置並清空所有號碼紀錄？','重置',()=>{nDrawnAll=[];nHistory=[];document.getElementById('numStage').innerHTML='<span class="num-ball-ph">按下「開始抽籤」產生號碼球</span>';nUpdateStats();nRenderHist();toast('已重置 🔄');});}
 function nClearHist(){nHistory=[];nDrawnAll=[];document.getElementById('numStage').innerHTML='<span class="num-ball-ph">按下「開始抽籤」產生號碼球</span>';nUpdateStats();nRenderHist();toast('紀錄已清除 🗑');}
 function nRenderHist(){const el=document.getElementById('nRecords');if(!nHistory.length){el.innerHTML='<div class="num-empty">尚無紀錄，開始抽籤後顯示於此</div>';return;}el.innerHTML=nHistory.map(rec=>{const balls=rec.nums.map(n=>`<div class="num-mini-ball ${BALL_CLS[n%BALL_CLS.length]}">${n}</div>`).join('');const tag=rec.repeat?` <span style="font-size:11px;color:var(--orange)">[可重複]</span>`:'';return `<div class="num-rec-row"><div class="num-rec-meta"><span class="num-rec-idx">第 ${rec.round} 次${tag}</span><span class="num-rec-time">${rec.time}</span></div><div class="num-rec-balls">${balls}</div></div>`;}).join('');}
