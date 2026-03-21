@@ -6,16 +6,56 @@
 <title>Lucky Pro — 幸運遊戲</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script>
-// Force confetti to never use Worker (fixes SecurityError in sandboxed iframes)
+/* ── 自製彩帶引擎（無 Worker，無 CDN，iframe 安全） ── */
 (function(){
-  if(typeof confetti === 'undefined') return;
-  const _orig = confetti;
-  window.confetti = function(opts){
-    return _orig(Object.assign({useWorker:false}, opts||{}));
+  const CVS=document.createElement('canvas');
+  CVS.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;';
+  let CTX,RAF,particles=[],active=false;
+  function init(){if(CVS.parentNode)return;document.body.appendChild(CVS);CTX=CVS.getContext('2d');}
+  function resize(){CVS.width=innerWidth;CVS.height=innerHeight;}
+  function Particle(opts){
+    const ang=(opts.angle||90)*Math.PI/180;
+    const spd=(opts.startVelocity||28)*(0.7+Math.random()*0.6);
+    const colors=opts.colors||['#FF453A','#FF9F0A','#FFD60A','#32D74B','#34AADC','#0071E3','#BF5AF2','#FF375F'];
+    this.x=(opts.origin?.x||0.5)*innerWidth;
+    this.y=(opts.origin?.y||0.4)*innerHeight;
+    this.vx=Math.cos(ang-(opts.spread||70)*Math.PI/180*(Math.random()-.5))*spd;
+    this.vy=-Math.abs(Math.sin(ang-(opts.spread||70)*Math.PI/180*(Math.random()-.5))*spd);
+    this.color=colors[Math.floor(Math.random()*colors.length)];
+    this.w=6+Math.random()*6;this.h=3+Math.random()*4;
+    this.rot=Math.random()*360;this.rotV=(Math.random()-0.5)*12;
+    this.life=1;this.decay=0.012+Math.random()*0.01;
+    this.gravity=0.4;this.ticks=opts.ticks||200;this.tick=0;
+    this.shape=Math.random()>.6?'circle':'rect';
+  }
+  Particle.prototype.update=function(){
+    this.vx*=0.99;this.vy+=this.gravity;
+    this.x+=this.vx;this.y+=this.vy;
+    this.rot+=this.rotV;this.tick++;
+    this.life=Math.max(0,1-this.tick/this.ticks);
   };
-  window.confetti.reset = _orig.reset ? _orig.reset.bind(_orig) : function(){};
+  Particle.prototype.draw=function(ctx){
+    ctx.save();ctx.globalAlpha=this.life;ctx.fillStyle=this.color;
+    ctx.translate(this.x,this.y);ctx.rotate(this.rot*Math.PI/180);
+    if(this.shape==='circle'){ctx.beginPath();ctx.arc(0,0,this.w/2,0,Math.PI*2);ctx.fill();}
+    else{ctx.fillRect(-this.w/2,-this.h/2,this.w,this.h);}
+    ctx.restore();
+  };
+  function loop(){
+    CTX.clearRect(0,0,CVS.width,CVS.height);
+    particles=particles.filter(p=>{p.update();p.draw(CTX);return p.life>0;});
+    if(particles.length>0)RAF=requestAnimationFrame(loop);
+    else{active=false;CTX.clearRect(0,0,CVS.width,CVS.height);}
+  }
+  window.confetti=function(opts){
+    init();resize();
+    const n=opts?.particleCount||50;
+    for(let i=0;i<n;i++)particles.push(new Particle(opts||{}));
+    if(!active){active=true;cancelAnimationFrame(RAF);RAF=requestAnimationFrame(loop);}
+  };
+  window.confetti.reset=function(){particles=[];active=false;cancelAnimationFrame(RAF);if(CTX)CTX.clearRect(0,0,CVS.width,CVS.height);};
+  window.addEventListener('resize',()=>{if(CVS.parentNode)resize();});
 })();
 </script>
 <style>
