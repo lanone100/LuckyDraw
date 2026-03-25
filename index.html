@@ -495,6 +495,41 @@ gap:16px;
 }
 </style>
 
+<script>
+/* ── 鎖定所有縮放行為 ── */
+(function(){
+  // 1. 攔截 Ctrl+滾輪（桌面滾鼠/觸控板雙指縮放）
+  document.addEventListener('wheel', function(e){
+    if(e.ctrlKey || e.metaKey){ e.preventDefault(); }
+  }, {passive:false});
+
+  // 2. 攔截 Ctrl++ / Ctrl+- / Ctrl+0（鍵盤縮放）
+  document.addEventListener('keydown', function(e){
+    if((e.ctrlKey || e.metaKey) && ['+','-','=','_','0'].includes(e.key)){
+      e.preventDefault();
+    }
+  });
+
+  // 3. 攔截觸控雙指縮放（touchstart 超過 1 指時阻止）
+  document.addEventListener('touchstart', function(e){
+    if(e.touches.length > 1){ e.preventDefault(); }
+  }, {passive:false});
+
+  // 4. 攔截 touchmove 雙指手勢
+  document.addEventListener('touchmove', function(e){
+    if(e.touches.length > 1){ e.preventDefault(); }
+  }, {passive:false});
+
+  // 5. 攔截雙擊放大（行動端）
+  var lastTouch = 0;
+  document.addEventListener('touchend', function(e){
+    var now = Date.now();
+    if(now - lastTouch < 300){ e.preventDefault(); }
+    lastTouch = now;
+  }, {passive:false});
+})();
+</script>
+
 </head>
 <body>
 <div class="orb orb1"></div><div class="orb orb2"></div>
