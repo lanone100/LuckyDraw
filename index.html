@@ -3,7 +3,7 @@
 <html lang="zh-TW" data-theme="light">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <title>Lucky Pro — 幸運遊戲</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -75,8 +75,15 @@
   --sh-sm:0 2px 8px rgba(0,0,0,.3);--sh-md:0 8px 24px rgba(0,0,0,.4);--sh-lg:0 20px 60px rgba(0,0,0,.6);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html{scroll-behavior:smooth;}
-body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;display:flex;flex-direction:column;align-items:center;transition:background .4s,color .3s;overflow-x:hidden;}
+html{scroll-behavior:smooth;touch-action:pan-x pan-y;-ms-touch-action:pan-x pan-y;}
+body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;display:flex;flex-direction:column;align-items:center;transition:background .4s,color .3s;overflow-x:hidden;touch-action:pan-x pan-y;}
+/* 防止 iOS Safari 點擊 input/select 自動放大（font-size < 16px 會觸發） */
+input,select,textarea{font-size:16px !important;}
+/* 僅限視覺顯示用的數字欄位保留自訂字型大小，覆蓋後再還原 */
+.num-inp{font-size:24px !important;}
+.num-qty-val{font-size:38px !important;}
+/* 禁止所有元素雙指縮放 */
+html,body{-webkit-user-scalable:none;}
 .orb{position:fixed;border-radius:50%;filter:blur(80px);opacity:.22;pointer-events:none;z-index:0;}
 .orb1{width:420px;height:420px;background:radial-gradient(circle,#0071E3,#BF5AF2);top:-130px;right:-110px;}
 .orb2{width:320px;height:320px;background:radial-gradient(circle,#FF9F0A,#FF375F);bottom:80px;left:-90px;}
@@ -306,7 +313,7 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
 .num-sort-chk{width:20px;height:20px;border-radius:5px;border:1.5px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
 .num-sort-chk.on{background:var(–green);border-color:var(–green);}
 .num-sort-lbl{font-size:14px;color:rgba(255,255,255,.7);font-weight:500;}
-.btn-num-draw{width:100%;background:linear-gradient(135deg,#FFD60A,#FF9F0A);color:#1D1D1F;border:none;padding:17px;border-radius:var(–r-md);font-family:‘Outfit’,sans-serif;font-size:18px;font-weight:900;cursor:pointer;transition:all .3s;box-shadow:0 8px 24px rgba(255,213,0,.35);margin-top:14px;position:relative;overflow:hidden;}
+.btn-num-draw{width:100%;background:linear-gradient(135deg,#FFD60A,#FF9F0A);color:#1D1D1F;border:none;padding:17px;border-radius:var(–r-md);font-family:‘Outfit’,sans-serif;font-size:18px;font-weight:900;cursor:pointer;transition:all .3s;box-shadow:0 8px 24px rgba(255,213,0,.35);margin-top:0;margin-bottom:14px;position:relative;overflow:hidden;}
 .btn-num-draw::before{content:’’;position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);transition:left .5s;}
 .btn-num-draw:not(:disabled):hover::before{left:100%;}
 .btn-num-draw:not(:disabled):active{transform:scale(.97);}
